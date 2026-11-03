@@ -1,0 +1,18 @@
+# OS generated
+**/.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Language specific
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Datasets downloaded by the example notebooks
+Lecture-Notes/*/data/cifar-10*
