@@ -123,21 +123,27 @@
 
 몇 개의 층이 학습해야 할 이상적인 함수를 $\mathcal{H}(\mathbf{x})$라 하자($\mathbf{x}$는 그 층들의 입력이다). ResNet은 층들이 $\mathcal{H}(\mathbf{x})$를 직접 근사하게 하지 않고, 입력과의 차이인 **잔차 함수(residual function)** 를 근사하게 한다.
 
-$$\mathcal{F}(\mathbf{x}) := \mathcal{H}(\mathbf{x}) - \mathbf{x} \quad\Longrightarrow\quad \mathcal{H}(\mathbf{x}) = \mathcal{F}(\mathbf{x}) + \mathbf{x}$$
+```math
+\mathcal{F}(\mathbf{x}) := \mathcal{H}(\mathbf{x}) - \mathbf{x} \quad\Longrightarrow\quad \mathcal{H}(\mathbf{x}) = \mathcal{F}(\mathbf{x}) + \mathbf{x}
+```
 
 여러 비선형 층이 복잡한 함수를 점근적으로 근사할 수 있다고 가정하면, 입력과 출력의 차원이 같을 때 잔차 함수도 근사할 수 있으므로 두 형식의 표현력은 같다. 차이는 **학습의 쉬움**에 있다. 최적 함수가 항등 사상이라면, 일반 네트워크는 비선형 층의 조합으로 $\mathcal{H}(\mathbf{x}) = \mathbf{x}$를 정확히 만들어야 하지만, 잔차 네트워크는 가중치를 0 쪽으로 보내 $\mathcal{F}(\mathbf{x}) = \mathbf{0}$으로 만들면 된다.
 
-수치 예로 확인한다. 블록의 입력이 이전 ReLU의 출력인 $\mathbf{x} = (2, 1)$이고, 블록의 두 가중치 층이 모두 0으로 학습되었다고 하자. 그러면 $\mathcal{F}(\mathbf{x}) = W_2\,\sigma(W_1\mathbf{x}) = \mathbf{0}$이고, 덧셈 뒤의 ReLU를 거친 출력은 다음과 같다.
+수치 예로 확인한다. 블록의 입력이 이전 ReLU의 출력인 $\mathbf{x} = (2, 1)$이고, 블록의 두 가중치 층이 모두 0으로 학습되었다고 하자. 그러면 $`\mathcal{F}(\mathbf{x}) = W_2\,\sigma(W_1\mathbf{x}) = \mathbf{0}`$이고, 덧셈 뒤의 ReLU를 거친 출력은 다음과 같다.
 
-$$\mathbf{y} = \sigma(\mathcal{F}(\mathbf{x}) + \mathbf{x}) = \sigma((0, 0) + (2, 1)) = (2, 1) = \mathbf{x}$$
+```math
+\mathbf{y} = \sigma(\mathcal{F}(\mathbf{x}) + \mathbf{x}) = \sigma((0, 0) + (2, 1)) = (2, 1) = \mathbf{x}
+```
 
-같은 두 층에서 shortcut을 없애면 출력은 $\sigma(\mathbf{0}) = (0, 0)$이 되어 입력 정보가 모두 사라진다. 일반 네트워크가 항등 사상을 내려면 $W_2\,\sigma(W_1\mathbf{x}) = \mathbf{x}$를 만족하는 특정한 가중치를 찾아야 한다.
+같은 두 층에서 shortcut을 없애면 출력은 $\sigma(\mathbf{0}) = (0, 0)$이 되어 입력 정보가 모두 사라진다. 일반 네트워크가 항등 사상을 내려면 $`W_2\,\sigma(W_1\mathbf{x}) = \mathbf{x}`$를 만족하는 특정한 가중치를 찾아야 한다.
 
 실제 문제에서 최적 함수가 정확히 항등 사상일 가능성은 낮다. 논문은 최적 함수가 영 사상보다 항등 사상에 가깝다면, 항등 사상을 기준으로 작은 변화(perturbation)를 찾는 편이 함수를 처음부터 새로 배우는 것보다 쉬우므로, 잔차 형식이 최적화 문제를 **전조건화(preconditioning)** 한다고 해석한다 [1]. 2.7절의 층 응답 분석은 이 해석을 실험으로 뒷받침한다.
 
 **기울기 경로 관점.** 블록의 출력을 $\mathbf{y} = \mathbf{x} + \mathcal{F}(\mathbf{x})$로 단순화하면(덧셈 뒤의 ReLU를 생략한 경우) 연쇄 법칙에 따라 다음이 성립한다.
 
-$$\frac{\partial \mathbf{y}}{\partial \mathbf{x}} = I + \frac{\partial \mathcal{F}}{\partial \mathbf{x}}$$
+```math
+\frac{\partial \mathbf{y}}{\partial \mathbf{x}} = I + \frac{\partial \mathcal{F}}{\partial \mathbf{x}}
+```
 
 항등 행렬 $I$ 항 덕분에 손실의 기울기는 잔차 가지를 거치지 않고 shortcut을 따라 앞쪽 층으로 그대로 전달되는 경로를 갖는다 [5]. 스칼라로 단순화한 예에서, 일반 네트워크의 각 층 미분이 0.5이면 10층을 거친 기울기는 $0.5^{10} \approx 0.00098$로 줄어든다. 잔차 블록에서 잔차 가지의 미분이 0.05라면 블록 하나의 미분은 $1 + 0.05 = 1.05$이고 10블록을 거쳐도 $1.05^{10} \approx 1.63$이며, $-0.05$라면 $0.95^{10} \approx 0.60$이다. 잔차 가지의 미분이 작을 때 기울기의 크기가 1 근처에 머문다는 것이 핵심이다.
 
@@ -147,9 +153,11 @@ $$\frac{\partial \mathbf{y}}{\partial \mathbf{x}} = I + \frac{\partial \mathcal{
 
 잔차 형식은 하나 이상의 층을 건너뛰는 **shortcut 연결(shortcut connection)** 로 구현한다. 3강의 스킵 연결과 같은 구조이다. 논문의 기본 블록은 다음과 같다 [1].
 
-$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + \mathbf{x}$$
+```math
+\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + \mathbf{x}
+```
 
-두 층짜리 블록에서 $\mathcal{F} = W_2\,\sigma(W_1\mathbf{x})$이며 $\sigma$는 ReLU이다(편향은 표기에서 생략한다). $\mathcal{F} + \mathbf{x}$는 원소별 덧셈으로 계산하고, 덧셈 뒤에 두 번째 ReLU를 적용한다. 항등 shortcut은 **추가 파라미터도 추가 연산도 없으므로** (무시할 만한 원소별 덧셈 제외), 깊이, 너비, 파라미터 수, 연산량이 같은 일반 네트워크와 잔차 네트워크를 공정하게 비교할 수 있다.
+두 층짜리 블록에서 $`\mathcal{F} = W_2\,\sigma(W_1\mathbf{x})`$이며 $\sigma$는 ReLU이다(편향은 표기에서 생략한다). $\mathcal{F} + \mathbf{x}$는 원소별 덧셈으로 계산하고, 덧셈 뒤에 두 번째 ReLU를 적용한다. 항등 shortcut은 **추가 파라미터도 추가 연산도 없으므로** (무시할 만한 원소별 덧셈 제외), 깊이, 너비, 파라미터 수, 연산량이 같은 일반 네트워크와 잔차 네트워크를 공정하게 비교할 수 있다.
 
 ```mermaid
 flowchart TB
@@ -166,7 +174,9 @@ flowchart TB
 
 $\mathbf{x}$와 $\mathcal{F}$의 차원이 다르면(채널 수가 늘어날 때) 덧셈을 할 수 없으므로, shortcut에서 선형 사영 $W_s$로 차원을 맞춘다.
 
-$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + W_s\mathbf{x}$$
+```math
+\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + W_s\mathbf{x}
+```
 
 논문은 차원이 늘어나는 shortcut을 다루는 세 가지 방식을 비교했다. 특징 맵의 크기가 절반이 되는 곳에서는 shortcut도 stride 2로 적용한다.
 
@@ -219,7 +229,7 @@ flowchart TB
 
 *표 3. 기본 블록과 병목 블록의 가중치 수*
 
-병목 블록은 네 배 넓은 256채널을 다루면서도 64채널 기본 블록과 비슷한 가중치 수(따라서 비슷한 연산량)를 가진다. 같은 256채널을 기본 블록으로 처리하면 약 17배($1{,}179{,}648 / 69{,}632 \approx 16.9$)가 필요하다. 이 블록에서는 **항등 shortcut이 특히 중요하다.** shortcut을 사영으로 바꾸면 고차원(256채널) 양 끝을 잇게 되어 블록의 연산량과 크기가 두 배가 된다 [1]. 1×1 합성곱을 이용한 경량화는 9강에서 다시 다룬다.
+병목 블록은 네 배 넓은 256채널을 다루면서도 64채널 기본 블록과 비슷한 가중치 수(따라서 비슷한 연산량)를 가진다. 같은 256채널을 기본 블록으로 처리하면 약 17배($`1{,}179{,}648 / 69{,}632 \approx 16.9`$)가 필요하다. 이 블록에서는 **항등 shortcut이 특히 중요하다.** shortcut을 사영으로 바꾸면 고차원(256채널) 양 끝을 잇게 되어 블록의 연산량과 크기가 두 배가 된다 [1]. 1×1 합성곱을 이용한 경량화는 9강에서 다시 다룬다.
 
 | 모델 | conv2_x | conv3_x | conv4_x | conv5_x | 블록 | 연산량 (FLOPs) |
 |:-----|-----:|-----:|-----:|-----:|:-----|-----:|
@@ -265,7 +275,7 @@ flowchart TB
 
 ResNet-34의 오류는 같은 깊이의 일반 네트워크보다 $28.54 - 25.03 = 3.51$%p 낮다(논문의 "3.5%"). 더 깊은 ResNet-50/101/152(방식 B)는 34층보다 더 정확하며(top-1 오류 22.85, 21.75, 21.43%), 성능 저하가 나타나지 않는다. ResNet-152의 단일 모델 top-5 검증 오류는 4.49%로 이전의 모든 앙상블보다 낮고, 깊이가 다른 6개 모델의 앙상블은 ImageNet 테스트 세트에서 **top-5 오류 3.57%** 로 ILSVRC 2015 분류 부문 1위를 차지했다 [1].
 
-**CIFAR-10.** 훈련 이미지 5만 장과 테스트 이미지 1만 장, 10개 클래스로 이루어진 32×32 이미지 데이터셋 CIFAR-10에서는 깊이 자체의 영향을 보려고 일부러 단순한 구조를 썼다. 첫 3×3 합성곱 뒤에 특징 맵 크기 32, 16, 8마다 3×3 합성곱을 $2n$개씩(필터 수 16, 32, 64) 쌓고, 전역 평균 풀링과 10개 출력의 완전 연결 층을 두어 가중치 층이 모두 $6n + 2$개이다. $n = 3, 5, 7, 9$(20, 32, 44, 56층)로 비교하면 일반 네트워크는 깊을수록 학습 오류가 커졌지만 ResNet은 깊을수록 정확해져, ImageNet과 같은 현상이 나타났다. 110층 ResNet($n = 18$)은 테스트 오류 6.43%(5회 중 최고, 평균 6.61±0.16%)를 기록했다. 1202층 네트워크($n = 200$)도 최적화에 어려움 없이 학습 오류 0.1% 미만에 도달했지만, 테스트 오류는 7.93%로 110층보다 나빴다. 논문은 작은 데이터셋에 비해 지나치게 큰 모델(1,940만 파라미터)의 과적합으로 해석한다.
+**CIFAR-10.** 훈련 이미지 5만 장과 테스트 이미지 1만 장, 10개 클래스로 이루어진 32×32 이미지 데이터셋 CIFAR-10에서는 깊이 자체의 영향을 보려고 일부러 단순한 구조를 썼다. 첫 3×3 합성곱 뒤에 특징 맵 크기 32, 16, 8마다 3×3 합성곱을 $2n$개씩(필터 수 16, 32, 64) 쌓고, 전역 평균 풀링과 10개 출력의 완전 연결 층을 두어 가중치 층이 모두 $6n + 2$개이다. $n = 3, 5, 7, 9$(20, 32, 44, 56층)로 비교하면 일반 네트워크는 깊을수록 학습 오류가 커졌지만 ResNet은 깊을수록 정확해져, ImageNet과 같은 현상이 나타났다. 110층 ResNet($`n = 18`$)은 테스트 오류 6.43%(5회 중 최고, 평균 6.61±0.16%)를 기록했다. 1202층 네트워크($`n = 200`$)도 최적화에 어려움 없이 학습 오류 0.1% 미만에 도달했지만, 테스트 오류는 7.93%로 110층보다 나빴다. 논문은 작은 데이터셋에 비해 지나치게 큰 모델(1,940만 파라미터)의 과적합으로 해석한다.
 
 **층 응답 분석.** 각 3×3 층의 출력(BN 뒤, 비선형 함수 앞)의 표준편차를 비교하면 ResNet이 일반 네트워크보다 대체로 작고, 더 깊은 ResNet일수록 작다. 잔차 함수가 0에 가까운 값을 학습하는 경향이 있다는 2.3절의 동기를 뒷받침한다.
 
@@ -297,7 +307,7 @@ ResNet-34의 오류는 같은 깊이의 일반 네트워크보다 $28.54 - 25.03
 
 *표 7. 이미지 생성 태스크의 입력과 출력*
 
-출력 이미지는 보통 $H \times W \times 3$ 크기의 RGB 텐서이며, 생성 모델의 마지막 층은 픽셀값의 범위(예: Tanh로 $[-1, 1]$)에 맞춘다. 같은 입력 조건에서도 잡음 $\mathbf{z}$를 바꾸면 다른 이미지가 나온다는 점이 결정적인 출력을 내는 분류, 탐지와 다르다.
+출력 이미지는 보통 $H \times W \times 3$ 크기의 RGB 텐서이며, 생성 모델의 마지막 층은 픽셀값의 범위(예: Tanh로 $`[-1, 1]`$)에 맞춘다. 같은 입력 조건에서도 잡음 $\mathbf{z}$를 바꾸면 다른 이미지가 나온다는 점이 결정적인 출력을 내는 분류, 탐지와 다르다.
 
 ### 3.2 생성 모델의 종류
 
@@ -350,43 +360,55 @@ flowchart LR
 
 $D$는 학습 데이터와 $G$의 표본 모두에 올바른 레이블을 붙일 확률을 최대화하고, $G$는 $\log(1 - D(G(\mathbf{z})))$를 최소화한다. 두 모델은 가치 함수 $V(D, G)$에 대한 **2인 미니맥스 게임(two-player minimax game)** 을 한다.
 
-$$\min_G \max_D V(D, G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}(\mathbf{x})}[\log D(\mathbf{x})] + \mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log(1 - D(G(\mathbf{z})))]$$
+```math
+\min_G \max_D V(D, G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}(\mathbf{x})}[\log D(\mathbf{x})] + \mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log(1 - D(G(\mathbf{z})))]
+```
 
 - 첫째 항: 진짜 데이터 $\mathbf{x}$에 대해 $D(\mathbf{x})$가 1에 가까울수록 $\log D(\mathbf{x})$가 0에 가까워져 커진다.
 - 둘째 항: 가짜 $G(\mathbf{z})$에 대해 $D(G(\mathbf{z}))$가 0에 가까울수록 $\log(1 - D(G(\mathbf{z})))$가 커진다.
 - $D$는 두 항의 합을 키우려 하고, $G$는 둘째 항을 줄이려($D(G(\mathbf{z}))$를 키우려) 한다.
 
-> **[확률및통계]** $\mathbb{E}_{\mathbf{x} \sim p}[f(\mathbf{x})]$는 $\mathbf{x}$를 분포 $p$에서 뽑을 때 $f(\mathbf{x})$의 **기댓값**으로, 연속 분포에서는 $\int p(\mathbf{x}) f(\mathbf{x})\,d\mathbf{x}$이다. 학습에서는 미니배치 $m$개의 평균 $\frac{1}{m}\sum_i f(\mathbf{x}^{(i)})$로 근사한다. 두 분포 사이의 **KL 발산** $\mathrm{KL}(p \Vert q) = \mathbb{E}_{\mathbf{x} \sim p}[\log (p(\mathbf{x}) / q(\mathbf{x}))]$은 0 이상이며 $p = q$일 때만 0이다.
+> **[확률및통계]** $`\mathbb{E}_{\mathbf{x} \sim p}[f(\mathbf{x})]`$는 $\mathbf{x}$를 분포 $p$에서 뽑을 때 $f(\mathbf{x})$의 **기댓값**으로, 연속 분포에서는 $`\int p(\mathbf{x}) f(\mathbf{x})\,d\mathbf{x}`$이다. 학습에서는 미니배치 $m$개의 평균 $\frac{1}{m}\sum_i f(\mathbf{x}^{(i)})$로 근사한다. 두 분포 사이의 **KL 발산** $`\mathrm{KL}(p \Vert q) = \mathbb{E}_{\mathbf{x} \sim p}[\log (p(\mathbf{x}) / q(\mathbf{x}))]`$은 0 이상이며 $p = q$일 때만 0이다.
 
 ### 4.3 최적 판별자와 전역 최적해
 
 **명제 1 (최적 판별자).** $G$를 고정하면 최적 판별자는 다음과 같다.
 
-$$D_G^*(\mathbf{x}) = \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}$$
+```math
+D_G^*(\mathbf{x}) = \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}
+```
 
 **유도.** $\mathbf{x} = G(\mathbf{z})$로 바꾸어 쓰면 둘째 항의 기댓값은 $p_g$에 대한 기댓값이 되므로, 가치 함수는 하나의 적분으로 쓸 수 있다.
 
-$$V(G, D) = \int_{\mathbf{x}} \big[\, p_{\text{data}}(\mathbf{x}) \log D(\mathbf{x}) + p_g(\mathbf{x}) \log(1 - D(\mathbf{x})) \,\big] d\mathbf{x}$$
+```math
+V(G, D) = \int_{\mathbf{x}} \big[\, p_{\text{data}}(\mathbf{x}) \log D(\mathbf{x}) + p_g(\mathbf{x}) \log(1 - D(\mathbf{x})) \,\big] d\mathbf{x}
+```
 
 각 $\mathbf{x}$에서 $a = p_{\text{data}}(\mathbf{x})$, $b = p_g(\mathbf{x})$, $y = D(\mathbf{x})$라 하면 적분 안의 함수는 $f(y) = a \log y + b \log(1 - y)$이다. $(a, b) \neq (0, 0)$일 때 $y$로 미분하여 0으로 놓으면 다음과 같다.
 
-$$f'(y) = \frac{a}{y} - \frac{b}{1 - y} = 0 \quad\Longrightarrow\quad a(1 - y) = b\,y \quad\Longrightarrow\quad y = \frac{a}{a + b}$$
+```math
+f'(y) = \frac{a}{y} - \frac{b}{1 - y} = 0 \quad\Longrightarrow\quad a(1 - y) = b\,y \quad\Longrightarrow\quad y = \frac{a}{a + b}
+```
 
 $f''(y) = -a/y^2 - b/(1-y)^2 < 0$이므로 이 점이 $[0, 1]$에서의 최댓값이다. 각 점에서 적분 안의 값을 최대화하면 적분 전체가 최대가 되므로 명제가 성립한다.
 
-수치 예로, 어떤 이미지 $\mathbf{x}$에서 $p_{\text{data}}(\mathbf{x}) = 0.3$, $p_g(\mathbf{x}) = 0.1$이면 $D^*(\mathbf{x}) = 0.3 / (0.3 + 0.1) = 0.75$이다. 진짜 데이터가 나올 가능성이 생성자보다 세 배 높으므로 판별자는 진짜일 확률을 0.75로 본다. 두 밀도가 같아지면 $D^* = 0.5$가 되어 판별자는 동전 던지기보다 나을 수 없다.
+수치 예로, 어떤 이미지 $\mathbf{x}$에서 $p_{\text{data}}(\mathbf{x}) = 0.3$, $p_g(\mathbf{x}) = 0.1$이면 $`D^*(\mathbf{x}) = 0.3 / (0.3 + 0.1) = 0.75`$이다. 진짜 데이터가 나올 가능성이 생성자보다 세 배 높으므로 판별자는 진짜일 확률을 0.75로 본다. 두 밀도가 같아지면 $`D^* = 0.5`$가 되어 판별자는 동전 던지기보다 나을 수 없다.
 
 **정리 1 (전역 최적해).** 최적 판별자를 대입한 목적 $C(G) = \max_D V(G, D)$의 전역 최솟값은 $p_g = p_{\text{data}}$일 때, 그리고 그때에만 얻어지며, 그 값은 $-\log 4$이다.
 
-**유도.** $D_G^*$를 대입하면 다음과 같다.
+**유도.** $`D_G^*`$를 대입하면 다음과 같다.
 
-$$C(G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}}\left[\log \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right] + \mathbb{E}_{\mathbf{x} \sim p_g}\left[\log \frac{p_g(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right]$$
+```math
+C(G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}}\left[\log \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right] + \mathbb{E}_{\mathbf{x} \sim p_g}\left[\log \frac{p_g(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right]
+```
 
 각 로그 안의 분모를 $2 \cdot \frac{p_{\text{data}} + p_g}{2}$로 쓰면 각 항에서 $-\log 2$가 분리되고, 남은 부분은 두 분포의 평균 $m = \frac{p_{\text{data}} + p_g}{2}$에 대한 KL 발산이 된다.
 
-$$C(G) = -\log 4 + \mathrm{KL}\!\left(p_{\text{data}} \,\Big\Vert\, m\right) + \mathrm{KL}\!\left(p_g \,\Big\Vert\, m\right) = -\log 4 + 2 \cdot \mathrm{JSD}(p_{\text{data}} \Vert p_g)$$
+```math
+C(G) = -\log 4 + \mathrm{KL}\!\left(p_{\text{data}} \,\Big\Vert\, m\right) + \mathrm{KL}\!\left(p_g \,\Big\Vert\, m\right) = -\log 4 + 2 \cdot \mathrm{JSD}(p_{\text{data}} \Vert p_g)
+```
 
-**옌센-섀넌 발산(Jensen-Shannon divergence, JSD)** 은 0 이상이고 두 분포가 같을 때만 0이므로, $C(G)$의 최솟값은 $-\log 4 \approx -1.386$이며 $p_g = p_{\text{data}}$일 때만 얻어진다. 실제로 $p_g = p_{\text{data}}$이면 $D^* = 1/2$이므로 $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$로 맞아떨어진다. 즉 임의의 함수를 표현할 수 있는 생성자와 판별자의 공간에서 **게임의 유일한 해는 생성자가 데이터 분포를 정확히 재현하고 판별자가 모든 곳에서 1/2을 출력하는 상태이다.** 논문의 명제 2는 수렴도 보인다. $G$와 $D$의 용량이 충분하고, 알고리즘의 각 단계에서 판별자가 주어진 $G$에 대한 최적에 도달하며, 기준 $C(G)$가 개선되도록 $p_g$를 갱신하면 $p_g$는 $p_{\text{data}}$로 수렴한다. $C(G)$가 $p_g$에 대해 볼록하고 유일한 전역 최적해를 가지므로, $p_g$를 충분히 작게 갱신하면 그 최적해에 도달한다는 논증이다.
+**옌센-섀넌 발산(Jensen-Shannon divergence, JSD)** 은 0 이상이고 두 분포가 같을 때만 0이므로, $C(G)$의 최솟값은 $-\log 4 \approx -1.386$이며 $p_g = p_{\text{data}}$일 때만 얻어진다. 실제로 $p_g = p_{\text{data}}$이면 $`D^* = 1/2`$이므로 $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$로 맞아떨어진다. 즉 임의의 함수를 표현할 수 있는 생성자와 판별자의 공간에서 **게임의 유일한 해는 생성자가 데이터 분포를 정확히 재현하고 판별자가 모든 곳에서 1/2을 출력하는 상태이다.** 논문의 명제 2는 수렴도 보인다. $G$와 $D$의 용량이 충분하고, 알고리즘의 각 단계에서 판별자가 주어진 $G$에 대한 최적에 도달하며, 기준 $C(G)$가 개선되도록 $p_g$를 갱신하면 $p_g$는 $p_{\text{data}}$로 수렴한다. $C(G)$가 $p_g$에 대해 볼록하고 유일한 전역 최적해를 가지므로, $p_g$를 충분히 작게 갱신하면 그 최적해에 도달한다는 논증이다.
 
 > **주의:** 이 결과는 $G$와 $D$가 임의의 함수를 표현할 수 있는 비모수적 설정(무한한 용량)에서 성립한다. 실제 신경망은 용량이 유한하고 파라미터 공간에서 최적화하므로, 논문은 이론적 보장이 그대로 적용되지 않는다고 밝히면서도 MLP의 뛰어난 성능이 합리적인 모델임을 시사한다고 본다 [2].
 
@@ -413,7 +435,9 @@ $$C(G) = -\log 4 + \mathrm{KL}\!\left(p_{\text{data}} \,\Big\Vert\, m\right) + \
 
 수치로 확인한다. 판별자의 출력이 시그모이드 $D = \sigma(a)$이고 가짜 표본에서 $a = -4.6$이면 $D = 1 / (1 + e^{4.6}) \approx 0.01$이다. 로짓 $a$에 대한 미분은 다음과 같다.
 
-$$\frac{\partial}{\partial a}\log(1 - \sigma(a)) = -\sigma(a) \approx -0.01, \qquad \frac{\partial}{\partial a}\log \sigma(a) = 1 - \sigma(a) \approx 0.99$$
+```math
+\frac{\partial}{\partial a}\log(1 - \sigma(a)) = -\sigma(a) \approx -0.01, \qquad \frac{\partial}{\partial a}\log \sigma(a) = 1 - \sigma(a) \approx 0.99
+```
 
 원래 목적은 생성자에게 약 0.01 크기의 기울기만 주지만, 비포화 목적은 약 0.99로 거의 100배 큰 기울기를 준다. 이 비포화 손실은 이후의 GAN 구현에서 널리 쓰인다.
 
@@ -471,7 +495,7 @@ DCGAN은 잡음 벡터의 산술(예: 안경 쓴 남자 - 안경 쓰지 않은 �
 
 ### 5.3 학습 안정화: WGAN
 
-판별자가 최적일 때 원래 GAN의 목적은 4.3절처럼 JSD를 줄이는 것과 같은데, 두 분포의 받침(support)이 서로 겹치지 않으면 JSD가 상수($\log 2$)에 머물러 생성자에 쓸모 있는 기울기를 주지 못한다. **WGAN** [14]은 한 분포를 다른 분포로 옮기는 최소 비용인 **Wasserstein-1 거리(earth mover's distance)** 를 쓴다. 판별자 대신 실수 점수를 내는 **비평자(critic)** 를 두고, 비평자가 립시츠 함수(어떤 상수 K에 대한 K-립시츠 함수)가 되도록 가중치를 일정 범위로 자른다(weight clipping). 이 거리는 분포가 겹치지 않아도 연속적으로 변하므로 학습이 안정되고, 손실값이 생성 품질과 함께 움직인다.
+판별자가 최적일 때 원래 GAN의 목적은 4.3절처럼 JSD를 줄이는 것과 같은데, 두 분포의 받침(support)이 서로 겹치지 않으면 JSD가 상수($`\log 2`$)에 머물러 생성자에 쓸모 있는 기울기를 주지 못한다. **WGAN** [14]은 한 분포를 다른 분포로 옮기는 최소 비용인 **Wasserstein-1 거리(earth mover's distance)** 를 쓴다. 판별자 대신 실수 점수를 내는 **비평자(critic)** 를 두고, 비평자가 립시츠 함수(어떤 상수 K에 대한 K-립시츠 함수)가 되도록 가중치를 일정 범위로 자른다(weight clipping). 이 거리는 분포가 겹치지 않아도 연속적으로 변하므로 학습이 안정되고, 손실값이 생성 품질과 함께 움직인다.
 
 ### 5.4 고해상도 생성: ProGAN과 StyleGAN
 
@@ -550,7 +574,7 @@ Google Scholar의 인용 버튼은 여러 인용 형식을 제공하지만 학�
 | ResNet 결과 | 34층 ResNet은 18층보다 정확하고(top-1 오류 25.03% 대 27.88%), 앙상블은 ImageNet top-5 오류 3.57%로 ILSVRC 2015에서 1위를 했으며, COCO 탐지에서 28% 상대 향상을 보였다. |
 | 이미지 생성 | 잡음, 레이블, 문장, 다른 이미지를 입력으로 받아 학습 데이터에 없던 새 이미지를 출력하는 태스크이다. |
 | GAN의 목적 함수 | $\min_G \max_D \mathbb{E}[\log D(\mathbf{x})] + \mathbb{E}[\log(1 - D(G(\mathbf{z})))]$의 미니맥스 게임이다. |
-| 최적 판별자와 최적해 | $D^* = p_{\text{data}} / (p_{\text{data}} + p_g)$이고, $C(G) = -\log 4 + 2\,\mathrm{JSD}$이므로 전역 최적해는 $p_g = p_{\text{data}}$이다. |
+| 최적 판별자와 최적해 | $`D^* = p_{\text{data}} / (p_{\text{data}} + p_g)`$이고, $`C(G) = -\log 4 + 2\,\mathrm{JSD}`$이므로 전역 최적해는 $p_g = p_{\text{data}}$이다. |
 | GAN의 학습 | $D$를 $k$단계, $G$를 1단계 번갈아 갱신하며, 초기 포화를 피하려고 $G$는 $\log D(G(\mathbf{z}))$를 최대화한다. |
 | GAN 이후의 모델 | DCGAN(합성곱 구조), 조건부 GAN과 pix2pix, CycleGAN(이미지 변환), WGAN(학습 안정화), ProGAN과 StyleGAN(고해상도), 확산 모델로 발전했다. |
 | 인용 | 인용 수는 Google Scholar에서 확인하고, 참고 문헌은 IEEE 형식으로 인용 순서대로 번호를 붙여 적는다. |
@@ -611,7 +635,7 @@ Google Scholar의 인용 버튼은 여러 인용 형식을 제공하지만 학�
    <details>
    <summary>정답</summary>
 
-   $D^*(\mathbf{x}) = 0.2 / (0.2 + 0.6) = 0.25$이다. 그 지점에서는 생성자의 표본이 진짜 데이터보다 세 배 자주 나오므로, 판별자는 진짜일 확률을 낮게 본다. 생성자는 이런 영역의 밀도를 줄이는 방향으로 학습된다.
+   $`D^*(\mathbf{x}) = 0.2 / (0.2 + 0.6) = 0.25`$이다. 그 지점에서는 생성자의 표본이 진짜 데이터보다 세 배 자주 나오므로, 판별자는 진짜일 확률을 낮게 본다. 생성자는 이런 영역의 밀도를 줄이는 방향으로 학습된다.
 
    </details>
 
@@ -620,7 +644,7 @@ Google Scholar의 인용 버튼은 여러 인용 형식을 제공하지만 학�
    <details>
    <summary>정답</summary>
 
-   $D^* = 1/2$이므로 $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4 \approx -1.386$이다. $C(G) = -\log 4 + 2\,\mathrm{JSD}(p_{\text{data}} \Vert p_g)$이고 JSD는 0 이상이며 두 분포가 같을 때만 0이므로, 이 값이 유일한 최솟값이다.
+   $`D^* = 1/2`$이므로 $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4 \approx -1.386$이다. $`C(G) = -\log 4 + 2\,\mathrm{JSD}(p_{\text{data}} \Vert p_g)`$이고 JSD는 0 이상이며 두 분포가 같을 때만 0이므로, 이 값이 유일한 최솟값이다.
 
    </details>
 

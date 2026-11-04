@@ -289,9 +289,9 @@ graph LR
 
 벡터 사이의 가까움은 흔히 **코사인 유사도(cosine similarity)** 로 잰다. 두 벡터 $\mathbf{u}$, $\mathbf{v}$의 코사인 유사도는 두 벡터가 이루는 각의 코사인이다.
 
-$$
+```math
 \cos(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u} \cdot \mathbf{v}}{\lVert \mathbf{u} \rVert \, \lVert \mathbf{v} \rVert}
-$$
+```
 
 값은 $-1$부터 $1$ 사이이며, 두 벡터의 방향이 같을수록 1에 가깝고 서로 수직이면 0이다.
 
@@ -386,19 +386,19 @@ TF-IDF 값은 특정 문서에서 특정 단어가 나타나는 빈도(TF)와, �
 
 문서의 집합을 $D$, 문서의 수를 $N$, 단어를 $t$, 문서를 $d$라 하면 각 값은 다음과 같다.
 
-$$
+```math
 \mathrm{TF}(t, d) = \text{문서 } d \text{에서 단어 } t \text{가 등장한 횟수}
-$$
+```
 
-$$
+```math
 \mathrm{IDF}(t, D) = \log \frac{N}{\mathrm{DF}(t)}, \qquad \mathrm{DF}(t) = \text{단어 } t \text{를 포함하는 문서의 수}
-$$
+```
 
-$$
+```math
 \text{TF-IDF}(t, d, D) = \mathrm{TF}(t, d) \times \mathrm{IDF}(t, D)
-$$
+```
 
-IDF의 성질은 다음과 같다. 모든 문서에 나오는 단어는 $\mathrm{DF}(t) = N$이므로 $\log 1 = 0$이 되어 TF-IDF가 0이 된다. 한 문서에만 나오는 단어는 $\mathrm{DF}(t) = 1$이므로 IDF가 $\log N$으로 가장 크다. 로그를 쓰는 이유는 문서 수가 많을 때 IDF가 지나치게 커지는 것을 막기 위해서이며, 로그의 밑(10이나 $e$)은 값의 척도만 바꿀 뿐 단어 사이의 순위는 바꾸지 않는다. IDF의 아이디어는 Spärck Jones의 단어 특이성 연구에서 비롯되었다 [6].
+IDF의 성질은 다음과 같다. 모든 문서에 나오는 단어는 $\mathrm{DF}(t) = N$이므로 $\log 1 = 0$이 되어 TF-IDF가 0이 된다. 한 문서에만 나오는 단어는 $\mathrm{DF}(t) = 1$이므로 IDF가 $\log N$으로 가장 크다. 로그를 쓰는 이유는 문서 수가 많을 때 IDF가 지나치게 커지는 것을 막기 위해서이며, 로그의 밑(10이나 $`e`$)은 값의 척도만 바꿀 뿐 단어 사이의 순위는 바꾸지 않는다. IDF의 아이디어는 Spärck Jones의 단어 특이성 연구에서 비롯되었다 [6].
 
 같은 아이디어를 조금 바꾼 변형도 널리 쓰인다.
 
@@ -502,7 +502,7 @@ TF-IDF에는 다음과 같은 한계가 있다.
 
 *그림 3. 단어마다 대응하는 실수 벡터(왼쪽)와 man에서 woman으로의 차이가 king에서 queen으로의 차이와 비슷한 벡터 공간(오른쪽)*
 
-Word2Vec의 바탕에는 **분포 가설(distributional hypothesis)**, 곧 비슷한 문맥에 나타나는 단어는 비슷한 의미를 가진다는 생각이 있다 [9]. Word2Vec은 단어가 주변에 어떤 단어와 함께 나타나는지를 예측하도록 신경망을 학습시키고, 그 과정에서 얻은 가중치를 단어 벡터로 쓴다. 이렇게 학습한 벡터에서는 의미 관계가 벡터의 차이로 나타난다. 그림 3의 오른쪽처럼 $\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}$과 $\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}$이 비슷한 방향을 가리키므로, $\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}$을 계산하면 $\mathbf{v}_{\text{queen}}$에 가까운 벡터가 나온다 [10]. 한국어 위키백과와 나무위키로 학습한 한국어 Word2Vec 벡터로 이러한 단어의 덧셈과 뺄셈을 직접 해 볼 수 있는 웹 데모도 공개되어 있다 [11].
+Word2Vec의 바탕에는 **분포 가설(distributional hypothesis)**, 곧 비슷한 문맥에 나타나는 단어는 비슷한 의미를 가진다는 생각이 있다 [9]. Word2Vec은 단어가 주변에 어떤 단어와 함께 나타나는지를 예측하도록 신경망을 학습시키고, 그 과정에서 얻은 가중치를 단어 벡터로 쓴다. 이렇게 학습한 벡터에서는 의미 관계가 벡터의 차이로 나타난다. 그림 3의 오른쪽처럼 $`\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}`$과 $`\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}`$이 비슷한 방향을 가리키므로, $`\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}`$을 계산하면 $`\mathbf{v}_{\text{queen}}`$에 가까운 벡터가 나온다 [10]. 한국어 위키백과와 나무위키로 학습한 한국어 Word2Vec 벡터로 이러한 단어의 덧셈과 뺄셈을 직접 해 볼 수 있는 웹 데모도 공개되어 있다 [11].
 
 Word2Vec에는 학습 방식이 다른 두 모델, CBOW와 skip-gram이 있다.
 
@@ -538,7 +538,7 @@ Word2Vec에는 학습 방식이 다른 두 모델, CBOW와 skip-gram이 있다.
 
 CBOW는 은닉층이 하나인 **얕은 신경망(shallow neural network)** 이다. 어휘의 수를 $V$, 임베딩 벡터의 차원을 $M$이라 하자. 이 예에서는 대소문자를 구분하여 The와 the를 서로 다른 단어로 보므로 $V = 7$이고, $M = 5$로 둔다. 각 단어의 인덱스는 The 0, black 1, cat 2, sat 3, on 4, the 5, mat 6이다. 신경망의 가중치는 입력 쪽의 $V \times M$ 행렬 $W$와 출력 쪽의 $M \times V$ 행렬 $W'$ 두 개이다. 중심 단어 sat을 예측하는 한 번의 계산은 다음 네 단계로 이루어진다.
 
-**1단계: 원-핫 벡터와 $W$의 곱.** 주변 단어 cat의 원-핫 벡터 $\mathbf{x}_{\text{cat}} = [0, 0, 1, 0, 0, 0, 0]$($1 \times V$)에 $W$($V \times M$)를 곱하면 $1 \times M$ 벡터 $\mathbf{v}_{\text{cat}}$이 나온다. $\mathbf{x}_{\text{cat}}$은 인덱스 2만 1이므로, 곱의 결과는 $W$의 인덱스 2 행을 그대로 꺼낸 것과 같다.
+**1단계: 원-핫 벡터와 $W$의 곱.** 주변 단어 cat의 원-핫 벡터 $`\mathbf{x}_{\text{cat}} = [0, 0, 1, 0, 0, 0, 0]`$($`1 \times V`$)에 $W$($`V \times M`$)를 곱하면 $1 \times M$ 벡터 $`\mathbf{v}_{\text{cat}}`$이 나온다. $`\mathbf{x}_{\text{cat}}`$은 인덱스 2만 1이므로, 곱의 결과는 $W$의 인덱스 2 행을 그대로 꺼낸 것과 같다.
 
 | 인덱스 | 단어 | $W$의 행 |
 |:---:|:-----|:-----|
@@ -550,41 +550,41 @@ CBOW는 은닉층이 하나인 **얕은 신경망(shallow neural network)** 이�
 | 5 | the | 0.70, 0.27, 1.22, 0.92, 1.63 |
 | 6 | mat | 3.48, 0.32, 0.48, 0.53, 2.69 |
 
-*표 10. 학습 중인 입력 가중치 행렬 $W$($V = 7$, $M = 5$)*
+*표 10. 학습 중인 입력 가중치 행렬 $`W`$($`V = 7`$, $`M = 5`$)*
 
-$$
+```math
 \mathbf{v}_{\text{cat}} = \mathbf{x}_{\text{cat}} W = [0.41, 0.73, 0.24, 0.15, 0.82]
-$$
+```
 
-주변 단어 black, on, the에도 같은 계산을 하여 $\mathbf{v}_{\text{black}}$, $\mathbf{v}_{\text{on}}$, $\mathbf{v}_{\text{the}}$를 얻는다.
+주변 단어 black, on, the에도 같은 계산을 하여 $`\mathbf{v}_{\text{black}}`$, $`\mathbf{v}_{\text{on}}`$, $`\mathbf{v}_{\text{the}}`$를 얻는다.
 
-**2단계: 투사층에서 벡터를 합친다.** **투사층(projection layer)** 은 주변 단어 $2n$개의 벡터를 하나로 합친다. 예를 들어 $\mathbf{v}_{\text{cat}}$과 $\mathbf{v}_{\text{on}} = [0.52, 0.45, 0.56, 0.17, 0.14]$을 더하면 $[0.93, 1.18, 0.80, 0.32, 0.96]$이다. 여기에 $\mathbf{v}_{\text{black}}$과 $\mathbf{v}_{\text{the}}$까지 네 벡터를 모두 더하면 다음과 같다.
+**2단계: 투사층에서 벡터를 합친다.** **투사층(projection layer)** 은 주변 단어 $2n$개의 벡터를 하나로 합친다. 예를 들어 $`\mathbf{v}_{\text{cat}}`$과 $`\mathbf{v}_{\text{on}} = [0.52, 0.45, 0.56, 0.17, 0.14]`$을 더하면 $[0.93, 1.18, 0.80, 0.32, 0.96]$이다. 여기에 $`\mathbf{v}_{\text{black}}`$과 $`\mathbf{v}_{\text{the}}`$까지 네 벡터를 모두 더하면 다음과 같다.
 
-$$
+```math
 \mathbf{v}_{\text{black}} + \mathbf{v}_{\text{cat}} + \mathbf{v}_{\text{on}} + \mathbf{v}_{\text{the}} = [2.25, 5.11, 2.74, 4.04, 2.83]
-$$
+```
 
 원 논문의 CBOW는 이 합을 주변 단어의 수로 나눈 **평균**을 투사층의 값으로 쓴다 [8].
 
-$$
+```math
 \mathbf{h} = \frac{1}{4}[2.25, 5.11, 2.74, 4.04, 2.83] = [0.5625, 1.2775, 0.685, 1.01, 0.7075]
-$$
+```
 
-그림 4가 투사층을 SUM으로 표시하듯 합으로 설명하기도 하는데, 합과 평균은 상수 배($1/2n$)만 다르다. 투사층에는 활성화 함수가 없어서 입력을 선형으로 합치기만 한다는 점이 일반적인 은닉층과 다르다.
+그림 4가 투사층을 SUM으로 표시하듯 합으로 설명하기도 하는데, 합과 평균은 상수 배($`1/2n`$)만 다르다. 투사층에는 활성화 함수가 없어서 입력을 선형으로 합치기만 한다는 점이 일반적인 은닉층과 다르다.
 
-**3단계: $W'$와 softmax로 확률을 구한다.** 투사층의 벡터 $\mathbf{h}$($1 \times M$)에 $W'$($M \times V$)를 곱하면 어휘의 각 단어에 대한 점수 $\mathbf{z}$($1 \times V$)가 나온다. 이 점수에 softmax를 적용하면 합이 1인 확률 분포 $\hat{\mathbf{y}}$가 된다.
+**3단계: $W'$와 softmax로 확률을 구한다.** 투사층의 벡터 $\mathbf{h}$($`1 \times M`$)에 $W'$($`M \times V`$)를 곱하면 어휘의 각 단어에 대한 점수 $\mathbf{z}$($`1 \times V`$)가 나온다. 이 점수에 softmax를 적용하면 합이 1인 확률 분포 $\hat{\mathbf{y}}$가 된다.
 
-$$
+```math
 \mathbf{z} = \mathbf{h} W', \qquad \hat{y}_j = \mathrm{softmax}(\mathbf{z})_j = \frac{e^{z_j}}{\sum_{k=1}^{V} e^{z_k}}
-$$
+```
 
 예를 들어 $\hat{\mathbf{y}} = [0.1, 0.03, 0.02, 0.7, 0.01, 0.05, 0.09]$가 나왔다면, 모델은 인덱스 3인 sat이 중심 단어일 확률을 0.7로 예측한 것이다.
 
 **4단계: 손실을 계산하고 가중치를 갱신한다.** 정답 $\mathbf{y}$는 sat의 원-핫 벡터 $[0, 0, 0, 1, 0, 0, 0]$이다. 예측과 정답의 차이는 **교차 엔트로피(cross entropy)** 손실로 잰다.
 
-$$
+```math
 L = -\sum_{j=1}^{V} y_j \log \hat{y}_j = -\log \hat{y}_{\text{sat}} = -\ln 0.7 \approx 0.357
-$$
+```
 
 정답 위치만 $y_j = 1$이므로 합에서 정답 단어의 항만 남는다. 예측 확률이 1에 가까울수록 손실은 0에 가까워진다. 오류 역전파로 이 손실의 기울기를 구하고 경사하강법으로 $W$와 $W'$를 갱신하며, 코퍼스의 모든 (중심 단어, 주변 단어) 쌍에 이 과정을 반복한다. softmax, 교차 엔트로피, 역전파는 1강에서 다룬 신경망 학습과 같다.
 
@@ -600,7 +600,7 @@ $$
 
 *그림 6. 중심 단어 sat의 원-핫 벡터로 주변 단어 black, cat, on, the를 예측하는 skip-gram 신경망*
 
-계산 과정은 CBOW와 같은 부품을 쓴다. 중심 단어 sat의 원-핫 벡터에 $W$를 곱해 $\mathbf{v}_{\text{sat}}$을 얻고(투사층은 이 벡터 하나이므로 평균이 필요 없다), $W'$와 softmax로 어휘 전체의 확률 분포를 구한다. 이 분포가 주변 단어 black, cat, on, the 각각에 높은 확률을 주도록 네 개의 교차 엔트로피 손실을 더해 학습한다.
+계산 과정은 CBOW와 같은 부품을 쓴다. 중심 단어 sat의 원-핫 벡터에 $W$를 곱해 $`\mathbf{v}_{\text{sat}}`$을 얻고(투사층은 이 벡터 하나이므로 평균이 필요 없다), $W'$와 softmax로 어휘 전체의 확률 분포를 구한다. 이 분포가 주변 단어 black, cat, on, the 각각에 높은 확률을 주도록 네 개의 교차 엔트로피 손실을 더해 학습한다.
 
 전반적으로 skip-gram이 CBOW보다 성능이 좋다고 알려져 있다. 중심 단어 하나가 여러 주변 단어를 예측하는 신호를 받으므로, 중심 단어의 벡터가 주변 단어들의 뜻을 포괄하게 되기 때문이다. 원 논문의 실험에서도 skip-gram은 의미 관계를 묻는 유추 태스크에서 CBOW보다 정확도가 크게 높았고, CBOW는 문법 관계 태스크에서 조금 앞서며 학습이 더 빨랐다 [8].
 
@@ -626,11 +626,11 @@ CBOW와 skip-gram의 출력층은 softmax로 어휘 전체 $V$개 단어의 확�
 
 *그림 7. "cat sat on"에서 중심 단어 sat의 벡터와 cat, on(positive), software(negative)의 벡터를 내적하고 sigmoid로 1과 0을 예측하는 네거티브 샘플링*
 
-그림 7의 예에서 중심 단어 sat의 벡터 $\mathbf{v}_{\text{sat}}$(입력 행렬 $W$의 빨간 행)과 출력 쪽 벡터들(전치한 $W'^T$의 행) 가운데 cat, on, software의 벡터만 골라 각각 내적한다. 내적 값에 **sigmoid** 함수 $\sigma(x) = 1/(1 + e^{-x})$를 적용하면 0과 1 사이의 확률이 되고, cat과 on은 1에, 무작위로 뽑은 software는 0에 가까워지도록 학습한다. 중심 벡터를 $\mathbf{v}_c$, 실제 주변 단어의 출력 벡터를 $\mathbf{u}_o$, 무작위로 뽑은 $k$개 단어의 출력 벡터를 $\mathbf{u}_1, \dots, \mathbf{u}_k$라 하면 손실은 다음과 같다.
+그림 7의 예에서 중심 단어 sat의 벡터 $`\mathbf{v}_{\text{sat}}`$(입력 행렬 $W$의 빨간 행)과 출력 쪽 벡터들(전치한 $W'^T$의 행) 가운데 cat, on, software의 벡터만 골라 각각 내적한다. 내적 값에 **sigmoid** 함수 $\sigma(x) = 1/(1 + e^{-x})$를 적용하면 0과 1 사이의 확률이 되고, cat과 on은 1에, 무작위로 뽑은 software는 0에 가까워지도록 학습한다. 중심 벡터를 $`\mathbf{v}_c`$, 실제 주변 단어의 출력 벡터를 $`\mathbf{u}_o`$, 무작위로 뽑은 $k$개 단어의 출력 벡터를 $`\mathbf{u}_1, \dots, \mathbf{u}_k`$라 하면 손실은 다음과 같다.
 
-$$
+```math
 L = -\log \sigma(\mathbf{u}_o \cdot \mathbf{v}_c) - \sum_{i=1}^{k} \log \sigma(-\mathbf{u}_i \cdot \mathbf{v}_c)
-$$
+```
 
 첫 항은 positive 쌍의 내적을 크게, 둘째 항은 negative 쌍의 내적을 작게 만든다($\sigma(-x) = 1 - \sigma(x)$이므로 negative 쌍이 0으로 분류될 확률을 높인다). 한 번의 학습에서 계산하는 내적은 $V$개가 아니라 $k + 1$개뿐이므로 속도가 크게 빨라진다. 원 논문은 작은 데이터셋에서 $k$를 5\~20, 큰 데이터셋에서 2\~5로 쓰고, negative 단어를 단어 빈도의 $3/4$제곱에 비례하는 확률로 뽑을 때 성능이 가장 좋았다고 보고한다 [12].
 
@@ -659,9 +659,9 @@ print(char_ngrams("birthday"))
 
 단어 apple의 벡터는 이렇게 나눈 세부 단어들의 벡터의 합이다.
 
-$$
+```math
 \mathbf{v}_{\text{apple}} = \mathbf{z}_{\lt\text{ap}} + \mathbf{z}_{\text{app}} + \mathbf{z}_{\text{ppl}} + \mathbf{z}_{\text{ple}} + \mathbf{z}_{\text{le}\gt} + \mathbf{z}_{\lt\text{apple}\gt}
-$$
+```
 
 나머지 학습 과정은 Word2Vec(skip-gram과 네거티브 샘플링)과 거의 같다. 다만 학습되는 대상이 단어 벡터가 아니라 각 n-gram의 벡터 $\mathbf{z}$이다. FastText의 장점은 다음과 같다.
 
@@ -820,7 +820,7 @@ print(output)
 |:-----|:-----|
 | 어간 추출의 결과는 항상 사전에 있는 단어이다. | **F.** 어간 추출은 규칙에 따라 접미사를 잘라 내므로 'flies' → 'fli'처럼 사전에 없는 형태가 나올 수 있다. 사전의 기본형을 돌려주는 것은 표제어 추출이다. |
 | 서로 다른 두 단어의 원-핫 벡터는 코사인 유사도가 항상 0이다. | **T.** 1의 위치가 서로 달라 내적이 0이므로 유사도도 0이다. 그래서 원-핫 인코딩은 단어 사이의 관계를 담지 못한다. |
-| 모든 문서에 등장하는 단어는 TF-IDF($\mathrm{IDF} = \log(N/\mathrm{DF})$)가 0이다. | **T.** $\mathrm{DF} = N$이므로 $\mathrm{IDF} = \log 1 = 0$이고, TF가 아무리 커도 곱은 0이다. |
+| 모든 문서에 등장하는 단어는 TF-IDF($`\mathrm{IDF} = \log(N/\mathrm{DF})`$)가 0이다. | **T.** $\mathrm{DF} = N$이므로 $\mathrm{IDF} = \log 1 = 0$이고, TF가 아무리 커도 곱은 0이다. |
 | CBOW의 투사층은 ReLU 같은 비선형 활성화 함수를 쓴다. | **F.** 투사층은 주변 단어 벡터의 평균(또는 합)을 구할 뿐 활성화 함수가 없는 선형 층이다. |
 | 네거티브 샘플링을 쓰면 한 번의 학습에서 어휘 전체에 대한 softmax를 계산하지 않아도 된다. | **T.** positive 단어 하나와 negative 단어 $k$개에 대해서만 내적과 sigmoid를 계산하는 이진 분류로 바꾸기 때문이다. |
 | FastText는 학습 데이터에 없던 단어의 벡터를 만들 수 없다. | **F.** 그 단어의 문자 n-gram 가운데 학습된 n-gram 벡터를 더해 벡터를 만들 수 있다. 이것이 Word2Vec과 다른 점이다. |
@@ -898,7 +898,7 @@ print(output)
 
    </details>
 
-6. **CBOW 계산:** 윈도 크기가 1이고 주변 단어 벡터가 $\mathbf{v}_a = [1, 2]$, $\mathbf{v}_b = [3, 0]$일 때 투사층의 값(평균)을 구하라. 또 softmax 출력에서 정답 단어의 확률이 0.25이면 교차 엔트로피 손실(자연로그)은 얼마인가?
+6. **CBOW 계산:** 윈도 크기가 1이고 주변 단어 벡터가 $`\mathbf{v}_a = [1, 2]`$, $`\mathbf{v}_b = [3, 0]`$일 때 투사층의 값(평균)을 구하라. 또 softmax 출력에서 정답 단어의 확률이 0.25이면 교차 엔트로피 손실(자연로그)은 얼마인가?
 
    <details>
    <summary>정답</summary>
@@ -912,7 +912,7 @@ print(output)
    <details>
    <summary>정답</summary>
 
-   입력 쪽 가중치 행렬 $W$($V \times M$)의 각 행이 그 단어의 임베딩 벡터이다. 원-핫 벡터는 한 위치만 1이므로 $\mathbf{x}W$는 $W$의 그 행을 꺼낸 것과 같고, 따라서 인덱스로 행을 바로 읽으면 된다. 이 행렬을 룩업 테이블이라 한다.
+   입력 쪽 가중치 행렬 $W$($`V \times M`$)의 각 행이 그 단어의 임베딩 벡터이다. 원-핫 벡터는 한 위치만 1이므로 $\mathbf{x}W$는 $W$의 그 행을 꺼낸 것과 같고, 따라서 인덱스로 행을 바로 읽으면 된다. 이 행렬을 룩업 테이블이라 한다.
 
    </details>
 

@@ -309,7 +309,7 @@ tensor([[0.5010],
 
 *Table 3. Tensor sizes of the unidirectional LSTM model*
 
-The Korean labels mean "before the operations" (연산 전), "output of the final layer" (최종층 출력), and "output of the last hidden unit" (마지막 hidden unit 출력). All output probabilities are near 0.5 because the model is untrained: the initial weights are small, so the output of `fc` is near 0, and $\sigma(0) = 0.5$. To use this model for real, it must be trained by deciding the dataset, loss function (binary cross-entropy), and optimizer as in Section 4 of Lecture 2 (Lecture 3). This LSTM layer has $4 \times 64 \times (4 + 64) + 4 \times 64 \times 2 = 17{,}920$ parameters, because each of the 4 gates has input weights ($64 \times 4$), hidden weights ($64 \times 64$), and two sets of biases (`b_ih` and `b_hh`, 64 each).
+The Korean labels mean "before the operations" (연산 전), "output of the final layer" (최종층 출력), and "output of the last hidden unit" (마지막 hidden unit 출력). All output probabilities are near 0.5 because the model is untrained: the initial weights are small, so the output of `fc` is near 0, and $\sigma(0) = 0.5$. To use this model for real, it must be trained by deciding the dataset, loss function (binary cross-entropy), and optimizer as in Section 4 of Lecture 2 (Lecture 3). This LSTM layer has $4 \times 64 \times (4 + 64) + 4 \times 64 \times 2 = 17{,}920$ parameters, because each of the 4 gates has input weights ($`64 \times 4`$), hidden weights ($`64 \times 64`$), and two sets of biases (`b_ih` and `b_hh`, 64 each).
 
 ---
 

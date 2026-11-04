@@ -244,7 +244,7 @@ Every convolution layer has a $3 \times 3$ kernel, stride 1, and padding 1, so i
 
 *Table 2. Tensor sizes as a 224×224 image passes through each block of VGG-16*
 
-$512 \times 7 \times 7 = 25088$ matches `in_features=25088` of the first fully connected layer. The layers with weights are 13 convolutions and 3 fully connected layers, 16 in total. The convolution layers have 14,714,688 parameters and the fully connected layers 123,642,856, for a total of 138,357,544 (about 138 million), most of them concentrated in the first fully connected layer ($25088 \times 4096$).
+$512 \times 7 \times 7 = 25088$ matches `in_features=25088` of the first fully connected layer. The layers with weights are 13 convolutions and 3 fully connected layers, 16 in total. The convolution layers have 14,714,688 parameters and the fully connected layers 123,642,856, for a total of 138,357,544 (about 138 million), most of them concentrated in the first fully connected layer ($`25088 \times 4096`$).
 
 ---
 
@@ -307,13 +307,13 @@ The golden retriever photo (width 640, height 426) goes through the steps as fol
 
 `mean = (0.485, 0.456, 0.406)` and `std = (0.229, 0.224, 0.225)` are the per-channel means and standard deviations of R, G, and B computed over the ImageNet training images, the values shared by the pretrained models of torchvision [5]. For example, an orange pixel with color (255, 128, 0) changes as follows.
 
-$$
+```math
 \text{ToTensor: } \left(\frac{255}{255}, \frac{128}{255}, \frac{0}{255}\right) = (1.000, 0.502, 0.000)
-$$
+```
 
-$$
+```math
 \text{Normalize: } \left(\frac{1.000 - 0.485}{0.229}, \frac{0.502 - 0.456}{0.224}, \frac{0.000 - 0.406}{0.225}\right) \approx (2.249, 0.205, -1.804)
-$$
+```
 
 The normalized values range from $(0 - 0.485)/0.229 \approx -2.118$ to $(1 - 0.485)/0.229 \approx 2.249$ in the R channel and from $-1.804$ to $2.640$ in the B channel. Normalization stabilizes training by bringing the values of each channel near mean 0 and standard deviation 1, and a pretrained model must receive input normalized with exactly the same values as during training.
 

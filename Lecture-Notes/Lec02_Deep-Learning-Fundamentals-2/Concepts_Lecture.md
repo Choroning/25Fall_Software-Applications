@@ -111,9 +111,9 @@ A **CNN (convolutional neural network)** is a neural network that uses the convo
 
 The **convolution operation** is a linear combination of a region of the input and a **kernel**. A kernel, also called a **filter**, is a small array of weights. The region of the input that the kernel overlaps at one time is called the **receptive field**. Applying a kernel $u$ of size $h$ (odd) to a one-dimensional signal $z$ gives the result $f$ as follows.
 
-$$
+```math
 f(i) = z(i) \circledast u = \sum_{x=-(h-1)/2}^{(h-1)/2} z(i + x)\,u(x)
-$$
+```
 
 The kernel positions are numbered $-(h-1)/2, \dots, (h-1)/2$ so that the center is 0. For a kernel of size 3, $u = (-1, 0, 1)$, the values are $u(-1) = -1$, $u(0) = 0$, $u(1) = 1$, and $f(i) = -z(i - 1) + z(i + 1)$. Sliding the kernel one position at a time, multiplying the values at each position, and adding them all gives a result called a **feature map**.
 
@@ -126,7 +126,7 @@ The kernel positions are numbered $-(h-1)/2, \dots, (h-1)/2$ so that the center 
 
 *Table 2. One-dimensional convolution of the signal (2, 2, 2, 2, 2, 9, 9, 9) with the kernel (−1, 0, 1)*
 
-For example, at $i = 5$ the receptive field is the values (2, 9, 9) at positions 4, 5, 6, and $f(5) = 2 \times (-1) + 9 \times 0 + 9 \times 1 = 7$. At the two ends ($i = 0, 7$) the kernel extends outside the signal, so the value is undefined (−). The result is 0 where the values are constant and 7 only near the boundary where the value changes from 2 to 9, so this kernel finds the points where the value changes (boundaries).
+For example, at $i = 5$ the receptive field is the values (2, 9, 9) at positions 4, 5, 6, and $f(5) = 2 \times (-1) + 9 \times 0 + 9 \times 1 = 7$. At the two ends ($`i = 0, 7`$) the kernel extends outside the signal, so the value is undefined (−). The result is 0 where the values are constant and 7 only near the boundary where the value changes from 2 to 9, so this kernel finds the points where the value changes (boundaries).
 
 **Example of two-dimensional convolution.** For a two-dimensional signal (an image), a two-dimensional kernel is slid horizontally and vertically. Applying a 3 × 3 kernel to the following 8 × 8 image gives a 6 × 6 feature map (the outer border is undefined).
 
@@ -157,8 +157,8 @@ The convolution operation can extract features of the input (image). Depending o
 
 *Figure 4. Two feature maps obtained by applying a horizontal edge kernel and a vertical edge kernel*
 
-- The **horizontal edge kernel** $\begin{pmatrix} 1 & 1 & 1 \\ 0 & 0 & 0 \\ -1 & -1 & -1 \end{pmatrix}$ subtracts the sum of the bottom row from the sum of the top row. Its value is large where the brightness changes from top to bottom, that is, at horizontal boundaries (horizontal edges).
-- The **vertical edge kernel** $\begin{pmatrix} -1 & 0 & 1 \\ -1 & 0 & 1 \\ -1 & 0 & 1 \end{pmatrix}$ subtracts the sum of the left column from the sum of the right column. Its value is large where the brightness changes from left to right, that is, at vertical boundaries (vertical edges), as in the example of Section 2.2.
+- The **horizontal edge kernel** $`\begin{pmatrix} 1 & 1 & 1 \\ 0 & 0 & 0 \\ -1 & -1 & -1 \end{pmatrix}`$ subtracts the sum of the bottom row from the sum of the top row. Its value is large where the brightness changes from top to bottom, that is, at horizontal boundaries (horizontal edges).
+- The **vertical edge kernel** $`\begin{pmatrix} -1 & 0 & 1 \\ -1 & 0 & 1 \\ -1 & 0 & 1 \end{pmatrix}`$ subtracts the sum of the left column from the sum of the right column. Its value is large where the brightness changes from left to right, that is, at vertical boundaries (vertical edges), as in the example of Section 2.2.
 
 In Figure 4, applying the two kernels to the same photo gives feature maps in which the horizontal and vertical features stand out brightly. In regions of constant brightness, the positive and negative parts of the kernel cancel and the value is close to 0.
 
@@ -178,7 +178,7 @@ The **convolutional layer** of Figure 5 convolves (⊛) the input image with fou
 
 | Method | Accuracy per photo $p$ | Probability of getting all 12 right $p^{12}$ |
 |:-----|:-----:|:-----|
-| Random guessing | 0.5 | $0.5^{12} = 1/4096 \approx 0.024\%$ |
+| Random guessing | 0.5 | $`0.5^{12} = 1/4096 \approx 0.024\%`$ |
 | Classical computer vision [3] | 0.827 | $0.827^{12} \approx 0.102 \approx 1/9.77$ |
 | Convolutional neural network [4] | 0.98914 | $0.98914^{12} \approx 0.877$ |
 
@@ -221,15 +221,15 @@ input (5 × 5)       kernel (3 × 3)    output (3 × 3)
 
 The top-left output value is the sum of the 9 elementwise products of the top-left 3 × 3 region of the input and the kernel.
 
-$$
+```math
 \begin{aligned}
 &3 \cdot 0 + 3 \cdot 1 + 2 \cdot 2 \\
 +\;&0 \cdot 2 + 0 \cdot 2 + 1 \cdot 0 \\
 +\;&3 \cdot 0 + 1 \cdot 1 + 2 \cdot 2 \;=\; 0 + 3 + 4 + 0 + 0 + 0 + 0 + 1 + 4 = 12
 \end{aligned}
-$$
+```
 
-Moving the kernel one position to the right makes the receptive field rows 0-2, columns 1-3, $\begin{pmatrix} 3 & 2 & 1 \\ 0 & 1 & 3 \\ 1 & 2 & 2 \end{pmatrix}$, giving $0 + 2 + 2 + 0 + 2 + 0 + 0 + 2 + 4 = 12$. Computing the same way at 3 horizontal and 3 vertical positions fills all 9 outputs.
+Moving the kernel one position to the right makes the receptive field rows 0-2, columns 1-3, $`\begin{pmatrix} 3 & 2 & 1 \\ 0 & 1 & 3 \\ 1 & 2 & 2 \end{pmatrix}`$, giving $0 + 2 + 2 + 0 + 2 + 0 + 0 + 2 + 4 = 12$. Computing the same way at 3 horizontal and 3 vertical positions fills all 9 outputs.
 
 ### 2.7 Padding and Stride
 
@@ -244,9 +244,9 @@ As the kernel is applied, the output becomes smaller than the input (5 × 5 → 
 
 Applied to the input of Section 2.6, they give the following.
 
-$$
+```math
 \text{padding 1, stride 1: } \begin{pmatrix} 6 & 14 & 17 & 11 & 3 \\ 14 & 12 & 12 & 17 & 11 \\ 8 & 10 & 17 & 19 & 13 \\ 11 & 9 & 6 & 14 & 12 \\ 6 & 4 & 4 & 6 & 4 \end{pmatrix} \qquad \text{padding 0, stride 2: } \begin{pmatrix} 12 & 17 \\ 9 & 14 \end{pmatrix}
-$$
+```
 
 The stride-2 output is the same as taking only rows and columns 0 and 2 of the stride-1 output (Figure 6).
 
@@ -254,11 +254,11 @@ The stride-2 output is the same as taking only rows and columns 0 and 2 of the s
 
 With input size $(H, W)$, filter size $(FH, FW)$, stride $S$, and padding $P$, the output size $(OH, OW)$ is as follows.
 
-$$
+```math
 (OH, OW) = \left(\frac{H + 2P - FH}{S} + 1,\ \frac{W + 2P - FW}{S} + 1\right)
-$$
+```
 
-**Derivation.** The width of the padded input is $W + 2P$. The rightmost position at which the left end of the kernel can sit is $W + 2P - FW$ (counting from 0), and the kernel starts at 0 and moves $S$ cells at a time, so the possible positions are the values among $0, S, 2S, \dots$ that do not exceed $W + 2P - FW$. Their number is $\lfloor (W + 2P - FW)/S \rfloor + 1$. If the division is not exact, the leftover cells are not used, so the floor ($\lfloor \cdot \rfloor$) is taken.
+**Derivation.** The width of the padded input is $W + 2P$. The rightmost position at which the left end of the kernel can sit is $W + 2P - FW$ (counting from 0), and the kernel starts at 0 and moves $S$ cells at a time, so the possible positions are the values among $0, S, 2S, \dots$ that do not exceed $W + 2P - FW$. Their number is $\lfloor (W + 2P - FW)/S \rfloor + 1$. If the division is not exact, the leftover cells are not used, so the floor ($`\lfloor \cdot \rfloor`$) is taken.
 
 | Input | Filter | Padding | Stride | Computation | Output |
 |:-----:|:-----:|:-----:|:-----:|:-----|:-----:|
@@ -394,9 +394,9 @@ torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dil
 
 The input is $(N, C_{in}, H_{in}, W_{in})$ or, without a batch axis, $(C_{in}, H_{in}, W_{in})$, and the output is $(N, C_{out}, H_{out}, W_{out})$. $N$ is the batch size. The output size is as follows (`[0]` and `[1]` are the values for the height and width directions).
 
-$$
+```math
 H_{out} = \left\lfloor \frac{H_{in} + 2 \times \text{padding}[0] - \text{dilation}[0] \times (\text{kernel\_size}[0] - 1) - 1}{\text{stride}[0]} + 1 \right\rfloor
-$$
+```
 
 $W_{out}$ uses the same formula with the `[1]` values. With `dilation = 1`, the numerator becomes $H_{in} + 2P - F$, matching the formula of Section 2.8. With `dilation` $d$, the kernel elements are spaced $d - 1$ cells apart, so the kernel actually covers $d(F - 1) + 1$ cells.
 
@@ -455,9 +455,9 @@ The multi-layer perceptron and deep multi-layer perceptron of Lecture 1 and the 
 
 A single piece of time-series data represents the value at each time point as a vector and arranges those vectors in time order, making it a **vector of vectors** of variable length that differs from sample to sample.
 
-$$
+```math
 \mathbf{x} = (\mathbf{a}^1, \mathbf{a}^2, \dots, \mathbf{a}^T)
-$$
+```
 
 For example, if the temperature, humidity, and fine-dust concentration are recorded every day, then $\mathbf{a}^1 = (23.5, 42, 0.1)$, $\mathbf{a}^2 = (25.5, 45, 0.08)$, …, and the number of recorded days $T$ is the length of the time series. The superscript $t$ denotes the time point, not a power.
 
@@ -478,9 +478,9 @@ An **RNN (recurrent neural network)** has a recurrent structure that feeds infor
 
 *Figure 13. An RNN with its recurrent connection unrolled along time, and the RNN computation expressed with the weights U, W, and V*
 
-$$
+```math
 \mathbf{h}^t = \tau_1\left(\mathbf{W}\mathbf{h}^{t-1} + \mathbf{U}\mathbf{a}^t + \mathbf{b}\right), \qquad \mathbf{o}^t = \tau_2\left(\mathbf{V}\mathbf{h}^t + \mathbf{c}\right)
-$$
+```
 
 - $\mathbf{U}$ is the weight matrix from the input to the hidden layer, $\mathbf{W}$ from the previous hidden state to the current hidden state, and $\mathbf{V}$ from the hidden layer to the output. $\mathbf{b}, \mathbf{c}$ are biases, $\tau_1$ is usually tanh, and $\tau_2$ is an output function suited to the problem (for example, softmax).
 - Without the term $\mathbf{W}\mathbf{h}^{t-1}$, this is the same as a multi-layer perceptron. That term is the recurrent connection that carries past information into the present.
@@ -529,13 +529,13 @@ A basic RNN suffers from the **vanishing gradient** problem, losing the informat
 
 The top of Figure 15 is a case where the information that $h_3$ needs is in the nearby $x_0, x_1$, so the gap is short and the RNN learns well. The bottom is a case where the information that $h_{t+1}$ needs is in the much earlier $x_0, x_1$; the gap between the relevant information and the point that uses it is long, and the RNN's ability to learn degrades [11].
 
-**Cause.** For the scalar RNN $h^t = \tanh(w h^{t-1} + u a^t)$ of Section 3.4, the derivative with respect to the hidden state one step earlier is $\frac{\partial h^t}{\partial h^{t-1}} = w\,(1 - (h^t)^2)$ (since $\tanh'(s) = 1 - \tanh^2(s)$). For the loss at time $T$ to reach the input at time 1 during backpropagation, the chain rule multiplies this value $T - 1$ times.
+**Cause.** For the scalar RNN $h^t = \tanh(w h^{t-1} + u a^t)$ of Section 3.4, the derivative with respect to the hidden state one step earlier is $`\frac{\partial h^t}{\partial h^{t-1}} = w\,(1 - (h^t)^2)`$ (since $`\tanh'(s) = 1 - \tanh^2(s)`$). For the loss at time $T$ to reach the input at time 1 during backpropagation, the chain rule multiplies this value $T - 1$ times.
 
-$$
+```math
 \frac{\partial h^T}{\partial h^1} = \prod_{t=2}^{T} w\,(1 - (h^t)^2)
-$$
+```
 
-The derivative of tanh is at most 1, so if $\lvert w \rvert < 1$ the product shrinks exponentially with the number of time points. For example, if each factor is 0.5, after 20 time points it is $0.5^{20} \approx 9.5 \times 10^{-7}$, and the weights for the early inputs are hardly updated. Conversely, if the factors are larger than 1 in magnitude, the product grows explosively, which is the **exploding gradient** problem (for example, $1.1^{50} \approx 117$).
+The derivative of tanh is at most 1, so if $\lvert w \rvert < 1$ the product shrinks exponentially with the number of time points. For example, if each factor is 0.5, after 20 time points it is $0.5^{20} \approx 9.5 \times 10^{-7}$, and the weights for the early inputs are hardly updated. Conversely, if the factors are larger than 1 in magnitude, the product grows explosively, which is the **exploding gradient** problem (for example, $`1.1^{50} \approx 117`$).
 
 ### 3.7 LSTM
 
@@ -550,7 +550,7 @@ The **LSTM (long short-term memory)** is a structure that remedies the vanishing
 
 The RNN at the top of Figure 16 has only one tanh layer in its repeating module, while the LSTM at the bottom has three sigmoid layers (σ) and one tanh layer, and the line running across the top of the module is the cell state [13]. The LSTM computes the following, where $\sigma$ is the sigmoid and $\odot$ is the elementwise product.
 
-$$
+```math
 \begin{aligned}
 f_t &= \sigma(W_{xh\_f}\,x_t + W_{hh\_f}\,h_{t-1} + b_{h\_f}) \\
 i_t &= \sigma(W_{xh\_i}\,x_t + W_{hh\_i}\,h_{t-1} + b_{h\_i}) \\
@@ -559,7 +559,7 @@ g_t &= \tanh(W_{xh\_g}\,x_t + W_{hh\_g}\,h_{t-1} + b_{h\_g}) \\
 c_t &= f_t \odot c_{t-1} + i_t \odot g_t \\
 h_t &= o_t \odot \tanh(c_t)
 \end{aligned}
-$$
+```
 
 | Symbol | Name | Range | Role |
 |:-----|:-----|:-----|:-----|
@@ -572,15 +572,15 @@ $$
 
 *Table 14. Gates and states of the LSTM*
 
-**Worked example.** Let all values be scalars, with $x_t = 1$, $h_{t-1} = 0$, $c_{t-1} = 0.5$, the forget gate's weight and bias $W_{xh\_f} = 0.5$, $b_{h\_f} = 1$, and the other gates $W_{xh} = 1$ with bias 0 (since $h_{t-1} = 0$, the $W_{hh}$ terms are 0).
+**Worked example.** Let all values be scalars, with $x_t = 1$, $h_{t-1} = 0$, $c_{t-1} = 0.5$, the forget gate's weight and bias $`W_{xh\_f} = 0.5`$, $`b_{h\_f} = 1`$, and the other gates $W_{xh} = 1$ with bias 0 (since $h_{t-1} = 0$, the $W_{hh}$ terms are 0).
 
-$$
+```math
 f_t = \sigma(0.5 + 1) = \sigma(1.5) \approx 0.818, \quad i_t = \sigma(1) \approx 0.731, \quad o_t = \sigma(1) \approx 0.731, \quad g_t = \tanh(1) \approx 0.762
-$$
+```
 
-$$
+```math
 c_t = 0.818 \times 0.5 + 0.731 \times 0.762 \approx 0.409 + 0.557 = 0.966, \qquad h_t = 0.731 \times \tanh(0.966) \approx 0.731 \times 0.747 \approx 0.546
-$$
+```
 
 About 82% of the previous cell state 0.5 is kept and about 73% of the new information 0.762 is added, so the cell state becomes 0.966.
 
@@ -594,17 +594,17 @@ The **GRU (gated recurrent unit)** is a simplified LSTM [14]. Improving on the h
 
 *Figure 17. A GRU cell with a reset gate and an update gate*
 
-$$
+```math
 \begin{aligned}
 z_t &= \sigma(W_z \cdot [h_{t-1}, x_t]) \\
 r_t &= \sigma(W_r \cdot [h_{t-1}, x_t]) \\
 \tilde{h}_t &= \tanh(W \cdot [r_t * h_{t-1}, x_t]) \\
 h_t &= (1 - z_t) * h_{t-1} + z_t * \tilde{h}_t
 \end{aligned}
-$$
+```
 
-- $[h_{t-1}, x_t]$ is the concatenation of the two vectors, and $*$ is the elementwise product.
-- The **update gate** $z_t$ decides how much of the previous hidden state to keep and how much of the new candidate $\tilde{h}_t$ to accept. It plays the combined role of the LSTM's forget and input gates, and when $z_t$ is close to 0 the previous state is kept almost unchanged.
+- $[h_{t-1}, x_t]$ is the concatenation of the two vectors, and $`*`$ is the elementwise product.
+- The **update gate** $z_t$ decides how much of the previous hidden state to keep and how much of the new candidate $`\tilde{h}_t`$ to accept. It plays the combined role of the LSTM's forget and input gates, and when $z_t$ is close to 0 the previous state is kept almost unchanged.
 - The **reset gate** $r_t$ decides how much of the previous hidden state to use when forming the new candidate. Close to 0, it ignores the past and forms the candidate mainly from the current input.
 
 The LSTM needs 4 sets of gate weights and the GRU 3, so the GRU is lighter at the same size. For example, with input size 4 and hidden state size 64, PyTorch's LSTM has 17,920 parameters and its GRU 13,440. In practice basic RNNs are rarely used, and LSTMs and GRUs are used instead.
@@ -644,15 +644,15 @@ The symbols for tensor sizes are $N$ = batch size, $L$ = sequence length, $D$ = 
 | Tensor | Size (`batch_first=False`) | Size (`batch_first=True`) | Content |
 |:-----|:-----|:-----|:-----|
 | Input `input` | $(L, N, H_{in})$ | $(N, L, H_{in})$ | Features of the input sequence |
-| `h_0` | $(D \times \text{num\_layers}, N, H_{out})$ | Same | Initial hidden state of each layer; 0 if not given |
-| `c_0` | $(D \times \text{num\_layers}, N, H_{cell})$ | Same | Initial cell state of each layer; 0 if not given |
+| `h_0` | $`(D \times \text{num\_layers}, N, H_{out})`$ | Same | Initial hidden state of each layer; 0 if not given |
+| `c_0` | $`(D \times \text{num\_layers}, N, H_{cell})`$ | Same | Initial cell state of each layer; 0 if not given |
 | Output `output` | $(L, N, D \times H_{out})$ | $(N, L, D \times H_{out})$ | Hidden states $h_t$ of the last layer at every time point |
-| `h_n` | $(D \times \text{num\_layers}, N, H_{out})$ | Same | Final hidden state of each layer |
-| `c_n` | $(D \times \text{num\_layers}, N, H_{cell})$ | Same | Final cell state of each layer |
+| `h_n` | $`(D \times \text{num\_layers}, N, H_{out})`$ | Same | Final hidden state of each layer |
+| `c_n` | $`(D \times \text{num\_layers}, N, H_{cell})`$ | Same | Final cell state of each layer |
 
 *Table 16. Input and output tensor sizes of torch.nn.LSTM*
 
-An LSTM layer takes, along with the input, initial arrays `h_0` and `c_0` that hold the hidden state and cell state, as in `lstm(input, (h_0, c_0))`, and returns `output, (h_n, c_n)`. One hidden state and one cell state are needed per layer and per direction, so the first dimension is $D \times \text{num\_layers}$. For example, a two-layer bidirectional LSTM has $2 \times 2 = 4$.
+An LSTM layer takes, along with the input, initial arrays `h_0` and `c_0` that hold the hidden state and cell state, as in `lstm(input, (h_0, c_0))`, and returns `output, (h_n, c_n)`. One hidden state and one cell state are needed per layer and per direction, so the first dimension is $`D \times \text{num\_layers}`$. For example, a two-layer bidirectional LSTM has $2 \times 2 = 4$.
 
 > **Caution:** Unlike other layers, `nn.LSTM` with the default `batch_first=False` puts the batch axis in the middle, $(L, N, H_{in})$. If the dataset was built in (batch, sequence, feature) order, `batch_first=True` must be given. Also, `batch_first` does not affect the axis order of `h_0`, `c_0`, `h_n`, and `c_n`, which always have the batch axis in the middle. It is a good habit to check defaults in the official documentation rather than in blog posts.
 
@@ -758,7 +758,7 @@ The Lecture 2 lab covers steps 4 and 5 (the model and the forward pass), and the
    <details>
    <summary>Answer</summary>
 
-   The receptive field of the central output is rows 1-3, columns 1-3, $\begin{pmatrix} 0 & 1 & 3 \\ 1 & 2 & 2 \\ 0 & 0 & 2 \end{pmatrix}$. Multiplying elementwise with the kernel $\begin{pmatrix} 0 & 1 & 2 \\ 2 & 2 & 0 \\ 0 & 1 & 2 \end{pmatrix}$ gives $0 + 1 + 6 + 2 + 4 + 0 + 0 + 0 + 4 = 17$.
+   The receptive field of the central output is rows 1-3, columns 1-3, $`\begin{pmatrix} 0 & 1 & 3 \\ 1 & 2 & 2 \\ 0 & 0 & 2 \end{pmatrix}`$. Multiplying elementwise with the kernel $`\begin{pmatrix} 0 & 1 & 2 \\ 2 & 2 & 0 \\ 0 & 1 & 2 \end{pmatrix}`$ gives $0 + 1 + 6 + 2 + 4 + 0 + 0 + 0 + 4 = 17$.
 
    </details>
 
@@ -780,12 +780,12 @@ The Lecture 2 lab covers steps 4 and 5 (the model and the forward pass), and the
 
    </details>
 
-5. **Pooling:** Apply 2 × 2 max pooling and average pooling (stride 2) to the feature map $\begin{pmatrix} 1 & 4 & 2 & 0 \\ 3 & 8 & 1 & 1 \\ 0 & 2 & 6 & 7 \\ 5 & 1 & 3 & 2 \end{pmatrix}$.
+5. **Pooling:** Apply 2 × 2 max pooling and average pooling (stride 2) to the feature map $`\begin{pmatrix} 1 & 4 & 2 & 0 \\ 3 & 8 & 1 & 1 \\ 0 & 2 & 6 & 7 \\ 5 & 1 & 3 & 2 \end{pmatrix}`$.
 
    <details>
    <summary>Answer</summary>
 
-   The four regions are (1, 4, 3, 8), (2, 0, 1, 1), (0, 2, 5, 1), and (6, 7, 3, 2). Max pooling gives $\begin{pmatrix} 8 & 2 \\ 5 & 7 \end{pmatrix}$ and average pooling $\begin{pmatrix} 4 & 1 \\ 2 & 4.5 \end{pmatrix}$.
+   The four regions are (1, 4, 3, 8), (2, 0, 1, 1), (0, 2, 5, 1), and (6, 7, 3, 2). Max pooling gives $`\begin{pmatrix} 8 & 2 \\ 5 & 7 \end{pmatrix}`$ and average pooling $`\begin{pmatrix} 4 & 1 \\ 2 & 4.5 \end{pmatrix}`$.
 
    </details>
 
@@ -798,7 +798,7 @@ The Lecture 2 lab covers steps 4 and 5 (the model and the forward pass), and the
 
    </details>
 
-7. **RNN computation:** For the scalar RNN of Section 3.4 ($w = 0.5$, $u = 1$, $h^0 = 0$), what is $h^2$ for the input sequence $(0, 1)$? Compare it with $h^1$ in Table 12.
+7. **RNN computation:** For the scalar RNN of Section 3.4 ($w = 0.5$, $u = 1$, $`h^0 = 0`$), what is $h^2$ for the input sequence $(0, 1)$? Compare it with $h^1$ in Table 12.
 
    <details>
    <summary>Answer</summary>
@@ -830,7 +830,7 @@ The Lecture 2 lab covers steps 4 and 5 (the model and the forward pass), and the
     <details>
     <summary>Answer</summary>
 
-    $N = 8$, $L = 15$, and $D = 2$. `output` is $(N, L, D \times H_{out}) = (8, 15, 40)$, and `h_n` and `c_n` are $(D \times \text{num\_layers}, N, H) = (4, 8, 20)$. Even with `batch_first=True`, `h_n` and `c_n` have the batch axis in the middle.
+    $N = 8$, $L = 15$, and $D = 2$. `output` is $(N, L, D \times H_{out}) = (8, 15, 40)$, and `h_n` and `c_n` are $`(D \times \text{num\_layers}, N, H) = (4, 8, 20)`$. Even with `batch_first=True`, `h_n` and `c_n` have the batch axis in the middle.
 
     </details>
 

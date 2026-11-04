@@ -118,15 +118,15 @@ Lightweighting methods can be broadly divided into three kinds.
 
 The most basic way to convert a real number $r$ into an integer $q$ is to map the real range linearly onto the integer range. Choosing a **scale** $S$ and a **zero point** $Z$ gives the following relation [2].
 
-$$
+```math
 r \approx S\,(q - Z), \qquad q = \mathrm{round}\left(\frac{r}{S}\right) + Z
-$$
+```
 
-Mapping the minimum and maximum of the real range to the two ends of the integer range (for example, 0-255) is asymmetric quantization, and setting $Z = 0$ and mapping the largest absolute value to the end of the integer range (for example, $-127$ to $127$) is symmetric quantization. An example of symmetric quantization is computed as follows.
+Mapping the minimum and maximum of the real range to the two ends of the integer range (for example, 0-255) is asymmetric quantization, and setting $Z = 0$ and mapping the largest absolute value to the end of the integer range (for example, $-127$ to $`127`$) is symmetric quantization. An example of symmetric quantization is computed as follows.
 
 1. In the FP32 weights $w = [-1.234, 0.456, 2.54]$, the largest absolute value is 2.54, so the scale is $S = 2.54 / 127 = 0.02$.
 2. Dividing each value by $S$ and rounding gives $[-61.7, 22.8, 127] \to q = [-62, 23, 127]$. These integers are stored in 8 bits.
-3. At inference, multiplying by $S$ restores $\hat{w} = [-1.24, 0.46, 2.54]$. The error from the original values is at most 0.006, no more than half the scale ($0.01$).
+3. At inference, multiplying by $S$ restores $\hat{w} = [-1.24, 0.46, 2.54]$. The error from the original values is at most 0.006, no more than half the scale ($`0.01`$).
 
 ```python
 import numpy as np
@@ -159,9 +159,9 @@ The 1×1 convolution and the bottleneck structure, key components of lightweight
 
 ResNet used **residual learning** with **skip connections** to solve the **degradation** problem, in which training becomes harder as layers get deeper [4]. In an ordinary CNN, the stacked layers learn the desired function $H(\mathbf{x})$ directly, but a residual block learns only the residual $\mathcal{F}(\mathbf{x}) = H(\mathbf{x}) - \mathbf{x}$, the difference from the input, and adds the input $\mathbf{x}$ to the output as is.
 
-$$
+```math
 \text{output} = \mathcal{F}(\mathbf{x}) + \mathbf{x}
-$$
+```
 
 ![Figure 5. Comparison of an ordinary CNN, in which two stacked layers learn H(x) directly, and residual learning, which learns F(x) and adds x through a skip connection](../../images/Lec09_p08.png)
 
@@ -233,7 +233,7 @@ Figure 8 shows two ways to turn a 256×256×512 input into a 256×256×64 output
 - **One 3×3 convolution:** It uses 64 filters of size 3×3×512, so it has $3 \times 3 \times 512 \times 64 = 294{,}912$ parameters.
 - **A 1×1 convolution to reduce, then a 3×3 convolution:** 32 filters of size 1×1×512 make 256×256×32 ($1 \times 1 \times 512 \times 32 = 16{,}384$ parameters), and 64 filters of size 3×3×32 make 256×256×64 ($3 \times 3 \times 32 \times 64 = 18{,}432$ parameters). The total is 34,816.
 
-The second way has about 1/8.5 of the parameters of the first. Each weight is multiplied once per output position, so the number of multiplications drops by the same ratio, from about 19.3 billion ($256 \times 256 \times 294{,}912$) to about 2.28 billion ($256 \times 256 \times 34{,}816$).
+The second way has about 1/8.5 of the parameters of the first. Each weight is multiplied once per output position, so the number of multiplications drops by the same ratio, from about 19.3 billion ($`256 \times 256 \times 294{,}912`$) to about 2.28 billion ($`256 \times 256 \times 34{,}816`$).
 
 ---
 
@@ -282,9 +282,9 @@ The Fire module works as follows.
 
 **Parameter count example: fire2.** With a 55×55×96 input and $s_{1\times1} = 16$, $e_{1\times1} = 64$, $e_{3\times3} = 64$, the parameters of fire2 are as follows (including biases).
 
-$$
+```math
 \underbrace{96 \times 16 + 16}_{\text{squeeze}} + \underbrace{16 \times 64 + 64}_{\text{expand 1×1}} + \underbrace{9 \times 16 \times 64 + 64}_{\text{expand 3×3}} = 1{,}552 + 1{,}088 + 9{,}280 = 11{,}920
-$$
+```
 
 Producing the same 128 channels from the same input with one 3×3 convolution would need $9 \times 96 \times 128 + 128 = 110{,}720$ parameters, so the Fire module cuts the parameters to about 1/9. The following code implements the Fire module in PyTorch and confirms these values.
 
@@ -405,17 +405,17 @@ The symbols are defined as follows.
 
 In standard convolution, one kernel has size $D_K \times D_K \times M$ and sees all input channels at once. The number of multiplications, step by step, is as follows.
 
-$$
+```math
 \text{once at one position (Mults once)} = D_K^2 \times M
-$$
+```
 
-$$
+```math
 \text{one kernel (Mults per Kernel)} = D_G^2 \times D_K^2 \times M
-$$
+```
 
-$$
+```math
 N \text{ kernels (Mults N Kernels)} = N \times D_G^2 \times D_K^2 \times M
-$$
+```
 
 Computing one output position multiplies each of the kernel's $D_K^2 M$ weights once, and this repeats for $D_G^2$ output positions and $N$ kernels. Standard convolution performs spatial feature extraction (filtering) and channel combination in one step.
 
@@ -438,42 +438,42 @@ In the upper part of Figure 13, the input is split by channel (채널 분리, "c
 
 **Multiplications of depthwise convolution (DC).** The filter is $D_K \times D_K \times 1$, so it multiplies $D_K^2$ times at one position and $D_G^2 \times D_K^2$ times for the whole output of one channel; for $M$ channels it is the following.
 
-$$
+```math
 \text{DC Mults} = M \times D_G^2 \times D_K^2
-$$
+```
 
 **Multiplications of pointwise convolution (PC).** The filter is $1 \times 1 \times M$, so it multiplies $M$ times at one position and $D_G \times D_G \times M$ times for one kernel; for $N$ kernels it is the following.
 
-$$
+```math
 \text{PC Mults} = N \times D_G^2 \times M
-$$
+```
 
 **Total.**
 
-$$
+```math
 \text{Total} = \text{DC Mults} + \text{PC Mults} = M \times D_G^2 \times D_K^2 + N \times D_G^2 \times M = M \times D_G^2 \, (D_K^2 + N)
-$$
+```
 
 ### 4.4 Comparing Computation and Parameter Counts
 
 The ratio of the multiplications of depthwise separable convolution to those of standard convolution is as follows.
 
-$$
+```math
 \frac{\text{multiplications of depthwise separable convolution}}{\text{multiplications of standard convolution}} = \frac{M \times D_G^2 \, (D_K^2 + N)}{N \times D_G^2 \times D_K^2 \times M} = \frac{D_K^2 + N}{D_K^2 \times N} = \frac{1}{N} + \frac{1}{D_K^2}
-$$
+```
 
 For example, with $N = 1{,}024$ and $D_K = 3$, the ratio is $\frac{1}{1024} + \frac{1}{3^2} \approx 0.001 + 0.111 = 0.112$. The number of output channels $N$ is usually large, so $1/N$ is negligible and the ratio is roughly $1/D_K^2$. With 3×3 kernels, computation drops by about 8-9 times.
 
 Parameter counts can be compared in the same way. Standard convolution has $D_K^2 \times M \times N$ parameters, and depthwise separable convolution has $D_K^2 \times M + M \times N$.
 
-**Worked example.** One layer inside MobileNet ($D_K = 3$, $M = N = 512$, $D_F = D_G = 14$) gives the following.
+**Worked example.** One layer inside MobileNet ($D_K = 3$, $M = N = 512$, $`D_F = D_G = 14`$) gives the following.
 
 | Layer | Mult-Adds | Parameters |
 |:-----|:-----|:-----|
 | Standard convolution | $3^2 \times 512 \times 512 \times 14^2 = 462{,}422{,}016$ (about 462M) | $3^2 \times 512 \times 512 = 2{,}359{,}296$ (about 2.36M) |
 | Depthwise separable convolution | $3^2 \times 512 \times 14^2 + 512 \times 512 \times 14^2 = 903{,}168 + 51{,}380{,}224 = 52{,}283{,}392$ (about 52.3M) | $3^2 \times 512 + 512 \times 512 = 4{,}608 + 262{,}144 = 266{,}752$ (about 0.27M) |
 
-*Table 6. Standard convolution versus depthwise separable convolution for a layer with $D_K = 3$, $M = N = 512$, $D_F = 14$*
+*Table 6. For a layer with $`D_K = 3`$, $`M = N = 512`$, $`D_F = 14`$, standard convolution versus depthwise separable convolution*
 
 The ratio of multiplications is $52.3 / 462 \approx 0.113 = 1/512 + 1/9$, matching the formula above. It is also worth noting that most of the computation and parameters of depthwise separable convolution come from the pointwise (1×1) convolution. This fact is the starting point of ShuffleNet in Section 5.
 
@@ -561,11 +561,11 @@ MobileNet adjusts model size and computation with two hyperparameters.
 
 The multiplications of a depthwise separable convolution layer with both multipliers applied are as follows.
 
-$$
+```math
 D_K \cdot D_K \cdot \alpha M \cdot \rho D_F \cdot \rho D_F + \alpha M \cdot \alpha N \cdot \rho D_F \cdot \rho D_F
-$$
+```
 
-The second term dominates, so computation decreases roughly in proportion to $\alpha^2$ and exactly in proportion to $\rho^2$. The parameter count decreases roughly in proportion to $\alpha^2$ and does not depend on $\rho$. Applying them in turn to the layer of Section 4.4 ($D_K = 3$, $M = N = 512$, $D_F = 14$) gives the following. Each row is cumulative on top of the row above.
+The second term dominates, so computation decreases roughly in proportion to $\alpha^2$ and exactly in proportion to $\rho^2$. The parameter count decreases roughly in proportion to $\alpha^2$ and does not depend on $\rho$. Applying them in turn to the layer of Section 4.4 ($D_K = 3$, $M = N = 512$, $`D_F = 14`$) gives the following. Each row is cumulative on top of the row above.
 
 | Layer / modification | Mult-Adds (millions) | Parameters (millions) |
 |:-----|:---:|:---:|
@@ -672,27 +672,27 @@ The FLOPs (multiply-adds) of ResNet's bottleneck unit and the ShuffleNet unit ar
 
 *Figure 19. The computation of each layer and the totals for the ResNet bottleneck unit and the ShuffleNet unit*
 
-**ResNet bottleneck unit.** The 1×1 convolution ($c \to m$) costs $hw \cdot c \cdot m$, the 3×3 convolution ($m \to m$) costs $hw \cdot 9 m^2$, and the 1×1 convolution ($m \to c$) costs $hw \cdot m \cdot c$, giving the following.
+**ResNet bottleneck unit.** The 1×1 convolution ($`c \to m`$) costs $hw \cdot c \cdot m$, the 3×3 convolution ($`m \to m`$) costs $hw \cdot 9 m^2$, and the 1×1 convolution ($`m \to c`$) costs $hw \cdot m \cdot c$, giving the following.
 
-$$
+```math
 hw(2cm + 9m^2)
-$$
+```
 
-**ShuffleNet unit.** The 1×1 group convolution ($c \to m$) costs $hw \cdot c \cdot m / g$, the 3×3 depthwise convolution costs $9$ per channel, $hw \cdot 9m$, and the 1×1 group convolution ($m \to c$) costs $hw \cdot m \cdot c / g$, giving the following.
+**ShuffleNet unit.** The 1×1 group convolution ($`c \to m`$) costs $hw \cdot c \cdot m / g$, the 3×3 depthwise convolution costs $9$ per channel, $hw \cdot 9m$, and the 1×1 group convolution ($`m \to c`$) costs $hw \cdot m \cdot c / g$, giving the following.
 
-$$
+```math
 hw\left(\frac{2cm}{g} + 9m\right)
-$$
+```
 
 ShuffleNet reduces the cost of the 1×1 layers to $1/g$ and the cost of the 3×3 layer from $9m^2$ to $9m$. For example, with $h = w = 28$, $c = 240$, $m = 60$, and $g = 3$:
 
-$$
+```math
 \text{ResNet: } 784 \times (2 \cdot 240 \cdot 60 + 9 \cdot 60^2) = 784 \times 61{,}200 = 47{,}980{,}800
-$$
+```
 
-$$
+```math
 \text{ShuffleNet: } 784 \times \left(\frac{2 \cdot 240 \cdot 60}{3} + 9 \cdot 60\right) = 784 \times 10{,}140 = 7{,}949{,}760
-$$
+```
 
 The computation of the ShuffleNet unit is about 1/6 of the ResNet bottleneck unit. For the same computation budget, ShuffleNet can use wider feature maps (more channels), which raises accuracy in small models.
 
@@ -719,15 +719,15 @@ In the Stage rows, stride 2, 1 and repeat 1, 3 mean one stride-2 unit followed b
 | Model | Complexity (MFLOPs) | Classification error (%) | Error difference (points) |
 |:-----|:---:|:---:|:---:|
 | 1.0 MobileNet-224 | 569 | 29.4 | - |
-| ShuffleNet 2× ($g = 3$) | 524 | **26.3** | 3.1 |
-| ShuffleNet 2× (with SE, $g = 3$) | 527 | **24.7** | 4.7 |
+| ShuffleNet 2× ($`g = 3`$) | 524 | **26.3** | 3.1 |
+| ShuffleNet 2× (with SE, $`g = 3`$) | 527 | **24.7** | 4.7 |
 | 0.75 MobileNet-224 | 325 | 31.6 | - |
-| ShuffleNet 1.5× ($g = 3$) | 292 | **28.5** | 3.1 |
+| ShuffleNet 1.5× ($`g = 3`$) | 292 | **28.5** | 3.1 |
 | 0.5 MobileNet-224 | 149 | 36.3 | - |
-| ShuffleNet 1× ($g = 8$) | 140 | **32.4** | 3.9 |
+| ShuffleNet 1× ($`g = 8`$) | 140 | **32.4** | 3.9 |
 | 0.25 MobileNet-224 | 41 | 49.4 | - |
-| ShuffleNet 0.5× ($g = 4$) | 38 | **41.6** | 7.8 |
-| ShuffleNet 0.5× (shallow, $g = 3$) | 40 | **42.8** | 6.6 |
+| ShuffleNet 0.5× ($`g = 4`$) | 38 | **41.6** | 7.8 |
+| ShuffleNet 0.5× (shallow, $`g = 3`$) | 40 | **42.8** | 6.6 |
 
 *Table 12. ImageNet classification error of MobileNet and ShuffleNet at similar computation*
 
@@ -802,7 +802,7 @@ All four models share the approach of replacing the expensive 3×3 standard conv
 
    </details>
 
-2. **Quantization:** Compute the scale and the quantized integers when the weights $[-0.5, 1.0, 2.0]$ are quantized to symmetric INT8 ($-127$ to $127$).
+2. **Quantization:** Compute the scale and the quantized integers when the weights $[-0.5, 1.0, 2.0]$ are quantized to symmetric INT8 ($-127$ to $`127`$).
 
    <details>
    <summary>Answer</summary>

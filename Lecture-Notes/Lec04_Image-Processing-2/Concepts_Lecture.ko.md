@@ -301,9 +301,9 @@ train_transform = transforms.Compose([
 
 **정확도(accuracy)** 는 전체 중 맞힌 비율이다.
 
-$$
+```math
 \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-$$
+```
 
 제품이 불량인지 분류하는 문제를 예로 든다. True는 불량, False는 정상이고, 전체 제품은 58개이다.
 
@@ -324,17 +324,17 @@ TP = 30, FP = 5, FN = 3, TN = 20이므로 정확도는 (30 + 20)/(30 + 20 + 3 + 
 
 **정밀도(precision)** 는 Positive로 예측한 것 중 실제로 Positive인 비율로, 예측값이 얼마나 정확한가를 나타낸다.
 
-$$
+```math
 \text{Precision} = \frac{TP}{TP + FP}
-$$
+```
 
 정밀도가 중요한 예는 스팸 메일 판별이다. 정상 메일(Negative)을 스팸(Positive)으로 판별하면 중요한 메일을 놓쳐 업무에 차질이 생기므로, Negative를 Positive로 판단하지 않는 것(FP를 줄이는 것)이 중요하다.
 
 **재현율(recall)** 은 실제 Positive인 것 중 올바르게 Positive로 맞힌 비율로, 실제 정답을 얼마나 찾아냈는가를 나타낸다.
 
-$$
+```math
 \text{Recall} = \frac{TP}{TP + FN}
-$$
+```
 
 재현율이 중요한 예는 암 환자 진단이다. 암 환자(Positive)를 정상(Negative)으로 진단하면 치료 시기를 놓치는 큰 문제가 생기므로, Positive를 Negative로 판단하지 않는 것(FN을 줄이는 것)이 중요하다. 6.2절의 무조건 정상으로 예측하는 모델은 TP = 0이므로 재현율이 0이 되어 문제가 바로 드러난다.
 
@@ -346,9 +346,9 @@ $$
 
 두 지표를 모두 반영하는 지표가 **F1 점수(F1 score)** 이며, 정밀도와 재현율의 **조화 평균(harmonic mean)** 이다.
 
-$$
+```math
 F_1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}} = \frac{2TP}{2TP + FP + FN}
-$$
+```
 
 오른쪽 식은 정밀도와 재현율의 정의를 대입해 정리한 것이다. 표 6의 예에서 $F_1 = 2 \times 0.857 \times 0.909 / (0.857 + 0.909) = 60/68 \approx 0.882$이다. 조화 평균은 두 값 중 작은 쪽에 가깝게 나온다. 정밀도 1.0, 재현율 0.01인 모델은 산술 평균이 0.505이지만 F1 점수는 $2 \times 1.0 \times 0.01 / 1.01 \approx 0.020$으로, 한쪽만 높은 모델을 높게 평가하지 않는다.
 
@@ -384,15 +384,15 @@ F1 점수는 $2TP/(2TP + FP + FN)$으로 계산하면 편하다. 예를 들어 D
 
 **Macro F1**은 클래스별 F1 점수의 산술 평균이다. 모든 클래스를 똑같이 중요하게 다룬다.
 
-$$
+```math
 F_1^{\text{macro}} = \frac{F_1(\text{dog}) + F_1(\text{cat}) + F_1(\text{cow})}{3} = \frac{0.421 + 0.308 + 0.667}{3} \approx 0.465
-$$
+```
 
 **Weighted F1**은 클래스별 데이터의 규모(불균형)를 고려해, 각 클래스의 F1 점수를 실제 표본 수의 비율로 가중 평균한다. 실제 개수는 Dog 6, Cat 10, Cow 9개이다.
 
-$$
+```math
 F_1^{\text{weighted}} = 0.421 \times \frac{6}{25} + 0.308 \times \frac{10}{25} + 0.667 \times \frac{9}{25} \approx 0.101 + 0.123 + 0.240 = 0.464
-$$
+```
 
 **Micro F1**은 클래스를 나누지 않고 전체 표본을 종합적으로 고려한다. 모든 클래스의 TP, FP, FN을 먼저 더한 뒤 정밀도, 재현율, F1 점수를 한 번에 계산한다.
 
@@ -405,9 +405,9 @@ $$
 
 *표 9. Micro F1 계산을 위한 TP, FP, FN의 합계*
 
-$$
+```math
 \text{Precision}^{\text{micro}} = \frac{12}{12 + 13} = 0.48, \qquad \text{Recall}^{\text{micro}} = \frac{12}{12 + 13} = 0.48, \qquad F_1^{\text{micro}} = 0.48
-$$
+```
 
 이 값은 정확도 (4 + 2 + 6)/25 = 12/25 = 0.48과 같다. 표본마다 클래스를 정확히 하나 예측하는 분류(단일 레이블 다중 클래스 분류)에서는 틀린 표본 하나가 예측한 클래스의 FP 하나와 실제 클래스의 FN 하나를 동시에 만들므로, FP의 합과 FN의 합이 모두 틀린 표본 수와 같다. 따라서 micro 정밀도와 micro 재현율이 모두 (맞힌 수)/(전체 수)가 되어 micro F1 점수가 정확도와 같아진다.
 
@@ -596,9 +596,9 @@ graph LR
 
 Wortsman 등이 제안한 원래 방법은 다음과 같다 [15]. 같은 사전 학습 모델에서 출발해 학습률, 데이터 증강, 학습 기간 같은 하이퍼파라미터만 바꾸어 여러 번 미세 조정한 뒤, 그 가중치들을 평균한다.
 
-$$
+```math
 \theta_{\text{soup}} = \frac{1}{k}\sum_{i=1}^{k} \theta_i
-$$
+```
 
 - **uniform soup:** 미세 조정한 모델 $k$개의 가중치를 모두 평균한다.
 - **greedy soup:** 검증 정확도가 높은 모델부터 차례로 하나씩 수프에 넣어 보고, 넣었을 때 검증 정확도가 오르는 경우에만 남긴다.

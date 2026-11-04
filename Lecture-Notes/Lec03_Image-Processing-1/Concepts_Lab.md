@@ -529,7 +529,7 @@ Counting the parameters of the two models layer by layer gives the following.
 |:-----|:-----|:-----|
 | Convolution 1 (3→32) | 3 × 32 × 3 × 3 + 32 | 896 |
 | Convolutions 2, 3 (32→32) | 32 × 32 × 3 × 3 + 32 each | 9,248 each |
-| Three batch normalizations | 32 × 2 ($\gamma$, $\beta$) each | 64 each |
+| Three batch normalizations | 32 × 2 ($\gamma$, $`\beta`$) each | 64 each |
 | Fully connected | 32,768 × 10 + 10 | 327,690 |
 | Total | 896 + 2 × 9,248 + 3 × 64 + 327,690 | 347,274 |
 

@@ -143,7 +143,9 @@ flowchart LR
 
 Given an unlabeled corpus of tokens $\mathcal{U} = \lbrace u_1, \ldots, u_n\rbrace$, the likelihood of the standard **language modeling** objective is maximized.
 
-$$L_1(\mathcal{U}) = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1}; \Theta) \qquad (1)$$
+```math
+L_1(\mathcal{U}) = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1}; \Theta) \qquad (1)
+```
 
 - $k$: the size of the **context window**, that is, the number of previous tokens that can be seen when predicting the next token.
 - $P$: the conditional probability computed by a neural network with parameters $\Theta$. The parameters are trained with stochastic gradient descent.
@@ -152,15 +154,19 @@ In other words, the model is trained to predict the next token from the previous
 
 A numerical example illustrates this. Suppose that for the three tokens "the cat sat" the model assigns the conditional probabilities $P(\text{the}) = 0.2$, $P(\text{cat} \mid \text{the}) = 0.5$, and $P(\text{sat} \mid \text{the cat}) = 0.4$. The log-likelihood is as follows.
 
-$$\ln 0.2 + \ln 0.5 + \ln 0.4 = -1.609 - 0.693 - 0.916 = -3.219$$
+```math
+\ln 0.2 + \ln 0.5 + \ln 0.4 = -1.609 - 0.693 - 0.916 = -3.219
+```
 
-Training pushes this value toward 0 (the probabilities toward 1). The performance of a language model is often expressed as **perplexity**, $\exp\!\left(-\frac{1}{N}\sum_i \log P(u_i \mid \cdot)\right)$, which is $\exp(3.219 / 3) \approx 2.92$ in this example. Perplexity can be read as the average number of candidates among which the model hesitates at each step, and lower is better. The paper's language model achieved a token-level perplexity of 18.4 on BooksCorpus [1].
+Training pushes this value toward 0 (the probabilities toward 1). The performance of a language model is often expressed as **perplexity**, $`\exp\!\left(-\frac{1}{N}\sum_i \log P(u_i \mid \cdot)\right)`$, which is $\exp(3.219 / 3) \approx 2.92$ in this example. Perplexity can be read as the average number of candidates among which the model hesitates at each step, and lower is better. The paper's language model achieved a token-level perplexity of 18.4 on BooksCorpus [1].
 
 ### 3.2 Transformer Decoder
 
 The language model is a **multi-layer Transformer decoder**, a variant of the Transformer [5]. It applies multi-head self-attention over the input context tokens followed by position-wise feedforward layers to produce an output distribution over target tokens.
 
-$$h_0 = U W_e + W_p, \qquad h_l = \texttt{transformer\_block}(h_{l-1}) \;\; \forall l \in [1, n], \qquad P(u) = \mathrm{softmax}(h_n W_e^{T}) \qquad (2)$$
+```math
+h_0 = U W_e + W_p, \qquad h_l = \texttt{transformer\_block}(h_{l-1}) \;\; \forall l \in [1, n], \qquad P(u) = \mathrm{softmax}(h_n W_e^{T}) \qquad (2)
+```
 
 - $U = (u_{-k}, \ldots, u_{-1})$: the (one-hot) vectors of the context tokens.
 - $W_e$: the token embedding matrix, $W_p$: the position embedding matrix, $n$: the number of layers (blocks).
@@ -195,9 +201,13 @@ Since $e^{-\infty} = 0$, the masked cells get a weight of 0. The second row is c
 
 After pre-training, the parameters are adapted to the target task. Each instance of the labeled dataset $\mathcal{C}$ consists of a sequence of input tokens $x^1, \ldots, x^m$ and a label $y$. The input is passed through the pre-trained model to obtain **the activation of the final Transformer block at the last token position** $h_l^m$, and a newly added linear output layer $W_y$ predicts $y$.
 
-$$P(y \mid x^1, \ldots, x^m) = \mathrm{softmax}(h_l^m W_y) \qquad (3)$$
+```math
+P(y \mid x^1, \ldots, x^m) = \mathrm{softmax}(h_l^m W_y) \qquad (3)
+```
 
-$$L_2(\mathcal{C}) = \sum_{(x, y)} \log P(y \mid x^1, \ldots, x^m) \qquad (4)$$
+```math
+L_2(\mathcal{C}) = \sum_{(x, y)} \log P(y \mid x^1, \ldots, x^m) \qquad (4)
+```
 
 As a numerical example, if $h_l^m W_y$ for the three classes of an entailment judgment (entailment, neutral, contradiction) is $(2.0, 0.5, -1.0)$, the softmax result is $(0.786, 0.175, 0.039)$. If the correct answer is entailment, this instance adds $\ln 0.786 \approx -0.241$ to $L_2$, and training pushes this probability toward 1.
 
@@ -207,7 +217,9 @@ The representation at the last token position is used because of masked self-att
 
 Optimizing language modeling together as an **auxiliary objective** during fine-tuning (a) improves the generalization of the supervised model and (b) accelerates convergence. The following objective is maximized with a weight $\lambda$.
 
-$$L_3(\mathcal{C}) = L_2(\mathcal{C}) + \lambda \cdot L_1(\mathcal{C}) \qquad (5)$$
+```math
+L_3(\mathcal{C}) = L_2(\mathcal{C}) + \lambda \cdot L_1(\mathcal{C}) \qquad (5)
+```
 
 Here $L_1(\mathcal{C})$ is the language modeling objective on the input text of the labeled data. The experiments used $\lambda = 0.5$. Implementations often write it as cross-entropy losses to be minimized instead of log-likelihoods to be maximized. For example, if the classification loss of a mini-batch is 0.35 and the language modeling loss is 2.80, the total loss is $0.35 + 0.5 \times 2.80 = 1.75$.
 
@@ -444,7 +456,7 @@ BERT pointed out the limitation that GPT's unidirectional language modeling sees
 | Two-stage training | A language model is pre-trained on an unlabeled corpus and then fine-tuned on discriminative tasks with labeled data. |
 | Language modeling objective | $L_1 = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1})$, which predicts the next token from the previous $k$ tokens. |
 | Transformer decoder | Masked self-attention blocks with 12 layers, 768 dimensions, and 12 heads, whose output layer shares the token embedding matrix. |
-| Fine-tuning | A linear layer $W_y$ and softmax are added on the representation $h_l^m$ at the last token position, and $L_3 = L_2 + \lambda L_1$ ($\lambda = 0.5$) is maximized. |
+| Fine-tuning | A linear layer $W_y$ and softmax are added on the representation $h_l^m$ at the last token position, and $L_3 = L_2 + \lambda L_1$ ($`\lambda = 0.5`$) is maximized. |
 | Input transformations | Entailment joins the premise and hypothesis with a delimiter, similarity adds the representations of both orderings, and multiple choice builds a sequence per answer and normalizes with softmax. |
 | Settings | Pre-training uses BooksCorpus, 512 tokens, a batch of 64, 100 epochs, and a learning rate of $2.5 \times 10^{-4}$; fine-tuning uses a learning rate of $6.25 \times 10^{-5}$, a batch of 32, and 3 epochs. |
 | Results | State-of-the-art on 9 of 12 datasets, with Story Cloze +8.9, RACE +5.7, MNLI +1.5, and GLUE 72.8 (previously 68.9). |

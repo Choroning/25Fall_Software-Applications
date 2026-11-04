@@ -101,9 +101,9 @@ graph LR
 
 그림 4는 2강에서 다룬 AlexNet이다. 입력 크기가 정해져 있으므로 전처리에서 이미지를 227×227로 맞추어야 하고, 출력은 1000개 클래스의 점수이므로 후처리에서 가장 큰 점수의 위치를 클래스 이름으로 바꾸어야 한다. 합성곱 층과 풀링 층을 지날 때의 출력 크기는 입력 크기 $W$, 커널 크기 $K$, 패딩 $P$, 스트라이드 $S$로 계산한다.
 
-$$
+```math
 O = \left\lfloor \frac{W - K + 2P}{S} \right\rfloor + 1
-$$
+```
 
 | 층 | 설정 | 출력 크기 계산 | 출력 |
 |:-----|:-----|:-----|:-----|
@@ -150,9 +150,9 @@ $$
 
 **Normalize.** `transforms.Normalize(mean, std)`는 채널 $c$마다 평균 $m_c$를 빼고 표준 편차 $s_c$로 나눈다. `mean`과 `std`에는 채널 수만큼의 값을 시퀀스로 준다. 컬러 이미지는 채널이 3개이므로 `(0.5, 0.5, 0.5)`처럼 값이 3개이다.
 
-$$
+```math
 x' = \frac{x - m_c}{s_c}
-$$
+```
 
 평균과 표준 편차를 모두 0.5로 주면 0\~1 범위의 값이 −1\~1 범위로 옮겨진다. 픽셀 값 0, 128, 255를 따라가면 다음과 같다.
 
@@ -276,17 +276,17 @@ PyTorch는 손실 함수와 층을 `torch.nn`에, 최적화 기법을 `torch.opt
 
 **교차 엔트로피 손실.** `nn.CrossEntropyLoss`는 로짓 $z_1, \dots, z_K$에 softmax를 적용해 확률로 바꾸고, 정답 클래스 $y$의 확률에 음의 로그를 취한다.
 
-$$
+```math
 p_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}, \qquad L = -\log p_y = -z_y + \log \sum_{j=1}^{K} e^{z_j}
-$$
+```
 
 정답 클래스의 확률이 1에 가까우면 손실은 0에 가깝고, 확률이 작을수록 손실이 커진다. 예를 들어 정답 확률이 0.534이면 $L = -\ln 0.534 \approx 0.627$이다. 클래스가 10개인 문제에서 모든 클래스에 같은 확률 0.1을 주는 모델의 손실은 $-\ln 0.1 = \ln 10 \approx 2.303$이므로, 학습 초기의 손실은 이 값 근처에서 시작한다.
 
 **모멘텀 SGD.** `optim.SGD`는 확률적 경사하강법(stochastic gradient descent)으로, 미니배치에서 구한 기울기 $g_t$로 파라미터 $\theta$를 고친다. `lr`은 **학습률(learning rate)** $\eta$, `momentum`은 모멘텀 계수 $\mu$이다. PyTorch의 모멘텀 SGD는 다음과 같이 이전 갱신 방향 $v$를 누적한다 [2].
 
-$$
+```math
 v_t = \mu v_{t-1} + g_t, \qquad \theta_t = \theta_{t-1} - \eta v_t
-$$
+```
 
 $\mu = 0.9$이면 이전 방향을 90% 유지하면서 새 기울기를 더하므로, 기울기 방향이 계속 같은 축으로는 속도가 붙고 방향이 번갈아 바뀌는 축(그림 6의 지그재그)에서는 서로 상쇄된다.
 
@@ -474,15 +474,15 @@ print('예측 class:', classes[preds[0]])
 
 그림 13은 확산 과정을 확률 미분 방정식(stochastic differential equation, SDE)으로 나타낸 점수 기반 생성 모델이다 [6]. 순방향 과정은 시각 0의 데이터 $\mathbf{x}(0)$에 잡음을 계속 더해 시각 $T$에서 순수한 잡음 $\mathbf{x}(T)$로 만든다.
 
-$$
+```math
 d\mathbf{x} = \mathbf{f}(\mathbf{x}, t)\,dt + g(t)\,d\mathbf{w}
-$$
+```
 
 $\mathbf{f}$는 값이 움직이는 평균 방향(drift), $g(t)$는 잡음의 세기, $\mathbf{w}$는 무작위 움직임을 나타내는 Wiener 과정(브라운 운동)이다. 역방향 과정은 잡음 $\mathbf{x}(T)$에서 출발해 시간을 거슬러 데이터 $\mathbf{x}(0)$를 만든다.
 
-$$
+```math
 d\mathbf{x} = \left[\mathbf{f}(\mathbf{x}, t) - g(t)^2 \nabla_{\mathbf{x}} \log p_t(\mathbf{x})\right] dt + g(t)\,d\bar{\mathbf{w}}
-$$
+```
 
 $p_t$는 시각 $t$에서 데이터의 확률 분포이고, $\nabla_{\mathbf{x}} \log p_t(\mathbf{x})$는 확률이 높아지는 방향을 가리키는 **점수 함수(score function)** 이다. 신경망이 이 점수 함수를 학습하면 잡음에서 시작해 점점 데이터다운 이미지를 만들 수 있다. 그림의 강아지 사진은 순방향으로 갈수록 잡음에 묻히고, 역방향으로 오면 다시 나타난다.
 
@@ -621,17 +621,17 @@ sigmoid 함수 $\sigma(z) = 1/(1+e^{-z})$의 도함수는 $\sigma'(z) = \sigma(z
 
 그림 24의 왼쪽 일반 블록은 두 층(weight layer와 ReLU)이 원하는 출력 $H(x)$를 직접 학습한다. 오른쪽 **잔차 블록(residual block)** 에서는 두 층이 $F(x)$를 계산하고, 입력 $x$를 층을 건너뛰어 그대로 더한다. 이 건너뛰는 연결을 **스킵 연결(skip connection)** 또는 shortcut connection이라 하며, 층을 거친 뒤 원본 $x$를 다시 더해 원본을 잊지 않게 한다.
 
-$$
+```math
 H(x) = F(x) + x \quad \Longleftrightarrow \quad F(x) = H(x) - x
-$$
+```
 
 두 층은 원하는 출력 전체가 아니라 출력과 입력의 차이, 즉 **잔차(residual)** $F(x)$만 학습하면 된다. 4.1절의 상황처럼 항등 함수가 최선이라면 일반 블록은 비선형 층으로 $H(x) = x$를 맞춰야 하지만, 잔차 블록은 가중치를 0 쪽으로 보내 $F(x) = 0$으로 만들면 된다. 이쪽이 훨씬 쉽다.
 
 스킵 연결은 역전파에도 지름길을 만든다. 블록 출력을 입력으로 미분하면
 
-$$
+```math
 \frac{\partial H}{\partial x} = \frac{\partial F}{\partial x} + 1
-$$
+```
 
 이므로, $\partial F/\partial x$가 작아도 1이 더해져 기울기가 사라지지 않고 앞 블록으로 전달된다. 단순화하여 각 블록의 미분을 스칼라 0.1이라 가정하면, 일반 블록 10개를 지난 기울기는 $0.1^{10} = 10^{-10}$배가 되지만 잔차 블록 10개를 지난 기울기는 $(1 + 0.1)^{10} \approx 2.59$배가 되어 사라지지 않는다. 스킵 연결은 파라미터를 더하지 않으므로 계산량도 거의 늘지 않는다.
 
@@ -659,9 +659,9 @@ $$
 
 층 $l$의 가중합을 $z^{(l)}$, 활성화 함수를 $\sigma$, 손실을 $L$이라 하면, 역전파에서 층 $l$의 오차 신호 $\delta^{(l)} = \partial L / \partial z^{(l)}$은 바로 뒤 층의 오차 신호로부터 다음과 같이 계산된다.
 
-$$
+```math
 \delta^{(l)} = \left( W^{(l+1)} \right)^{\top} \delta^{(l+1)} \odot \sigma'\!\left( z^{(l)} \right)
-$$
+```
 
 $\odot$은 원소별 곱이다. 입력 쪽 층의 기울기는 이 식을 여러 번 적용한 결과이므로, 대략 층마다 가중치의 크기와 활성화 함수의 미분값을 곱한 값이 거듭 곱해진다. 이 곱이 1보다 작으면 기울기가 지수적으로 작아지고(소실), 1보다 크면 지수적으로 커진다(폭주). 층마다 0.25가 곱해지면 10층 뒤에는 $0.25^{10} \approx 9.5 \times 10^{-7}$, 층마다 2가 곱해지면 $2^{10} = 1024$가 된다.
 
@@ -684,9 +684,9 @@ sigmoid의 미분값은 0.25 이하이고 tanh의 미분값 $1 - \tanh^2(z)$은 
 
 그림 26처럼 BN 층은 보통 완전 연결 층(또는 합성곱 층)과 활성화 함수 사이에 놓는다. 미니배치 $B = \lbrace x_1, \dots, x_m\rbrace$에 대해 특성(채널)마다 다음을 계산한다.
 
-$$
+```math
 \mu_B = \frac{1}{m}\sum_{i=1}^{m} x_i, \qquad \sigma_B^2 = \frac{1}{m}\sum_{i=1}^{m} (x_i - \mu_B)^2, \qquad \hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \qquad y_i = \gamma \hat{x}_i + \beta
-$$
+```
 
 $\epsilon$은 0으로 나누는 것을 막는 작은 수이다. 정규화로 평균 0, 분산 1이 된 값을 학습 가능한 파라미터 $\gamma$(크기)와 $\beta$(이동)로 다시 조정하므로, 필요하면 네트워크가 원래 분포를 되살릴 수도 있다. 그림 26의 오른쪽에서 Batch 1과 Batch 2의 분포는 서로 다른 쪽으로 치우쳐 있지만, BN을 거치면 둘 다 비슷한 종 모양의 분포가 된다. 값이 sigmoid나 tanh의 포화 구간으로 밀려나지 않으므로 기울기 소실이 줄고, 큰 학습률로도 안정적으로 학습된다. 평가 때는 미니배치 통계 대신 학습 중에 누적한 평균과 분산을 쓰므로, 1.6절에서 본 `model.eval()`이 필요하다.
 
@@ -714,15 +714,15 @@ $\epsilon$은 0으로 나누는 것을 막는 작은 수이다. 정규화로 평
 
 **기울기 클리핑(gradient clipping)** 은 기울기의 크기가 임계값 $\tau$보다 크면 방향은 그대로 두고 크기만 $\tau$로 줄이는 방법이다 [12].
 
-$$
+```math
 \mathbf{g}_{\text{clipped}} =
 \begin{cases}
 \mathbf{g} & \text{if } \lVert \mathbf{g} \rVert_2 \le \tau \\
 \tau \cdot \dfrac{\mathbf{g}}{\lVert \mathbf{g} \rVert_2} & \text{if } \lVert \mathbf{g} \rVert_2 > \tau
 \end{cases}
-$$
+```
 
-$\lVert \mathbf{g} \rVert_2$는 기울기 벡터의 L2 노름(길이)이다. 예를 들어 $\mathbf{g} = (3, 4)$, $\tau = 1$이면 $\lVert \mathbf{g} \rVert_2 = \sqrt{3^2 + 4^2} = 5 > 1$이므로 $\mathbf{g}_{\text{clipped}} = 1 \cdot (3, 4)/5 = (0.6, 0.8)$이 된다. 방향은 같고 길이만 1로 줄었다.
+$\lVert \mathbf{g} \rVert_2$는 기울기 벡터의 L2 노름(길이)이다. 예를 들어 $\mathbf{g} = (3, 4)$, $\tau = 1$이면 $\lVert \mathbf{g} \rVert_2 = \sqrt{3^2 + 4^2} = 5 > 1$이므로 $`\mathbf{g}_{\text{clipped}} = 1 \cdot (3, 4)/5 = (0.6, 0.8)`$이 된다. 방향은 같고 길이만 1로 줄었다.
 
 ![그림 28. 기울기 클리핑을 쓰지 않을 때(왼쪽)와 쓸 때(오른쪽)의 최적화 경로](../../images/Lec03_p38.png)
 
@@ -853,7 +853,7 @@ $\lVert \mathbf{g} \rVert_2$는 기울기 벡터의 L2 노름(길이)이다. 예
     <details>
     <summary>정답</summary>
 
-    $\lVert \mathbf{g} \rVert_2 = \sqrt{36 + 64} = 10 > 5$이므로 $\mathbf{g}_{\text{clipped}} = 5 \cdot (6, 8)/10 = (3, 4)$이다. 클리핑은 임계값보다 큰 기울기의 크기를 줄이기만 하고 작은 기울기는 그대로 두므로, 기울기가 너무 작아지는 소실에는 효과가 없다.
+    $\lVert \mathbf{g} \rVert_2 = \sqrt{36 + 64} = 10 > 5$이므로 $`\mathbf{g}_{\text{clipped}} = 5 \cdot (6, 8)/10 = (3, 4)`$이다. 클리핑은 임계값보다 큰 기울기의 크기를 줄이기만 하고 작은 기울기는 그대로 두므로, 기울기가 너무 작아지는 소실에는 효과가 없다.
 
     </details>
 

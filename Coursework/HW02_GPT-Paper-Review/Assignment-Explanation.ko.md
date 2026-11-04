@@ -143,7 +143,9 @@ flowchart LR
 
 레이블 없는 토큰 코퍼스 $\mathcal{U} = \lbrace u_1, \ldots, u_n\rbrace$이 주어지면, 표준 **언어 모델링(language modeling)** 목적의 가능도를 최대화한다.
 
-$$L_1(\mathcal{U}) = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1}; \Theta) \qquad (1)$$
+```math
+L_1(\mathcal{U}) = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1}; \Theta) \qquad (1)
+```
 
 - $k$: **문맥 창(context window)** 의 크기, 즉 다음 토큰을 예측할 때 볼 수 있는 이전 토큰의 수이다.
 - $P$: 파라미터 $\Theta$를 가진 신경망이 계산하는 조건부 확률이다. 파라미터는 확률적 경사하강법으로 학습한다.
@@ -152,15 +154,19 @@ $$L_1(\mathcal{U}) = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1}; \Theta) \q
 
 수치 예로 확인한다. 세 토큰 "the cat sat"에서 모델이 각 토큰에 준 조건부 확률이 $P(\text{the}) = 0.2$, $P(\text{cat} \mid \text{the}) = 0.5$, $P(\text{sat} \mid \text{the cat}) = 0.4$라 하자. 로그 가능도는 다음과 같다.
 
-$$\ln 0.2 + \ln 0.5 + \ln 0.4 = -1.609 - 0.693 - 0.916 = -3.219$$
+```math
+\ln 0.2 + \ln 0.5 + \ln 0.4 = -1.609 - 0.693 - 0.916 = -3.219
+```
 
-학습은 이 값을 0에 가깝게(확률을 1에 가깝게) 만든다. 언어 모델의 성능은 흔히 **퍼플렉서티(perplexity)** $\exp\!\left(-\frac{1}{N}\sum_i \log P(u_i \mid \cdot)\right)$로 나타내며, 이 예에서는 $\exp(3.219 / 3) \approx 2.92$이다. 퍼플렉서티는 모델이 매 단계에서 평균적으로 몇 개의 후보 사이에서 망설이는지로 해석할 수 있고, 낮을수록 좋다. 논문의 언어 모델은 BooksCorpus에서 토큰 수준 퍼플렉서티 18.4를 기록했다 [1].
+학습은 이 값을 0에 가깝게(확률을 1에 가깝게) 만든다. 언어 모델의 성능은 흔히 **퍼플렉서티(perplexity)** $`\exp\!\left(-\frac{1}{N}\sum_i \log P(u_i \mid \cdot)\right)`$로 나타내며, 이 예에서는 $\exp(3.219 / 3) \approx 2.92$이다. 퍼플렉서티는 모델이 매 단계에서 평균적으로 몇 개의 후보 사이에서 망설이는지로 해석할 수 있고, 낮을수록 좋다. 논문의 언어 모델은 BooksCorpus에서 토큰 수준 퍼플렉서티 18.4를 기록했다 [1].
 
 ### 3.2 Transformer 디코더
 
 언어 모델로는 Transformer [5]의 변형인 **다층 Transformer 디코더(multi-layer Transformer decoder)** 를 쓴다. 입력 문맥 토큰에 멀티 헤드 셀프 어텐션을 적용하고 위치별 피드 포워드 층을 거쳐, 목표 토큰에 대한 출력 분포를 만든다.
 
-$$h_0 = U W_e + W_p, \qquad h_l = \texttt{transformer\_block}(h_{l-1}) \;\; \forall l \in [1, n], \qquad P(u) = \mathrm{softmax}(h_n W_e^{T}) \qquad (2)$$
+```math
+h_0 = U W_e + W_p, \qquad h_l = \texttt{transformer\_block}(h_{l-1}) \;\; \forall l \in [1, n], \qquad P(u) = \mathrm{softmax}(h_n W_e^{T}) \qquad (2)
+```
 
 - $U = (u_{-k}, \ldots, u_{-1})$: 문맥 토큰의 (원-핫) 벡터들이다.
 - $W_e$: 토큰 임베딩 행렬, $W_p$: 위치 임베딩 행렬, $n$: 층(블록)의 수이다.
@@ -195,9 +201,13 @@ $e^{-\infty} = 0$이므로 가린 칸의 가중치는 0이 된다. 둘째 행은
 
 사전 학습이 끝나면 파라미터를 목표 태스크에 맞게 조정한다. 레이블 데이터셋 $\mathcal{C}$의 각 사례는 입력 토큰열 $x^1, \ldots, x^m$과 레이블 $y$로 이루어진다. 입력을 사전 학습 모델에 통과시켜 **마지막 Transformer 블록의 마지막 토큰 위치의 활성값** $h_l^m$을 얻고, 새로 더한 선형 출력층 $W_y$로 $y$를 예측한다.
 
-$$P(y \mid x^1, \ldots, x^m) = \mathrm{softmax}(h_l^m W_y) \qquad (3)$$
+```math
+P(y \mid x^1, \ldots, x^m) = \mathrm{softmax}(h_l^m W_y) \qquad (3)
+```
 
-$$L_2(\mathcal{C}) = \sum_{(x, y)} \log P(y \mid x^1, \ldots, x^m) \qquad (4)$$
+```math
+L_2(\mathcal{C}) = \sum_{(x, y)} \log P(y \mid x^1, \ldots, x^m) \qquad (4)
+```
 
 수치 예로, 함의 판단의 세 클래스(함의, 중립, 모순)에 대한 $h_l^m W_y$가 $(2.0, 0.5, -1.0)$이면 softmax 결과는 $(0.786, 0.175, 0.039)$이다. 정답이 함의라면 이 사례가 $L_2$에 더하는 값은 $\ln 0.786 \approx -0.241$이고, 학습은 이 확률을 1에 가깝게 키운다.
 
@@ -207,7 +217,9 @@ $$L_2(\mathcal{C}) = \sum_{(x, y)} \log P(y \mid x^1, \ldots, x^m) \qquad (4)$$
 
 미세 조정 중에 언어 모델링을 **보조 목적(auxiliary objective)** 으로 함께 최적화하면 (a) 지도 모델의 일반화가 좋아지고 (b) 수렴이 빨라진다. 가중치 $\lambda$로 다음 목적을 최대화한다.
 
-$$L_3(\mathcal{C}) = L_2(\mathcal{C}) + \lambda \cdot L_1(\mathcal{C}) \qquad (5)$$
+```math
+L_3(\mathcal{C}) = L_2(\mathcal{C}) + \lambda \cdot L_1(\mathcal{C}) \qquad (5)
+```
 
 여기서 $L_1(\mathcal{C})$는 레이블 데이터의 입력 텍스트에 대한 언어 모델링 목적이다. 실험에서는 $\lambda = 0.5$를 썼다. 구현에서는 최대화할 로그 가능도 대신 최소화할 교차 엔트로피 손실로 쓰는 경우가 많다. 예를 들어 어느 미니배치에서 분류 손실이 0.35, 언어 모델링 손실이 2.80이면 전체 손실은 $0.35 + 0.5 \times 2.80 = 1.75$이다.
 
@@ -444,7 +456,7 @@ BERT는 GPT의 단방향 언어 모델링이 문맥의 한쪽만 본다는 한�
 | 2단계 학습 | 레이블 없는 코퍼스로 언어 모델을 사전 학습한 뒤, 레이블 데이터로 판별 태스크에 미세 조정한다. |
 | 언어 모델링 목적 | $L_1 = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1})$로, 앞의 $k$개 토큰으로 다음 토큰을 예측한다. |
 | Transformer 디코더 | 12층, 768차원, 헤드 12개의 마스크드 셀프 어텐션 블록이며, 출력층은 토큰 임베딩 행렬을 공유한다. |
-| 미세 조정 | 마지막 토큰 위치의 표현 $h_l^m$에 선형 층 $W_y$와 softmax를 더하고, $L_3 = L_2 + \lambda L_1$($\lambda = 0.5$)을 최대화한다. |
+| 미세 조정 | 마지막 토큰 위치의 표현 $h_l^m$에 선형 층 $W_y$와 softmax를 더하고, $L_3 = L_2 + \lambda L_1$($`\lambda = 0.5`$)을 최대화한다. |
 | 입력 변환 | 함의는 전제와 가설을 구분자로 잇고, 유사도는 두 순서의 표현을 더하며, 다지선다는 답마다 열을 만들어 softmax로 정규화한다. |
 | 설정 | 사전 학습은 BooksCorpus, 512토큰, 배치 64, 100 에포크, 학습률 $2.5 \times 10^{-4}$이고, 미세 조정은 학습률 $6.25 \times 10^{-5}$, 배치 32, 3 에포크이다. |
 | 결과 | 12개 데이터셋 중 9개에서 최고 성능을 기록했으며, Story Cloze +8.9, RACE +5.7, MNLI +1.5, GLUE 72.8(이전 68.9)이다. |

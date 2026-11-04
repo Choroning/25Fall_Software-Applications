@@ -77,11 +77,11 @@ Because all information of the input sequence cannot be held in a fixed-size vec
 
 *Figure 2. The attention weights the decoder gives to each encoder time step when outputting "나는" (I 0.67, am 0.08, a 0.04, student 0.21), and the softmax distributions recomputed at every time step*
 
-The decoder produces its $t$-th output as follows. Let $\mathbf{h}_1, \dots, \mathbf{h}_n$ be the encoder's hidden states at each time step and $\mathbf{s}_t$ the decoder's current state.
+The decoder produces its $t$-th output as follows. Let $`\mathbf{h}_1, \dots, \mathbf{h}_n`$ be the encoder's hidden states at each time step and $`\mathbf{s}_t`$ the decoder's current state.
 
-1. **Attention score:** Compute a score $e_{t,i} = \mathrm{score}(\mathbf{s}_t, \mathbf{h}_i)$ for how related the decoder state is to each encoder hidden state. A dot product or a small neural network serves as the score function.
-2. **Attention distribution:** Apply softmax to the scores to obtain weights that sum to 1, $\alpha_{t,i} = \mathrm{softmax}(e_{t,\cdot})_i$.
-3. **Attention value:** Compute the weighted sum of the encoder hidden states, $\mathbf{c}_t = \sum_i \alpha_{t,i} \mathbf{h}_i$. This vector is the context vector for the $t$-th output and is used together with the decoder state to predict the next word.
+1. **Attention score:** Compute a score $`e_{t,i} = \mathrm{score}(\mathbf{s}_t, \mathbf{h}_i)`$ for how related the decoder state is to each encoder hidden state. A dot product or a small neural network serves as the score function.
+2. **Attention distribution:** Apply softmax to the scores to obtain weights that sum to 1, $`\alpha_{t,i} = \mathrm{softmax}(e_{t,\cdot})_i`$.
+3. **Attention value:** Compute the weighted sum of the encoder hidden states, $`\mathbf{c}_t = \sum_i \alpha_{t,i} \mathbf{h}_i`$. This vector is the context vector for the $t$-th output and is used together with the decoder state to predict the next word.
 
 In the example of Figure 2, when outputting "나는" (I), the weight on I is the largest at 0.67, followed by student 0.21, am 0.08, and a 0.04. At this step the decoder mostly consults the information of I to produce "나는". As the several softmax bars at the top of the figure show, the weights are recomputed at every output step, so when outputting "학생" (student) the decoder can give a large weight to student. Because the context vector differs at every step, there is no need to fit all information into one fixed-size vector, and the shorter path from output to input also lets gradients flow well.
 
@@ -136,17 +136,17 @@ In a library-search analogy, the query is the search phrase describing what one 
 
 As in Figure 4, the Q, K, and V vectors are obtained by multiplying the word vector $\mathbf{x}$ by learned weight matrices $W^Q$, $W^K$, and $W^V$. In the original paper, word vectors have $d_{\text{model}} = 512$ dimensions and the weight matrices are $512 \times 64$, so Q, K, and V have $d_k = 64$ dimensions (the label 차원 in the figure means "dimensions").
 
-$$
+```math
 \mathbf{q} = \mathbf{x} W^Q, \qquad \mathbf{k} = \mathbf{x} W^K, \qquad \mathbf{v} = \mathbf{x} W^V
-$$
+```
 
 ### 2.3 Scaled Dot-Product Attention
 
 The attention function used by the Transformer is **scaled dot-product attention**.
 
-$$
+```math
 \mathrm{Attention}(Q, K, V) = \mathrm{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
-$$
+```
 
 ```mermaid
 graph BT
@@ -163,7 +163,7 @@ graph BT
 
 The computation for the word 'I' proceeds step by step as follows. The sentence is "I am a student".
 
-1. **Attention score:** The query vector of 'I', $\mathbf{q}_I$, takes the dot product with the key vectors of all words. For example, let $\mathbf{q}_I \cdot \mathbf{k}_I = 128$, $\mathbf{q}_I \cdot \mathbf{k}_{am} = 32$, $\mathbf{q}_I \cdot \mathbf{k}_a = 32$, and $\mathbf{q}_I \cdot \mathbf{k}_{student} = 128$.
+1. **Attention score:** The query vector of 'I', $`\mathbf{q}_I`$, takes the dot product with the key vectors of all words. For example, let $`\mathbf{q}_I \cdot \mathbf{k}_I = 128`$, $`\mathbf{q}_I \cdot \mathbf{k}_{am} = 32`$, $`\mathbf{q}_I \cdot \mathbf{k}_a = 32`$, and $`\mathbf{q}_I \cdot \mathbf{k}_{student} = 128`$.
 2. **Scaling:** The variance of dot products grows in proportion to the vector dimension $d_k$ (explained below), so for stable training they are divided by $\sqrt{d_k}$. With $d_k = 64$, $\sqrt{d_k} = 8$, so the scores become $128/8 = 16$, $32/8 = 4$, $4$, and $16$. Because of this rescaling, it is called "scaled" dot-product attention.
 3. **Attention distribution:** Apply softmax to the scores to obtain the **attention distribution**, which sums to 1.
 4. **Attention value:** Take the weighted sum of each word's value vector with the attention distribution to obtain the **attention value**. It is also called the context vector for the word 'I'.
@@ -172,7 +172,7 @@ The computation for the word 'I' proceeds step by step as follows. The sentence 
 
 *Figure 6. Computing the scores of the query of I against the four keys (16, 4, 4, 16) and taking the weighted sum of the values with the softmax distribution (0.4, 0.1, 0.1, 0.4)*
 
-In Figure 6, the attention value is $0.4\,\mathbf{v}_I + 0.1\,\mathbf{v}_{am} + 0.1\,\mathbf{v}_a + 0.4\,\mathbf{v}_{student}$. The information of I and student, which are strongly related to 'I', is mainly reflected.
+In Figure 6, the attention value is $`0.4\,\mathbf{v}_I + 0.1\,\mathbf{v}_{am} + 0.1\,\mathbf{v}_a + 0.4\,\mathbf{v}_{student}`$. The information of I and student, which are strongly related to 'I', is mainly reflected.
 
 > **Note:** The distribution in Figure 6 (0.4, 0.1, 0.1, 0.4) is illustrative, showing the tendency. Actually applying softmax to the scores $[16, 4, 4, 16]$ gives about $[0.5, 0.000003, 0.000003, 0.5]$, because $e^{16}$ is about 160,000 times larger than $e^{4}$. Even after division by $\sqrt{d_k}$, a score gap of 12 makes softmax put almost all the weight on the largest scores, and the unscaled gap of 96 would be far more extreme. This saturation of softmax as score gaps grow is exactly the reason for the scaling explained next.
 
@@ -180,7 +180,7 @@ In Figure 6, the attention value is $0.4\,\mathbf{v}_I + 0.1\,\mathbf{v}_{am} + 
 
 > **[Probability and Statistics]** For independent random variables $q$ and $k$ with mean 0, the variance of their product is $\mathrm{Var}(qk) = E[q^2]E[k^2] = \mathrm{Var}(q)\mathrm{Var}(k)$. The variance of a sum of independent random variables is the sum of their variances, so the dot product, a sum of $d_k$ products of variance-1 components, has variance $d_k$. Dividing a random variable by a constant $c$ divides its variance by $c^2$, so the score divided by $\sqrt{d_k}$ has variance 1.
 
-**Matrix operations and parallel processing.** In practice, the computation is not done word by word but at once with the matrix $X$ ($\text{seq\_len} \times d_{\text{model}}$) whose rows are the word vectors of the sentence. $Q = XW^Q$, $K = XW^K$, and $V = XW^V$ are each $\text{seq\_len} \times d_k$ matrices, and $QK^T$ is a $\text{seq\_len} \times \text{seq\_len}$ matrix holding the scores of all word pairs. Applying softmax row by row and multiplying by $V$ yields the **attention value matrix**, which holds the attention values of all words.
+**Matrix operations and parallel processing.** In practice, the computation is not done word by word but at once with the matrix $X$ ($`\text{seq\_len} \times d_{\text{model}}`$) whose rows are the word vectors of the sentence. $Q = XW^Q$, $K = XW^K$, and $V = XW^V$ are each $`\text{seq\_len} \times d_k`$ matrices, and $QK^T$ is a $`\text{seq\_len} \times \text{seq\_len}`$ matrix holding the scores of all word pairs. Applying softmax row by row and multiplying by $V$ yields the **attention value matrix**, which holds the attention values of all words.
 
 ![Figure 7. The matrix computation that multiplies the sentence matrix by W^Q, W^K, W^V to make the Q, K, V matrices and obtains the attention value matrix at once as softmax(QK^T/√d_k)V](../../images/Lec08_p13.png)
 
@@ -192,13 +192,13 @@ An RNN needs the hidden state of the previous time step to compute the next one,
 
 The whole of self-attention is computed by hand with small numbers. The sentence is "I am a student", with $d_{\text{model}} = 4$ and $d_k = 2$. The matrix $X$, whose rows are the word vectors, and the weight matrices are as follows (in reality these are learned values, but integers are used here so that the computation is easy to follow).
 
-$$
+```math
 X = \begin{bmatrix} 1 & 0 & 1 & 0 \\ 0 & 2 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 1 & 0 & 2 & 0 \end{bmatrix}
 \begin{matrix} \leftarrow \text{I} \\ \leftarrow \text{am} \\ \leftarrow \text{a} \\ \leftarrow \text{student} \end{matrix}, \quad
 W^Q = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 0 \\ 0 & 1 \end{bmatrix}, \quad
 W^K = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 0 \\ 0 & 0 \end{bmatrix}, \quad
 W^V = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 1 \\ 1 & 0 \end{bmatrix}
-$$
+```
 
 **Step 1: Q, K, V.** For example, the query of I is $[1, 0, 1, 0] W^Q = [1 + 1, 0 + 0] = [2, 0]$. Computing the rest in the same way gives the following.
 
@@ -269,9 +269,9 @@ print(out)
 
 **Multi-head attention** is an architecture based on the idea that using several attentions in parallel is more effective than a single attention. Instead of performing attention once over all $d_{\text{model}}$ dimensions, it performs attention $h$ separate times in reduced $d_k = d_{\text{model}} / h$ dimensions. Each of these is called a **head**, and the original paper uses $h = 8$ and $d_k = 512 / 8 = 64$.
 
-$$
+```math
 d_{\text{model}} = d_k \times \text{num\_heads}, \qquad 512 = 64 \times 8
-$$
+```
 
 ![Figure 8. Multi-head attention, which performs attention num_heads times with different weights W_i^Q, W_i^K, W_i^V for each head](../../images/Lec08_p15.png)
 
@@ -279,17 +279,17 @@ $$
 
 The computation proceeds as follows.
 
-1. Each head $i$ makes Q, K, and V with its own weights $W_i^Q$, $W_i^K$, and $W_i^V$ ($d_{\text{model}} \times d_k$) and performs scaled dot-product attention to obtain the attention value matrix $\mathbf{a}_i$ ($\text{seq\_len} \times d_k$).
-2. Concatenating the results of the $h$ heads, $\mathbf{a}_0, \dots, \mathbf{a}_{h-1}$, side by side gives a $\text{seq\_len} \times (h \cdot d_k) = \text{seq\_len} \times d_{\text{model}}$ matrix.
-3. Multiplying the concatenated matrix by the weight $W^O$ ($d_{\text{model}} \times d_{\text{model}}$) produces the final output.
+1. Each head $i$ makes Q, K, and V with its own weights $W_i^Q$, $W_i^K$, and $W_i^V$ ($`d_{\text{model}} \times d_k`$) and performs scaled dot-product attention to obtain the attention value matrix $`\mathbf{a}_i`$ ($`\text{seq\_len} \times d_k`$).
+2. Concatenating the results of the $h$ heads, $`\mathbf{a}_0, \dots, \mathbf{a}_{h-1}`$, side by side gives a $`\text{seq\_len} \times (h \cdot d_k) = \text{seq\_len} \times d_{\text{model}}`$ matrix.
+3. Multiplying the concatenated matrix by the weight $W^O$ ($`d_{\text{model}} \times d_{\text{model}}`$) produces the final output.
 
-$$
+```math
 \mathrm{MultiHead}(Q, K, V) = \mathrm{Concat}(\mathrm{head}_1, \dots, \mathrm{head}_h) W^O, \qquad \mathrm{head}_i = \mathrm{Attention}(Q W_i^Q, K W_i^K, V W_i^V)
-$$
+```
 
 Several heads are effective because each head can attend to a different relation. One head can learn long-distance dependencies between words, and another the relation between a pronoun and the noun it refers to [4]. Because each head's dimension is smaller, the total computation is similar to that of a single attention over all dimensions.
 
-Multi-head attention **has the same input and output size.** If the input is $\text{seq\_len} \times d_{\text{model}}$, the output is also $\text{seq\_len} \times d_{\text{model}}$. The sizes must match so that the same structure can be repeated and stacked $N$ times. The parameters of one multi-head attention layer are $W^Q, W^K, W^V$ (each $512 \times 512$ when the 8 heads are combined) and $W^O$ ($512 \times 512$), so the weights alone number $4 \times 512 \times 512 = 1{,}048{,}576$, and adding $4 \times 512 = 2{,}048$ biases gives 1,050,624.
+Multi-head attention **has the same input and output size.** If the input is $`\text{seq\_len} \times d_{\text{model}}`$, the output is also $`\text{seq\_len} \times d_{\text{model}}`$. The sizes must match so that the same structure can be repeated and stacked $N$ times. The parameters of one multi-head attention layer are $W^Q, W^K, W^V$ (each $512 \times 512$ when the 8 heads are combined) and $W^O$ ($`512 \times 512`$), so the weights alone number $4 \times 512 \times 512 = 1{,}048{,}576$, and adding $4 \times 512 = 2{,}048$ biases gives 1,050,624.
 
 ### 2.6 Residual Connection, Layer Normalization, and the Feed-Forward Network
 
@@ -303,9 +303,9 @@ One encoder layer of the Transformer consists of two sublayers, multi-head self-
 - **Layer normalization:** The components of each word vector are normalized to mean 0 and variance 1, and then a learned scale and shift are applied (Norm) [6]. Unlike batch normalization, which looks at several samples in a batch together, it normalizes within the vector of a single sample, so it works regardless of sentence length or batch size. The output of a sublayer is $\mathrm{LayerNorm}(\mathbf{x} + \mathrm{Sublayer}(\mathbf{x}))$.
 - **Feed-forward network:** The same two-layer network is applied separately to the vector at each position. The hidden dimension in the original paper is $d_{ff} = 2048$.
 
-$$
+```math
 \mathrm{FFN}(\mathbf{x}) = \max(0, \mathbf{x} W_1 + \mathbf{b}_1) W_2 + \mathbf{b}_2
-$$
+```
 
 If self-attention mixes information among words, the feed-forward network processes the mixed information nonlinearly for each word.
 
@@ -486,11 +486,11 @@ On the curve in Figure 12, position 4 is at the maximum, but positions 0 and 8 h
 
 **Using sines and cosines at several frequencies.** The Transformer uses several sine and cosine functions with different frequencies together [4]. In the encoding vector of position $pos$, the even dimension $2i$ and the odd dimension $2i+1$ are as follows.
 
-$$
+```math
 PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right), \qquad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)
-$$
+```
 
-Each dimension pair $(2i, 2i+1)$ has a different angular frequency $\omega_i = 1/10000^{2i/d_{\text{model}}}$. The early dimensions (small $i$) change quickly with position, and the later dimensions change slowly. Just as the second, minute, and hour hands of a clock together indicate a time, combining fast and slow components gives each position a unique vector within any practical length (condition 2). All values lie between $-1$ and $1$ (condition 3), and the same position has the same vector regardless of the sentence (condition 1). The positional encoding vector has the same $d_{\text{model}}$ dimensions as the word embedding, so the two can be added element by element.
+Each dimension pair $(2i, 2i+1)$ has a different angular frequency $\omega_i = 1/10000^{2i/d_{\text{model}}}$. The early dimensions (small $`i`$) change quickly with position, and the later dimensions change slowly. Just as the second, minute, and hour hands of a clock together indicate a time, combining fast and slow components gives each position a unique vector within any practical length (condition 2). All values lie between $-1$ and $1$ (condition 3), and the same position has the same vector regardless of the sentence (condition 1). The positional encoding vector has the same $d_{\text{model}}$ dimensions as the word embedding, so the two can be added element by element.
 
 ![Figure 13. The sine and cosine positional encoding formulas, and adding the encoding vector of each position to the word embedding at that position in the sentence I am a student](../../images/Lec08_p31.png)
 
@@ -505,21 +505,21 @@ Computing a small example with $d_{\text{model}} = 4$: the pair $i = 0$ has $\om
 | 2 (a) | 0.909 | -0.416 | 0.020 | 1.000 |
 | 3 (student) | 0.141 | -0.990 | 0.030 | 1.000 |
 
-*Table 6. Positional encoding vectors of positions 0-3 with $d_{\text{model}} = 4$*
+*Table 6. For $`d_{\text{model}} = 4`$, positional encoding vectors of positions 0-3*
 
 The first two dimensions change greatly from position to position, and the last two change very slowly. Adding each row to the word embedding at the same position gives the input of the Transformer.
 
-**The distance condition and the rotation matrix.** A relative change in position can be expressed by a trigonometric rotation matrix. In one dimension pair, let $\theta = \omega\, pos$ and $\phi = \omega\, t$; the angle addition formulas give
+**The distance condition and the rotation matrix.** A relative change in position can be expressed by a trigonometric rotation matrix. In one dimension pair, let $`\theta = \omega\, pos`$ and $`\phi = \omega\, t`$; the angle addition formulas give
 
-$$
+```math
 \begin{pmatrix} \cos(\theta + \phi) \\ \sin(\theta + \phi) \end{pmatrix} = \begin{pmatrix} \cos\phi & -\sin\phi \\ \sin\phi & \cos\phi \end{pmatrix} \begin{pmatrix} \cos\theta \\ \sin\theta \end{pmatrix}
-$$
+```
 
 The encoding of position $pos + t$ is the encoding of position $pos$ rotated by $\phi = \omega t$, and the rotation angle depends only on the position difference $t$. Rotation does not change the length of a vector, so the squared distance between the two encodings in each dimension pair is $\lVert R(\phi)\mathbf{p} - \mathbf{p} \rVert^2 = 2 - 2\cos(\omega_i t)$, and the squared total distance is as follows.
 
-$$
+```math
 \lVert PE(pos + t) - PE(pos) \rVert^2 = \sum_{i} \left(2 - 2\cos(\omega_i t)\right)
-$$
+```
 
 This value does not contain $pos$, so $\mathrm{distance}(x, x + t) = \mathrm{distance}(y, y + t)$ holds (condition 4). In other words, rotating the encodings of positions x and y by the same angle $\omega_i t$ in each dimension pair moves them by the same distance. For example, with $d_{\text{model}} = 512$, the distances between positions 0 and 1, 3 and 4, and 40 and 41 are all about 3.714.
 
@@ -570,7 +570,7 @@ query suis           □      □      □      ■
 query étudiant       □      □      □      □
 ```
 
-*Figure 15. The mask that hides future positions in the decoder's attention score matrix (■ marks cells masked with $-\infty$)*
+*Figure 15. The mask that hides future positions in the decoder's attention score matrix (■ marks cells masked with $`-\infty`$)*
 
 Applying the mask to the example of Section 2.4 changes the attention distributions as follows. The first word I can see only itself, so it receives weight 1; am sees only I and am, and a sees only I, am, and a. The last word student can see all words, so its row is the same as in Table 3.
 
@@ -688,7 +688,7 @@ ViT-Base has 12 layers, hidden dimension 768, and 12 heads, about 86 million par
 | Statement | Judgment and Reason |
 |:-----|:-----|
 | The decoder of a seq2seq model with attention uses the same context vector at every output step. | **F.** The attention weights are recomputed at every step, so the context vector also differs at every output step. A single fixed context vector is used by seq2seq without attention. |
-| In scaled dot-product attention, dividing by $\sqrt{d_k}$ prevents softmax from saturating and its gradients from becoming small. | **T.** The larger the dimension, the larger the variance of the dot product ($d_k$), which concentrates softmax on one position, so dividing by $\sqrt{d_k}$ brings the variance back to 1. |
+| In scaled dot-product attention, dividing by $\sqrt{d_k}$ prevents softmax from saturating and its gradients from becoming small. | **T.** The larger the dimension, the larger the variance of the dot product ($`d_k`$), which concentrates softmax on one position, so dividing by $\sqrt{d_k}$ brings the variance back to 1. |
 | The output size of multi-head attention grows in proportion to the number of heads. | **F.** Each head produces a result of $d_k = d_{\text{model}}/h$ dimensions and the results are concatenated, so the output is again $d_{\text{model}}$-dimensional. Input and output sizes match, so layers can be stacked $N$ times. |
 | With sine and cosine positional encoding, the distance between positions $x$ and $x + t$ depends on $x$. | **F.** The position difference $t$ corresponds to a rotation by angle $\omega_i t$ in each dimension pair, so the distance $\sqrt{\sum_i (2 - 2\cos\omega_i t)}$ does not depend on $x$. |
 | BPE can split a word not in the training data into subwords by applying the learned merge rules. | **T.** The word is split into characters and the learned merges are applied in order. lowest is split into low and est. |
@@ -731,7 +731,7 @@ ViT-Base has 12 layers, hidden dimension 768, and 12 heads, about 86 million par
 
    </details>
 
-2. **Attention value:** With encoder hidden states $\mathbf{h}_1 = [1, 0]$ and $\mathbf{h}_2 = [0, 1]$ and attention weights $0.8$ and $0.2$, compute the context vector.
+2. **Attention value:** With encoder hidden states $`\mathbf{h}_1 = [1, 0]`$ and $`\mathbf{h}_2 = [0, 1]`$ and attention weights $0.8$ and $0.2$, compute the context vector.
 
    <details>
    <summary>Answer</summary>

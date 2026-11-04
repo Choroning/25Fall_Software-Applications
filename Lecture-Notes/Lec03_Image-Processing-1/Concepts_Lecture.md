@@ -101,9 +101,9 @@ Before writing code, decide what goes into the model and what comes out. In imag
 
 Figure 4 is AlexNet, covered in Lecture 2. Because its input size is fixed, preprocessing must resize images to 227×227, and because its output is a score for each of 1000 classes, postprocessing must turn the position of the largest score into a class name. The output size of a convolution or pooling layer is computed from the input size $W$, kernel size $K$, padding $P$, and stride $S$.
 
-$$
+```math
 O = \left\lfloor \frac{W - K + 2P}{S} \right\rfloor + 1
-$$
+```
 
 | Layer | Setting | Output size computation | Output |
 |:-----|:-----|:-----|:-----|
@@ -150,9 +150,9 @@ A **dataset** is an object that bundles pairs of inputs and answers so that they
 
 **Normalize.** `transforms.Normalize(mean, std)` subtracts the mean $m_c$ and divides by the standard deviation $s_c$ for each channel $c$. `mean` and `std` take a sequence with one value per channel. A color image has three channels, so there are three values, as in `(0.5, 0.5, 0.5)`.
 
-$$
+```math
 x' = \frac{x - m_c}{s_c}
-$$
+```
 
 With both the mean and the standard deviation set to 0.5, values in the range 0-1 move to the range −1 to 1. Following the pixel values 0, 128, and 255 gives the following.
 
@@ -276,17 +276,17 @@ PyTorch provides loss functions and layers in `torch.nn` and optimization method
 
 **Cross-entropy loss.** `nn.CrossEntropyLoss` applies softmax to the logits $z_1, \dots, z_K$ to turn them into probabilities and takes the negative logarithm of the probability of the correct class $y$.
 
-$$
+```math
 p_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}, \qquad L = -\log p_y = -z_y + \log \sum_{j=1}^{K} e^{z_j}
-$$
+```
 
 When the probability of the correct class is close to 1 the loss is close to 0, and the smaller the probability, the larger the loss. For example, if the probability of the correct class is 0.534, then $L = -\ln 0.534 \approx 0.627$. In a 10-class problem, a model that gives every class the same probability 0.1 has loss $-\ln 0.1 = \ln 10 \approx 2.303$, so the loss at the beginning of training starts near this value.
 
 **SGD with momentum.** `optim.SGD` is stochastic gradient descent, which corrects the parameters $\theta$ with the gradient $g_t$ computed on a mini-batch. `lr` is the **learning rate** $\eta$ and `momentum` is the momentum coefficient $\mu$. PyTorch's SGD with momentum accumulates the previous update direction $v$ as follows [2].
 
-$$
+```math
 v_t = \mu v_{t-1} + g_t, \qquad \theta_t = \theta_{t-1} - \eta v_t
-$$
+```
 
 With $\mu = 0.9$, the update keeps 90% of the previous direction and adds the new gradient, so it gains speed along axes where the gradient keeps the same direction, and the contributions cancel along axes where the direction alternates (the zigzag of Figure 6).
 
@@ -474,15 +474,15 @@ The architecture in Figure 12 first enlarges a small butterfly image to the targ
 
 Figure 13 shows a score-based generative model that describes diffusion with stochastic differential equations (SDEs) [6]. The forward process keeps adding noise to the data $\mathbf{x}(0)$ at time 0 until it becomes pure noise $\mathbf{x}(T)$ at time $T$.
 
-$$
+```math
 d\mathbf{x} = \mathbf{f}(\mathbf{x}, t)\,dt + g(t)\,d\mathbf{w}
-$$
+```
 
 $\mathbf{f}$ is the average direction in which the values move (drift), $g(t)$ is the strength of the noise, and $\mathbf{w}$ is a Wiener process (Brownian motion) representing random movement. The reverse process starts from the noise $\mathbf{x}(T)$ and goes backward in time to create the data $\mathbf{x}(0)$.
 
-$$
+```math
 d\mathbf{x} = \left[\mathbf{f}(\mathbf{x}, t) - g(t)^2 \nabla_{\mathbf{x}} \log p_t(\mathbf{x})\right] dt + g(t)\,d\bar{\mathbf{w}}
-$$
+```
 
 $p_t$ is the probability distribution of the data at time $t$, and $\nabla_{\mathbf{x}} \log p_t(\mathbf{x})$ is the **score function**, which points in the direction in which the probability increases. Once a neural network learns this score function, it can start from noise and create images that look more and more like data. The puppy photo in the figure is buried in noise as the forward process proceeds and reappears along the reverse process.
 
@@ -621,17 +621,17 @@ In Figure 23 the layers near the output layer are drawn dark and the layers near
 
 In the plain block on the left of Figure 24, two layers (weight layer and ReLU) learn the desired output $H(x)$ directly. In the **residual block** on the right, the two layers compute $F(x)$, and the input $x$ skips the layers and is added unchanged. This skipping connection is called a **skip connection** or shortcut connection, and it adds the original $x$ back after the layers so that the original is not forgotten.
 
-$$
+```math
 H(x) = F(x) + x \quad \Longleftrightarrow \quad F(x) = H(x) - x
-$$
+```
 
 The two layers need to learn only the difference between the output and the input, the **residual** $F(x)$, rather than the whole desired output. If the identity function is the best choice, as in the situation of Section 4.1, a plain block must fit $H(x) = x$ with nonlinear layers, whereas a residual block only has to drive its weights toward 0 to make $F(x) = 0$. The latter is much easier.
 
 The skip connection also creates a shortcut for backpropagation. Differentiating the block output with respect to its input gives
 
-$$
+```math
 \frac{\partial H}{\partial x} = \frac{\partial F}{\partial x} + 1
-$$
+```
 
 so even if $\partial F/\partial x$ is small, 1 is added and the gradient reaches the previous block without vanishing. As a simplification, assume that the derivative of each block is the scalar 0.1. The gradient after 10 plain blocks becomes $0.1^{10} = 10^{-10}$ times the original, whereas after 10 residual blocks it becomes $(1 + 0.1)^{10} \approx 2.59$ times and does not vanish. A skip connection adds no parameters, so the computation hardly increases either.
 
@@ -659,9 +659,9 @@ Backpropagation propagates the error from the output layer toward the input laye
 
 Let $z^{(l)}$ be the weighted sum of layer $l$, $\sigma$ the activation function, and $L$ the loss. In backpropagation, the error signal of layer $l$, $\delta^{(l)} = \partial L / \partial z^{(l)}$, is computed from the error signal of the next layer as follows.
 
-$$
+```math
 \delta^{(l)} = \left( W^{(l+1)} \right)^{\top} \delta^{(l+1)} \odot \sigma'\!\left( z^{(l)} \right)
-$$
+```
 
 $\odot$ is element-wise multiplication. The gradient of a layer near the input is the result of applying this equation many times, so roughly the product of the weight magnitude and the activation derivative of each layer is multiplied repeatedly. If this product is smaller than 1 the gradient shrinks exponentially (vanishing), and if it is larger than 1 the gradient grows exponentially (exploding). If every layer multiplies by 0.25, the factor after 10 layers is $0.25^{10} \approx 9.5 \times 10^{-7}$, and if every layer multiplies by 2, it is $2^{10} = 1024$.
 
@@ -684,9 +684,9 @@ The derivative of sigmoid is at most 0.25 and the derivative of tanh, $1 - \tanh
 
 As in Figure 26, a BN layer is usually placed between a fully connected (or convolutional) layer and the activation function. For a mini-batch $B = \lbrace x_1, \dots, x_m\rbrace$, the following is computed for each feature (channel).
 
-$$
+```math
 \mu_B = \frac{1}{m}\sum_{i=1}^{m} x_i, \qquad \sigma_B^2 = \frac{1}{m}\sum_{i=1}^{m} (x_i - \mu_B)^2, \qquad \hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \qquad y_i = \gamma \hat{x}_i + \beta
-$$
+```
 
 $\epsilon$ is a small number that prevents division by zero. The values normalized to mean 0 and variance 1 are rescaled by the trainable parameters $\gamma$ (scale) and $\beta$ (shift), so the network can recover the original distribution if needed. On the right of Figure 26, the distributions of Batch 1 and Batch 2 are skewed in different directions, but after BN both become similar bell-shaped distributions. Because values are not pushed into the saturated regions of sigmoid or tanh, vanishing gradients are reduced, and training stays stable even with a large learning rate. At evaluation time, the mean and variance accumulated during training are used instead of mini-batch statistics, which is why the `model.eval()` seen in Section 1.6 is needed.
 
@@ -714,15 +714,15 @@ In Figure 27, the ReLU family (ReLU, Leaky ReLU, ELU) and Softplus keep increasi
 
 **Gradient clipping** keeps the direction of the gradient and reduces only its magnitude to a threshold $\tau$ when the magnitude exceeds $\tau$ [12].
 
-$$
+```math
 \mathbf{g}_{\text{clipped}} =
 \begin{cases}
 \mathbf{g} & \text{if } \lVert \mathbf{g} \rVert_2 \le \tau \\
 \tau \cdot \dfrac{\mathbf{g}}{\lVert \mathbf{g} \rVert_2} & \text{if } \lVert \mathbf{g} \rVert_2 > \tau
 \end{cases}
-$$
+```
 
-$\lVert \mathbf{g} \rVert_2$ is the L2 norm (length) of the gradient vector. For example, if $\mathbf{g} = (3, 4)$ and $\tau = 1$, then $\lVert \mathbf{g} \rVert_2 = \sqrt{3^2 + 4^2} = 5 > 1$, so $\mathbf{g}_{\text{clipped}} = 1 \cdot (3, 4)/5 = (0.6, 0.8)$. The direction is the same and only the length has been reduced to 1.
+$\lVert \mathbf{g} \rVert_2$ is the L2 norm (length) of the gradient vector. For example, if $\mathbf{g} = (3, 4)$ and $\tau = 1$, then $\lVert \mathbf{g} \rVert_2 = \sqrt{3^2 + 4^2} = 5 > 1$, so $`\mathbf{g}_{\text{clipped}} = 1 \cdot (3, 4)/5 = (0.6, 0.8)`$. The direction is the same and only the length has been reduced to 1.
 
 ![Figure 28. Optimization paths without gradient clipping (left) and with gradient clipping (right)](../../images/Lec03_p38.png)
 
@@ -853,7 +853,7 @@ On the left of Figure 28, where the gradient is large, a single step moves too f
     <details>
     <summary>Answer</summary>
 
-    $\lVert \mathbf{g} \rVert_2 = \sqrt{36 + 64} = 10 > 5$, so $\mathbf{g}_{\text{clipped}} = 5 \cdot (6, 8)/10 = (3, 4)$. Clipping only reduces the magnitude of gradients larger than the threshold and leaves small gradients unchanged, so it has no effect on vanishing, where gradients become too small.
+    $\lVert \mathbf{g} \rVert_2 = \sqrt{36 + 64} = 10 > 5$, so $`\mathbf{g}_{\text{clipped}} = 5 \cdot (6, 8)/10 = (3, 4)`$. Clipping only reduces the magnitude of gradients larger than the threshold and leaves small gradients unchanged, so it has no effect on vanishing, where gradients become too small.
 
     </details>
 

@@ -123,21 +123,27 @@ Why this phenomenon is strange is explained by the following **solution by const
 
 Let $\mathcal{H}(\mathbf{x})$ be the ideal function that a few layers should learn ($\mathbf{x}$ is the input to those layers). Instead of letting the layers approximate $\mathcal{H}(\mathbf{x})$ directly, ResNet lets them approximate the difference from the input, the **residual function**.
 
-$$\mathcal{F}(\mathbf{x}) := \mathcal{H}(\mathbf{x}) - \mathbf{x} \quad\Longrightarrow\quad \mathcal{H}(\mathbf{x}) = \mathcal{F}(\mathbf{x}) + \mathbf{x}$$
+```math
+\mathcal{F}(\mathbf{x}) := \mathcal{H}(\mathbf{x}) - \mathbf{x} \quad\Longrightarrow\quad \mathcal{H}(\mathbf{x}) = \mathcal{F}(\mathbf{x}) + \mathbf{x}
+```
 
 If one assumes that several nonlinear layers can asymptotically approximate complicated functions, they can also approximate the residual function when the input and output have the same dimensions, so the two forms have the same representational power. The difference lies in the **ease of learning**. If the optimal function is an identity mapping, a plain network must build $\mathcal{H}(\mathbf{x}) = \mathbf{x}$ exactly from a combination of nonlinear layers, whereas a residual network only needs to drive its weights toward zero to make $\mathcal{F}(\mathbf{x}) = \mathbf{0}$.
 
-Let us check this with numbers. Suppose the input to a block is $\mathbf{x} = (2, 1)$, the output of a previous ReLU, and both weight layers of the block have been learned as zero. Then $\mathcal{F}(\mathbf{x}) = W_2\,\sigma(W_1\mathbf{x}) = \mathbf{0}$, and the output after the ReLU that follows the addition is as follows.
+Let us check this with numbers. Suppose the input to a block is $\mathbf{x} = (2, 1)$, the output of a previous ReLU, and both weight layers of the block have been learned as zero. Then $`\mathcal{F}(\mathbf{x}) = W_2\,\sigma(W_1\mathbf{x}) = \mathbf{0}`$, and the output after the ReLU that follows the addition is as follows.
 
-$$\mathbf{y} = \sigma(\mathcal{F}(\mathbf{x}) + \mathbf{x}) = \sigma((0, 0) + (2, 1)) = (2, 1) = \mathbf{x}$$
+```math
+\mathbf{y} = \sigma(\mathcal{F}(\mathbf{x}) + \mathbf{x}) = \sigma((0, 0) + (2, 1)) = (2, 1) = \mathbf{x}
+```
 
-If the shortcut is removed from the same two layers, the output becomes $\sigma(\mathbf{0}) = (0, 0)$, and all information in the input is lost. For a plain network to output an identity mapping, it must find specific weights that satisfy $W_2\,\sigma(W_1\mathbf{x}) = \mathbf{x}$.
+If the shortcut is removed from the same two layers, the output becomes $\sigma(\mathbf{0}) = (0, 0)$, and all information in the input is lost. For a plain network to output an identity mapping, it must find specific weights that satisfy $`W_2\,\sigma(W_1\mathbf{x}) = \mathbf{x}`$.
 
 In real problems the optimal function is unlikely to be exactly an identity mapping. The paper interprets that if the optimal function is closer to an identity mapping than to a zero mapping, finding small perturbations with reference to the identity mapping is easier than learning the function anew, so the residual form **preconditions** the optimization problem [1]. The analysis of layer responses in Section 2.7 supports this interpretation experimentally.
 
 **Gradient path view.** If the output of a block is simplified to $\mathbf{y} = \mathbf{x} + \mathcal{F}(\mathbf{x})$ (omitting the ReLU after the addition), the chain rule gives the following.
 
-$$\frac{\partial \mathbf{y}}{\partial \mathbf{x}} = I + \frac{\partial \mathcal{F}}{\partial \mathbf{x}}$$
+```math
+\frac{\partial \mathbf{y}}{\partial \mathbf{x}} = I + \frac{\partial \mathcal{F}}{\partial \mathbf{x}}
+```
 
 Because of the identity matrix $I$, the gradient of the loss has a path along the shortcut that reaches the earlier layers directly without passing through the residual branch [5]. In a scalar simplification, if the derivative of each layer of a plain network is 0.5, the gradient after 10 layers shrinks to $0.5^{10} \approx 0.00098$. If the derivative of the residual branch in a residual block is 0.05, the derivative of one block is $1 + 0.05 = 1.05$, and after 10 blocks it is still $1.05^{10} \approx 1.63$; if it is $-0.05$, it is $0.95^{10} \approx 0.60$. The key point is that the magnitude of the gradient stays near 1 when the derivative of the residual branch is small.
 
@@ -147,9 +153,11 @@ Because of the identity matrix $I$, the gradient of the loss has a path along th
 
 The residual form is implemented with **shortcut connections** that skip one or more layers. This is the same structure as the skip connection of Lecture 3. The basic building block of the paper is as follows [1].
 
-$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + \mathbf{x}$$
+```math
+\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + \mathbf{x}
+```
 
-In a two-layer block, $\mathcal{F} = W_2\,\sigma(W_1\mathbf{x})$, where $\sigma$ is ReLU (biases are omitted from the notation). $\mathcal{F} + \mathbf{x}$ is computed by element-wise addition, and the second ReLU is applied after the addition. Identity shortcuts **add neither parameters nor computation** (except for the negligible element-wise addition), so plain and residual networks with the same depth, width, number of parameters, and computational cost can be compared fairly.
+In a two-layer block, $`\mathcal{F} = W_2\,\sigma(W_1\mathbf{x})`$, where $\sigma$ is ReLU (biases are omitted from the notation). $\mathcal{F} + \mathbf{x}$ is computed by element-wise addition, and the second ReLU is applied after the addition. Identity shortcuts **add neither parameters nor computation** (except for the negligible element-wise addition), so plain and residual networks with the same depth, width, number of parameters, and computational cost can be compared fairly.
 
 ```mermaid
 flowchart TB
@@ -166,7 +174,9 @@ flowchart TB
 
 If the dimensions of $\mathbf{x}$ and $\mathcal{F}$ differ (when the number of channels increases), the addition is impossible, so a linear projection $W_s$ on the shortcut matches the dimensions.
 
-$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + W_s\mathbf{x}$$
+```math
+\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + W_s\mathbf{x}
+```
 
 The paper compared three options for the shortcuts that increase dimensions. Where the feature map size is halved, the shortcut is also applied with a stride of 2.
 
@@ -219,7 +229,7 @@ The two designs are compared by the number of weights (excluding biases). The nu
 
 *Table 3. Number of weights in the basic block and the bottleneck block*
 
-The bottleneck block handles 256 channels, four times as wide, yet has a number of weights (and hence a computational cost) similar to the 64-channel basic block. Processing the same 256 channels with a basic block would require about 17 times as many ($1{,}179{,}648 / 69{,}632 \approx 16.9$). **Identity shortcuts are particularly important** in this block. Replacing the shortcut with a projection would connect the two high-dimensional (256-channel) ends and double the computation and size of the block [1]. Lightweight design with 1×1 convolutions is revisited in Lecture 9.
+The bottleneck block handles 256 channels, four times as wide, yet has a number of weights (and hence a computational cost) similar to the 64-channel basic block. Processing the same 256 channels with a basic block would require about 17 times as many ($`1{,}179{,}648 / 69{,}632 \approx 16.9`$). **Identity shortcuts are particularly important** in this block. Replacing the shortcut with a projection would connect the two high-dimensional (256-channel) ends and double the computation and size of the block [1]. Lightweight design with 1×1 convolutions is revisited in Lecture 9.
 
 | Model | conv2_x | conv3_x | conv4_x | conv5_x | Block | Computation (FLOPs) |
 |:-----|-----:|-----:|-----:|-----:|:-----|-----:|
@@ -265,7 +275,7 @@ Three things can be read from this table.
 
 The error of ResNet-34 is $28.54 - 25.03 = 3.51$ percentage points lower than the plain network of the same depth (the "3.5%" of the paper). The deeper ResNet-50/101/152 (option B) are more accurate than the 34-layer ones (top-1 errors of 22.85, 21.75, and 21.43%), and no degradation appears. The single-model top-5 validation error of ResNet-152 is 4.49%, lower than all previous ensembles, and an ensemble of six models of different depths achieved a **top-5 error of 3.57%** on the ImageNet test set, winning first place in the ILSVRC 2015 classification task [1].
 
-**CIFAR-10.** On CIFAR-10, a dataset of 32×32 images in 10 classes with 50,000 training images and 10,000 test images, deliberately simple architectures were used to isolate the effect of depth. After a first 3×3 convolution, $2n$ 3×3 convolutions are stacked for each feature map size of 32, 16, and 8 (with 16, 32, and 64 filters), followed by global average pooling and a 10-way fully connected layer, for $6n + 2$ weighted layers in total. Comparing $n = 3, 5, 7, 9$ (20, 32, 44, and 56 layers), the plain networks had a higher training error as they got deeper, whereas the ResNets became more accurate as they got deeper, the same phenomenon as on ImageNet. The 110-layer ResNet ($n = 18$) achieved a test error of 6.43% (the best of 5 runs, with a mean of 6.61±0.16%). A 1202-layer network ($n = 200$) also reached a training error below 0.1% without optimization difficulty, but its test error of 7.93% was worse than that of the 110-layer network. The paper attributes this to overfitting by a model (19.4 million parameters) that is unnecessarily large for the small dataset.
+**CIFAR-10.** On CIFAR-10, a dataset of 32×32 images in 10 classes with 50,000 training images and 10,000 test images, deliberately simple architectures were used to isolate the effect of depth. After a first 3×3 convolution, $2n$ 3×3 convolutions are stacked for each feature map size of 32, 16, and 8 (with 16, 32, and 64 filters), followed by global average pooling and a 10-way fully connected layer, for $6n + 2$ weighted layers in total. Comparing $n = 3, 5, 7, 9$ (20, 32, 44, and 56 layers), the plain networks had a higher training error as they got deeper, whereas the ResNets became more accurate as they got deeper, the same phenomenon as on ImageNet. The 110-layer ResNet ($`n = 18`$) achieved a test error of 6.43% (the best of 5 runs, with a mean of 6.61±0.16%). A 1202-layer network ($`n = 200`$) also reached a training error below 0.1% without optimization difficulty, but its test error of 7.93% was worse than that of the 110-layer network. The paper attributes this to overfitting by a model (19.4 million parameters) that is unnecessarily large for the small dataset.
 
 **Analysis of layer responses.** Comparing the standard deviations of the outputs of each 3×3 layer (after BN and before the nonlinearity), ResNets have generally smaller responses than plain networks, and deeper ResNets have smaller ones. This supports the motivation of Section 2.3 that the residual functions tend to learn values close to zero.
 
@@ -350,43 +360,55 @@ The paper calls the case in which both $G$ and $D$ are multilayer perceptrons (M
 
 $D$ maximizes the probability of assigning the correct label to both training examples and samples from $G$, and $G$ minimizes $\log(1 - D(G(\mathbf{z})))$. The two models play a **two-player minimax game** with the value function $V(D, G)$.
 
-$$\min_G \max_D V(D, G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}(\mathbf{x})}[\log D(\mathbf{x})] + \mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log(1 - D(G(\mathbf{z})))]$$
+```math
+\min_G \max_D V(D, G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}(\mathbf{x})}[\log D(\mathbf{x})] + \mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log(1 - D(G(\mathbf{z})))]
+```
 
 - First term: for real data $\mathbf{x}$, the closer $D(\mathbf{x})$ is to 1, the closer $\log D(\mathbf{x})$ is to 0, so the term grows.
 - Second term: for a fake $G(\mathbf{z})$, the closer $D(G(\mathbf{z}))$ is to 0, the larger $\log(1 - D(G(\mathbf{z})))$ becomes.
-- $D$ tries to increase the sum of the two terms, and $G$ tries to decrease the second term (to increase $D(G(\mathbf{z}))$).
+- $D$ tries to increase the sum of the two terms, and $G$ tries to decrease the second term (to increase $`D(G(\mathbf{z}))`$).
 
-> **[Probability and Statistics]** $\mathbb{E}_{\mathbf{x} \sim p}[f(\mathbf{x})]$ is the **expected value** of $f(\mathbf{x})$ when $\mathbf{x}$ is drawn from the distribution $p$, which is $\int p(\mathbf{x}) f(\mathbf{x})\,d\mathbf{x}$ for a continuous distribution. In training it is approximated by the average over a mini-batch of $m$ samples, $\frac{1}{m}\sum_i f(\mathbf{x}^{(i)})$. The **KL divergence** between two distributions, $\mathrm{KL}(p \Vert q) = \mathbb{E}_{\mathbf{x} \sim p}[\log (p(\mathbf{x}) / q(\mathbf{x}))]$, is nonnegative and is zero only when $p = q$.
+> **[Probability and Statistics]** $`\mathbb{E}_{\mathbf{x} \sim p}[f(\mathbf{x})]`$ is the **expected value** of $f(\mathbf{x})$ when $\mathbf{x}$ is drawn from the distribution $p$, which is $`\int p(\mathbf{x}) f(\mathbf{x})\,d\mathbf{x}`$ for a continuous distribution. In training it is approximated by the average over a mini-batch of $m$ samples, $\frac{1}{m}\sum_i f(\mathbf{x}^{(i)})$. The **KL divergence** between two distributions, $`\mathrm{KL}(p \Vert q) = \mathbb{E}_{\mathbf{x} \sim p}[\log (p(\mathbf{x}) / q(\mathbf{x}))]`$, is nonnegative and is zero only when $p = q$.
 
 ### 4.3 Optimal Discriminator and Global Optimum
 
 **Proposition 1 (optimal discriminator).** For a fixed $G$, the optimal discriminator is as follows.
 
-$$D_G^*(\mathbf{x}) = \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}$$
+```math
+D_G^*(\mathbf{x}) = \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}
+```
 
 **Derivation.** Rewriting with $\mathbf{x} = G(\mathbf{z})$ turns the expectation of the second term into an expectation over $p_g$, so the value function can be written as a single integral.
 
-$$V(G, D) = \int_{\mathbf{x}} \big[\, p_{\text{data}}(\mathbf{x}) \log D(\mathbf{x}) + p_g(\mathbf{x}) \log(1 - D(\mathbf{x})) \,\big] d\mathbf{x}$$
+```math
+V(G, D) = \int_{\mathbf{x}} \big[\, p_{\text{data}}(\mathbf{x}) \log D(\mathbf{x}) + p_g(\mathbf{x}) \log(1 - D(\mathbf{x})) \,\big] d\mathbf{x}
+```
 
 At each $\mathbf{x}$, let $a = p_{\text{data}}(\mathbf{x})$, $b = p_g(\mathbf{x})$, and $y = D(\mathbf{x})$; then the integrand is $f(y) = a \log y + b \log(1 - y)$. For $(a, b) \neq (0, 0)$, differentiating with respect to $y$ and setting the result to zero gives the following.
 
-$$f'(y) = \frac{a}{y} - \frac{b}{1 - y} = 0 \quad\Longrightarrow\quad a(1 - y) = b\,y \quad\Longrightarrow\quad y = \frac{a}{a + b}$$
+```math
+f'(y) = \frac{a}{y} - \frac{b}{1 - y} = 0 \quad\Longrightarrow\quad a(1 - y) = b\,y \quad\Longrightarrow\quad y = \frac{a}{a + b}
+```
 
 Since $f''(y) = -a/y^2 - b/(1-y)^2 < 0$, this point is the maximum on $[0, 1]$. Maximizing the integrand at every point maximizes the whole integral, so the proposition holds.
 
-As a numerical example, if $p_{\text{data}}(\mathbf{x}) = 0.3$ and $p_g(\mathbf{x}) = 0.1$ at some image $\mathbf{x}$, then $D^*(\mathbf{x}) = 0.3 / (0.3 + 0.1) = 0.75$. Real data is three times as likely as the generator to produce this point, so the discriminator assigns a probability of 0.75 to it being real. When the two densities become equal, $D^* = 0.5$, and the discriminator can do no better than a coin flip.
+As a numerical example, if $p_{\text{data}}(\mathbf{x}) = 0.3$ and $p_g(\mathbf{x}) = 0.1$ at some image $\mathbf{x}$, then $`D^*(\mathbf{x}) = 0.3 / (0.3 + 0.1) = 0.75`$. Real data is three times as likely as the generator to produce this point, so the discriminator assigns a probability of 0.75 to it being real. When the two densities become equal, $`D^* = 0.5`$, and the discriminator can do no better than a coin flip.
 
 **Theorem 1 (global optimum).** The global minimum of $C(G) = \max_D V(G, D)$, the objective with the optimal discriminator substituted, is achieved if and only if $p_g = p_{\text{data}}$, and its value is $-\log 4$.
 
-**Derivation.** Substituting $D_G^*$ gives the following.
+**Derivation.** Substituting $`D_G^*`$ gives the following.
 
-$$C(G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}}\left[\log \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right] + \mathbb{E}_{\mathbf{x} \sim p_g}\left[\log \frac{p_g(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right]$$
+```math
+C(G) = \mathbb{E}_{\mathbf{x} \sim p_{\text{data}}}\left[\log \frac{p_{\text{data}}(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right] + \mathbb{E}_{\mathbf{x} \sim p_g}\left[\log \frac{p_g(\mathbf{x})}{p_{\text{data}}(\mathbf{x}) + p_g(\mathbf{x})}\right]
+```
 
 Writing each denominator inside the logarithms as $2 \cdot \frac{p_{\text{data}} + p_g}{2}$ separates $-\log 2$ from each term, and what remains are KL divergences to the mixture of the two distributions, $m = \frac{p_{\text{data}} + p_g}{2}$.
 
-$$C(G) = -\log 4 + \mathrm{KL}\!\left(p_{\text{data}} \,\Big\Vert\, m\right) + \mathrm{KL}\!\left(p_g \,\Big\Vert\, m\right) = -\log 4 + 2 \cdot \mathrm{JSD}(p_{\text{data}} \Vert p_g)$$
+```math
+C(G) = -\log 4 + \mathrm{KL}\!\left(p_{\text{data}} \,\Big\Vert\, m\right) + \mathrm{KL}\!\left(p_g \,\Big\Vert\, m\right) = -\log 4 + 2 \cdot \mathrm{JSD}(p_{\text{data}} \Vert p_g)
+```
 
-The **Jensen-Shannon divergence (JSD)** is nonnegative and is zero only when the two distributions are equal, so the minimum of $C(G)$ is $-\log 4 \approx -1.386$, achieved only when $p_g = p_{\text{data}}$. Indeed, if $p_g = p_{\text{data}}$, then $D^* = 1/2$, so $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$, which agrees. That is, in the space of arbitrary functions for the generator and the discriminator, **the unique solution of the game is the state in which the generator reproduces the data distribution exactly and the discriminator outputs 1/2 everywhere.** Proposition 2 of the paper also shows convergence. If $G$ and $D$ have enough capacity, the discriminator reaches its optimum given $G$ at each step of the algorithm, and $p_g$ is updated so as to improve the criterion $C(G)$, then $p_g$ converges to $p_{\text{data}}$. The argument is that $C(G)$ is convex in $p_g$ with a unique global optimum, so sufficiently small updates of $p_g$ reach that optimum.
+The **Jensen-Shannon divergence (JSD)** is nonnegative and is zero only when the two distributions are equal, so the minimum of $C(G)$ is $-\log 4 \approx -1.386$, achieved only when $p_g = p_{\text{data}}$. Indeed, if $p_g = p_{\text{data}}$, then $`D^* = 1/2`$, so $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$, which agrees. That is, in the space of arbitrary functions for the generator and the discriminator, **the unique solution of the game is the state in which the generator reproduces the data distribution exactly and the discriminator outputs 1/2 everywhere.** Proposition 2 of the paper also shows convergence. If $G$ and $D$ have enough capacity, the discriminator reaches its optimum given $G$ at each step of the algorithm, and $p_g$ is updated so as to improve the criterion $C(G)$, then $p_g$ converges to $p_{\text{data}}$. The argument is that $C(G)$ is convex in $p_g$ with a unique global optimum, so sufficiently small updates of $p_g$ reach that optimum.
 
 > **Caution:** This result holds in a nonparametric setting (infinite capacity) in which $G$ and $D$ can represent arbitrary functions. Real neural networks have finite capacity and are optimized in parameter space, so the paper notes that the theoretical guarantees do not apply directly, while considering that the excellent performance of MLPs suggests they are a reasonable model to use [2].
 
@@ -413,7 +435,9 @@ repeat (for the number of training iterations):
 
 Let us check this with numbers. If the output of the discriminator is a sigmoid $D = \sigma(a)$ and $a = -4.6$ for a fake sample, then $D = 1 / (1 + e^{4.6}) \approx 0.01$. The derivatives with respect to the logit $a$ are as follows.
 
-$$\frac{\partial}{\partial a}\log(1 - \sigma(a)) = -\sigma(a) \approx -0.01, \qquad \frac{\partial}{\partial a}\log \sigma(a) = 1 - \sigma(a) \approx 0.99$$
+```math
+\frac{\partial}{\partial a}\log(1 - \sigma(a)) = -\sigma(a) \approx -0.01, \qquad \frac{\partial}{\partial a}\log \sigma(a) = 1 - \sigma(a) \approx 0.99
+```
 
 The original objective gives the generator a gradient of only about 0.01 in magnitude, whereas the non-saturating objective gives about 0.99, nearly 100 times larger. This non-saturating loss became widely used in later GAN implementations.
 
@@ -471,7 +495,7 @@ DCGAN also showed that arithmetic on noise vectors (e.g., man with glasses - man
 
 ### 5.3 Stabilizing Training: WGAN
 
-When the discriminator is optimal, the original GAN objective amounts to reducing the JSD, as in Section 4.3, but when the supports of the two distributions do not overlap, the JSD stays at a constant ($\log 2$) and gives the generator no useful gradient. **WGAN** [14] uses the **Wasserstein-1 distance (earth mover's distance)**, the minimum cost of moving one distribution onto the other. Instead of a discriminator it has a **critic** that outputs a real-valued score, and it clips the weights to a fixed range (weight clipping) so that the critic is K-Lipschitz for some constant K. This distance changes continuously even when the distributions do not overlap, so training is stable and the loss value moves together with the quality of the samples.
+When the discriminator is optimal, the original GAN objective amounts to reducing the JSD, as in Section 4.3, but when the supports of the two distributions do not overlap, the JSD stays at a constant ($`\log 2`$) and gives the generator no useful gradient. **WGAN** [14] uses the **Wasserstein-1 distance (earth mover's distance)**, the minimum cost of moving one distribution onto the other. Instead of a discriminator it has a **critic** that outputs a real-valued score, and it clips the weights to a fixed range (weight clipping) so that the critic is K-Lipschitz for some constant K. This distance changes continuously even when the distributions do not overlap, so training is stable and the loss value moves together with the quality of the samples.
 
 ### 5.4 High-Resolution Generation: ProGAN and StyleGAN
 
@@ -550,7 +574,7 @@ The cite button of Google Scholar offers several citation styles, but the confer
 | ResNet results | The 34-layer ResNet is more accurate than the 18-layer one (top-1 error 25.03% vs. 27.88%), the ensemble won ILSVRC 2015 with a 3.57% ImageNet top-5 error, and COCO detection improved by 28% relatively. |
 | Image generation | The task that takes noise, labels, sentences, or other images as input and outputs new images that were not in the training data. |
 | GAN objective | A minimax game $\min_G \max_D \mathbb{E}[\log D(\mathbf{x})] + \mathbb{E}[\log(1 - D(G(\mathbf{z})))]$. |
-| Optimal discriminator and optimum | $D^* = p_{\text{data}} / (p_{\text{data}} + p_g)$, and since $C(G) = -\log 4 + 2\,\mathrm{JSD}$, the global optimum is $p_g = p_{\text{data}}$. |
+| Optimal discriminator and optimum | $`D^* = p_{\text{data}} / (p_{\text{data}} + p_g)`$, and since $`C(G) = -\log 4 + 2\,\mathrm{JSD}`$, the global optimum is $p_g = p_{\text{data}}$. |
 | GAN training | $D$ is updated for $k$ steps and $G$ for one step alternately, and $G$ maximizes $\log D(G(\mathbf{z}))$ to avoid saturation early in training. |
 | Models after GANs | They evolved into DCGAN (convolutional architecture), conditional GANs, pix2pix, and CycleGAN (image translation), WGAN (stable training), ProGAN and StyleGAN (high resolution), and diffusion models. |
 | Citation | Check the citation count on Google Scholar, and number the references in IEEE format in the order of citation. |
@@ -611,7 +635,7 @@ The cite button of Google Scholar offers several citation styles, but the confer
    <details>
    <summary>Answer</summary>
 
-   $D^*(\mathbf{x}) = 0.2 / (0.2 + 0.6) = 0.25$. At that point the generator's samples appear three times as often as real data, so the discriminator assigns a low probability of being real. The generator is trained in the direction of reducing its density in such regions.
+   $`D^*(\mathbf{x}) = 0.2 / (0.2 + 0.6) = 0.25`$. At that point the generator's samples appear three times as often as real data, so the discriminator assigns a low probability of being real. The generator is trained in the direction of reducing its density in such regions.
 
    </details>
 
@@ -620,7 +644,7 @@ The cite button of Google Scholar offers several citation styles, but the confer
    <details>
    <summary>Answer</summary>
 
-   Since $D^* = 1/2$, $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4 \approx -1.386$. Because $C(G) = -\log 4 + 2\,\mathrm{JSD}(p_{\text{data}} \Vert p_g)$ and the JSD is nonnegative and zero only when the two distributions are equal, this value is the unique minimum.
+   Since $`D^* = 1/2`$, $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4 \approx -1.386$. Because $`C(G) = -\log 4 + 2\,\mathrm{JSD}(p_{\text{data}} \Vert p_g)`$ and the JSD is nonnegative and zero only when the two distributions are equal, this value is the unique minimum.
 
    </details>
 

@@ -301,9 +301,9 @@ The first word of each name (True/False) says whether the prediction was correct
 
 **Accuracy** is the fraction of all samples that were predicted correctly.
 
-$$
+```math
 \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-$$
+```
 
 Take the problem of classifying whether a product is defective. True means defective, False means normal, and there are 58 products in total.
 
@@ -324,17 +324,17 @@ Using only accuracy for binary classification can cause problems. When one class
 
 **Precision** is the fraction of the samples predicted as Positive that are actually Positive, and it indicates how accurate the predictions are.
 
-$$
+```math
 \text{Precision} = \frac{TP}{TP + FP}
-$$
+```
 
 An example where precision matters is spam filtering. Classifying a normal mail (Negative) as spam (Positive) causes important mail to be missed and disrupts work, so it is important not to judge a Negative as Positive (to reduce FP).
 
 **Recall** is the fraction of the actual Positives that were correctly predicted as Positive, and it indicates how many of the actual answers were found.
 
-$$
+```math
 \text{Recall} = \frac{TP}{TP + FN}
-$$
+```
 
 An example where recall matters is cancer diagnosis. Diagnosing a cancer patient (Positive) as normal (Negative) causes the serious problem of missing the time for treatment, so it is important not to judge a Positive as Negative (to reduce FN). The model of Section 6.2 that always predicts normal has TP = 0, so its recall is 0 and the problem is exposed immediately.
 
@@ -346,9 +346,9 @@ Precision and recall are in a **trade-off** relationship, in which one improves 
 
 The metric that reflects both is the **F1 score**, the **harmonic mean** of precision and recall.
 
-$$
+```math
 F_1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}} = \frac{2TP}{2TP + FP + FN}
-$$
+```
 
 The right-hand expression is obtained by substituting the definitions of precision and recall and simplifying. In the example of Table 6, $F_1 = 2 \times 0.857 \times 0.909 / (0.857 + 0.909) = 60/68 \approx 0.882$. The harmonic mean comes out close to the smaller of the two values. A model with precision 1.0 and recall 0.01 has an arithmetic mean of 0.505, but its F1 score is $2 \times 1.0 \times 0.01 / 1.01 \approx 0.020$, so a model strong on only one side is not rated highly.
 
@@ -384,15 +384,15 @@ There are three ways to combine the per-class F1 scores into one.
 
 **Macro F1** is the arithmetic mean of the per-class F1 scores. It treats all classes as equally important.
 
-$$
+```math
 F_1^{\text{macro}} = \frac{F_1(\text{dog}) + F_1(\text{cat}) + F_1(\text{cow})}{3} = \frac{0.421 + 0.308 + 0.667}{3} \approx 0.465
-$$
+```
 
 **Weighted F1** takes the size (imbalance) of each class's data into account and weights each class's F1 score by its share of the actual samples. The actual counts are Dog 6, Cat 10, and Cow 9.
 
-$$
+```math
 F_1^{\text{weighted}} = 0.421 \times \frac{6}{25} + 0.308 \times \frac{10}{25} + 0.667 \times \frac{9}{25} \approx 0.101 + 0.123 + 0.240 = 0.464
-$$
+```
 
 **Micro F1** considers all samples together without separating classes. It first sums TP, FP, and FN over all classes and then computes precision, recall, and the F1 score at once.
 
@@ -405,9 +405,9 @@ $$
 
 *Table 9. Totals of TP, FP, and FN for computing micro F1*
 
-$$
+```math
 \text{Precision}^{\text{micro}} = \frac{12}{12 + 13} = 0.48, \qquad \text{Recall}^{\text{micro}} = \frac{12}{12 + 13} = 0.48, \qquad F_1^{\text{micro}} = 0.48
-$$
+```
 
 This value equals the accuracy (4 + 2 + 6)/25 = 12/25 = 0.48. In classification that predicts exactly one class per sample (single-label multi-class classification), each misclassified sample creates one FP for the predicted class and one FN for the actual class at the same time, so the sum of FP and the sum of FN both equal the number of misclassified samples. Therefore micro precision and micro recall both become (number correct)/(total), and the micro F1 score equals the accuracy.
 
@@ -596,9 +596,9 @@ In Figure 9, Models 1, 2, and 3 are trained on data with M samples, and the pred
 
 The original method proposed by Wortsman et al. is as follows [15]. Starting from the same pretrained model, fine-tune several times while changing only hyperparameters such as the learning rate, data augmentation, and training length, and then average the resulting weights.
 
-$$
+```math
 \theta_{\text{soup}} = \frac{1}{k}\sum_{i=1}^{k} \theta_i
-$$
+```
 
 - **Uniform soup:** Averages the weights of all $k$ fine-tuned models.
 - **Greedy soup:** Tries adding models to the soup one at a time in order of validation accuracy, keeping a model only if adding it raises the validation accuracy.
