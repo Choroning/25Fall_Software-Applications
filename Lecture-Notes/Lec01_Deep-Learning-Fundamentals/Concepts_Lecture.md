@@ -79,7 +79,7 @@ An industrial revolution is a technological change that fundamentally transforms
 | First industrial revolution | 18th century | Mechanization with the steam engine |
 | Second industrial revolution | 19th century - early 20th century | Mass production with electric power |
 | Third industrial revolution | Late 20th century | Informatization with computers and the internet |
-| Fourth industrial revolution | Early 21st century | Intelligence with AI, big data, and hyper-connectivity |
+| Fourth industrial revolution | Early 21st century | Intelligence with AI, big data, and hyper-connectivity (spreading to fields such as biotechnology, energy, geoengineering, and space technology) |
 
 *Table 1. The four industrial revolutions and their key technologies*
 
@@ -131,7 +131,7 @@ graph LR
 - **Application:** the service or product that users use, such as a self-driving car or a face-recognition entry system.
 - **Task:** a concrete problem the application must solve. Self-driving splits into several tasks, such as object detection to find pedestrians and vehicles and semantic segmentation to separate lanes and roads.
 - **Model:** a concrete neural network design that solves a task. VGG, GoogLeNet, and ResNet are representative models that performed well in image classification (VGG appears in the Lecture 1 lab and Lecture 3, and ResNet in Lectures 3-4).
-- **Network:** the basic form of neural network that a model is built from. A **DNN (deep neural network)** stacks fully connected layers deeply, a **CNN (convolutional neural network)** uses the convolution operation, and an **RNN (recurrent neural network)** processes ordered data with a recurrent structure. CNNs and RNNs are covered in Lecture 2.
+- **Network:** the basic form of neural network that a model is built from. A **DNN (deep neural network)** broadly means any deep neural network, but when listed alongside CNNs and RNNs it refers to a network that stacks fully connected layers deeply; a **CNN (convolutional neural network)** uses the convolution operation, and an **RNN (recurrent neural network)** processes ordered data with a recurrent structure. CNNs and RNNs are covered in Lecture 2.
 
 > **Key Point:** An application developer breaks the application into tasks and chooses a model suited to each task. This course focuses on the middle two levels: defining the task and understanding and using a model that fits it.
 
@@ -172,7 +172,7 @@ Machine learning is divided into three kinds according to the signal used for le
 |:-----|:-----|:-----|:-----|
 | **Supervised learning** | Pairs of inputs and correct answers (labels) | A function that predicts the answer from the input | Classification (image classification, customer retention, identity fraud detection, diagnostics), regression (advertising popularity prediction, weather forecasting, market forecasting, life expectancy estimation, population growth prediction) |
 | **Unsupervised learning** | Inputs without answers | Structure or patterns hidden in the data | Dimensionality reduction (meaningful compression, structure discovery, big data visualization, feature elicitation), clustering (recommender systems, targeted marketing, customer segmentation) |
-| **Reinforcement learning** | Rewards and penalties received while interacting with an environment | Actions that maximize the cumulative reward | Real-time decisions, game AI, robot navigation, skill acquisition |
+| **Reinforcement learning** | Rewards and penalties received while interacting with an environment | Actions that maximize the cumulative reward | Real-time decisions, game AI, robot navigation, skill acquisition, learning tasks |
 
 *Table 5. Comparison of the three learning types*
 
@@ -184,7 +184,7 @@ Machine learning is divided into three kinds according to the signal used for le
 
 The upper half of Figure 4 is supervised learning. When a model is trained on apple photos (input data) together with the answer (annotation) "These are apples", it predicts that an apple photo it has never seen is an apple. The lower half is unsupervised learning. When photos of mixed apples, peaches, and bananas are given without answers, the model groups similar-looking items into an apple group, a peach group, and a banana group. The model does not know the name of each group; it only finds that the groups differ from one another.
 
-The rest of this note assumes supervised learning.
+The following sections assume supervised learning.
 
 ---
 
@@ -238,13 +238,13 @@ In the network of Figure 6, a hidden node such as $h_1$ receives the two inputs 
 
 ### 2.3 Input and Output of a Neural Network: Dog and Cat Classification
 
-Consider a neural network that classifies whether an input photo shows a dog or a cat. We decide that it should output 0 for a dog photo and 1 for a cat photo.
+Consider a neural network that classifies whether an input photo shows a dog or a cat. The network is set to output 0 for a dog photo and 1 for a cat photo.
 
 ![Figure 7. A classification model that turns an image into an array of rows, columns, and channels, feeds it to a neural network, and outputs 0 for a dog and 1 for a cat](../../images/Lec01_p11.png)
 
 *Figure 7. A classification model that turns an image into an array of rows, columns, and channels, feeds it to a neural network, and outputs 0 for a dog and 1 for a cat*
 
-Computers process all data as arrays of numbers, that is, **tensors**. A color image is a three-dimensional array of rows, columns, and channels. There are three channels, red (R), green (G), and blue (B), and each element gives the brightness of that color at that position as an integer from 0 to 255. The small example in Figure 7 is a $3 \times 3 \times 3$ array with 3 rows, 3 columns, and 3 channels. The values of this array enter the input layer, pass through the hidden layers, and produce a value close to 0 or 1 at the output layer.
+Computers process all data as arrays of numbers, that is, **tensors**. A color image is a three-dimensional array of rows, columns, and channels. There are three channels, red (R), green (G), and blue (B), and in an image stored with 8 bits per channel each element gives the brightness of that color at that position as an integer from 0 to 255. The small example in Figure 7 is a $3 \times 3 \times 3$ array with 3 rows, 3 columns, and 3 channels. The values of this array enter the input layer, pass through the hidden layers, and produce a value close to 0 or 1 at the output layer.
 
 Before training, the weights are arbitrary values, so the network can produce a value far from 0 even for a dog photo. The process of adjusting the weights over many dog and cat photos so that dogs give 0 and cats give 1 is **training**.
 
@@ -384,7 +384,7 @@ b_1 &= h(w_1^{(2)}a_1 + w_2^{(2)}a_2) = cw_1^{(2)}a_1 + cw_2^{(2)}a_2 \\
 \end{aligned}
 $$
 
-The expression in parentheses is a constant that does not depend on $x_1$. This two-layer network therefore computes the same function as the one-layer network $b_1 = h\left((cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)})x_1\right)$, whose weight is replaced by $w_1^{(1)} \to cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)}$. For example, with $c = 1$, $w_1^{(1)} = 2$, $w_2^{(1)} = 3$, $w_1^{(2)} = 4$, and $w_2^{(2)} = 5$, we get $b_1 = (2 \cdot 4 + 3 \cdot 5)x_1 = 23x_1$, which cannot be distinguished from a single connection with weight 23.
+The expression in parentheses is a constant that does not depend on $x_1$. This two-layer network therefore computes the same function as the one-layer network $b_1 = h\left((cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)})x_1\right)$, whose weight is replaced by $w_1^{(1)} \to cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)}$. For example, with $c = 1$, $w_1^{(1)} = 2$, $w_2^{(1)} = 3$, $w_1^{(2)} = 4$, and $w_2^{(2)} = 5$, the result is $b_1 = (2 \cdot 4 + 3 \cdot 5)x_1 = 23x_1$, which cannot be distinguished from a single connection with weight 23.
 
 The same argument holds with more nodes and layers. Writing the weights of layer $l$ as a matrix $W_l$ and its biases as a vector $\mathbf{b}_l$, two layers without activation functions compute the following.
 
@@ -394,7 +394,7 @@ $$
 
 However many layers are stacked, the result equals one layer with a single matrix $W'$ and vector $\mathbf{b}'$. Only by inserting nonlinear activation functions between the layers does this collapse not happen, so that stacking more layers can express more complex functions.
 
-> **[Linear Algebra]** In linear algebra, the composition of linear transformations is again a linear transformation whose matrix is the product $W_2W_1$ of the two matrices. Because matrix multiplication is associative, composing $n$ linear transformations is still represented by the single matrix $W_n \cdots W_2W_1$. The equation above shows that, because of this property, depth loses its meaning when the layers of a neural network are linear.
+> **[Linear Algebra]** In linear algebra, the composition of linear transformations is again a linear transformation whose matrix is the product $W_2W_1$ of the two matrices. Because matrix multiplication is associative, composing $n$ linear transformations is still represented by the single matrix $W_n \cdots W_2W_1$. A layer with a bias, $W\mathbf{x} + \mathbf{b}$, is an affine transformation, and a composition of affine transformations is again an affine transformation. The equation above shows that, because of this property, depth loses its meaning when the layers of a neural network are linear.
 
 ### 3.5 Why Nonlinearity Is Needed: A Conceptual Check
 
@@ -605,9 +605,9 @@ graph LR
 
 *Table 16. Ideas of the main optimizers*
 
-When the paths of several optimizers are compared on a surface with a saddle point, which goes down in one direction and up in another, SGD tends to linger near the saddle point, methods that adapt the step size per weight such as Adagrad, AdaDelta, and RMSProp escape quickly, and Momentum and NAG escape after swinging wide because of their inertia [3].
+When the paths of several optimizers are compared on a surface with a saddle point, which goes down in one direction and up in another, SGD, Momentum, and NAG have difficulty leaving the neighborhood of the saddle point and only Momentum and NAG eventually escape, whereas methods that adapt the step size per weight, such as Adagrad, AdaDelta, and RMSProp, quickly head down the descending direction [3].
 
-Adam, the most widely used optimizer today, keeps both a moving average $m_t$ of the gradient $g_t$ (direction) and a moving average $v_t$ of the squared gradient (step size) [4].
+Adam, a widely used optimizer, keeps both a moving average $m_t$ of the gradient $g_t$ (direction) and a moving average $v_t$ of the squared gradient (step size) [4].
 
 $$
 m_t = \beta_1 m_{t-1} + (1 - \beta_1)g_t, \quad v_t = \beta_2 v_{t-1} + (1 - \beta_2)g_t^2, \quad \hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}, \quad w_t = w_{t-1} - \eta\frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
@@ -805,7 +805,7 @@ The test set is needed separately for the following reason. The validation set h
 
 ### 7.2 Overfitting and Underfitting
 
-**Overfitting** is the phenomenon in which a model predicts the training data almost perfectly but performs much worse on new data it did not see during training. It is like a student who memorized the questions and answers of a workbook while studying for an exam and cannot solve new questions.
+**Overfitting** is the phenomenon in which a model predicts the training data almost perfectly but performs much worse on new data it did not see during training. It is like a student who memorized the questions and answers of a workbook and cannot solve questions never seen before.
 
 ![Figure 16. Decision boundaries in the underfitting, appropriate fitting, and overfitting states](../../images/Lec01_p34.png)
 
@@ -941,7 +941,9 @@ print(torch.cuda.is_available())  # True on a GPU runtime
 - The program that runs the cells is the **kernel**, and it keeps remembering variables across cells. This makes it convenient to load data once and experiment with it across several cells.
 - On a local computer, it is installed with `pip install jupyterlab` and started with the `jupyter lab` command.
 
-| Python IDE or editor | Share of users |
+The following table shows the results of a 2018 poll in which KDnuggets, a website on data science and machine learning, asked more than 1,900 readers which Python editors and IDEs they had used most that year (up to three choices); Jupyter was used most [9]. Because several answers were allowed, the shares add up to more than 100%.
+
+| Python IDE or editor | Share of respondents |
 |:-----|:-----:|
 | Jupyter | 57% |
 | PyCharm | 35% |
@@ -957,7 +959,7 @@ print(torch.cuda.is_available())  # True on a GPU runtime
 | gedit | 1.3% |
 | Rodeo | 1.2% |
 
-*Table 24. The most popular Python IDEs and editors in a survey of Python developers*
+*Table 24. Shares of respondents who reported using each Python IDE or editor most in a 2018 reader poll*
 
 > **Caution:** Notebook cells can be run in any order, so the order of the code on screen and the actual state of the kernel can differ. To let others reproduce the results, it is good practice to restart the kernel at the end and run all cells again from the top.
 
@@ -967,7 +969,7 @@ A **framework** is a kind of package that bundles the libraries and modules for 
 
 | Framework | Developer | Characteristics |
 |:-----|:-----|:-----|
-| Keras | Google | Provides a concise high-level API that stacks layers like blocks, and is used together with TensorFlow. |
+| Keras | Google | Provides a concise high-level API that stacks layers like blocks. It was long used together with TensorFlow, and since Keras 3 it runs on a backend chosen from JAX, TensorFlow, and PyTorch [10]. |
 | PyTorch | Facebook (now Meta) | Builds the computation graph in the order the Python code runs, which makes debugging easy, and is widely used in research and industry. The labs of this course use PyTorch. |
 
 *Table 25. Comparison of Keras and PyTorch*
@@ -1006,7 +1008,7 @@ The first row of `w1.grad` holds the gradients of the weights entering node 20, 
 
 ### 8.4 Docker
 
-**Docker** is a tool that packages an application with the libraries and settings it needs into an isolated unit called a **container**, so that it runs the same way anywhere [9]. In deep learning it is used to reproduce environments exactly, such as combinations of Python, CUDA, and PyTorch versions that are hard to match.
+**Docker** is a tool that packages an application with the libraries and settings it needs into an isolated unit called a **container**, so that it runs the same way anywhere [11]. In deep learning it is used to reproduce environments exactly, such as combinations of Python, CUDA, and PyTorch versions that are hard to match.
 
 ![Figure 21. Comparison of the Docker container architecture and the virtual machine architecture](../../images/Lec01_p43.png)
 
@@ -1028,7 +1030,7 @@ docker run -it pytorch/pytorch python -c "import torch; print(torch.__version__)
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | Even with 10 hidden layers, a network whose activation functions are all linear is no more expressive than a network with no hidden layer. | **T.** A composition of linear transformations is one linear transformation, so it reduces to a single $W'\mathbf{x} + \mathbf{b}'$ (Section 3.4). |
 | Depending on the logits, the softmax outputs can sum to more than 1. | **F.** The denominator is the sum of all numerators, so the outputs always sum to 1. |
@@ -1172,4 +1174,6 @@ docker run -it pytorch/pytorch python -c "import torch; print(torch.__version__)
 6. N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever, and R. Salakhutdinov, "Dropout: A Simple Way to Prevent Neural Networks from Overfitting," *Journal of Machine Learning Research*, vol. 15, pp. 1929-1958, 2014.
 7. NVIDIA, "CUDA C++ Programming Guide," accessed Nov. 4, 2026. https://docs.nvidia.com/cuda/cuda-c-programming-guide/
 8. Google, "Colaboratory Frequently Asked Questions," accessed Nov. 4, 2026. https://research.google.com/colaboratory/faq.html
-9. Docker, "What is a Container?," accessed Nov. 4, 2026. https://www.docker.com/resources/what-container/
+9. G. Piatetsky, "Here are the most popular Python IDEs / Editors," *KDnuggets*, Dec. 2018, accessed Nov. 4, 2026. https://www.kdnuggets.com/2018/12/most-popular-python-ide-editor.html
+10. Keras, "Getting started with Keras," accessed Nov. 4, 2026. https://keras.io/getting_started/
+11. Docker, "What is a Container?," accessed Nov. 4, 2026. https://www.docker.com/resources/what-container/

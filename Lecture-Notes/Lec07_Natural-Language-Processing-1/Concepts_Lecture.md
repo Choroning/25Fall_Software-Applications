@@ -58,7 +58,7 @@ A **natural language** is a language people use to communicate in everyday life,
 
 Natural language processing is hard for two main reasons.
 
-- **It requires an understanding of human language.** Whether the English word "bank" means a financial institution or the side of a river can only be decided from context. To resolve such ambiguity, a computer must handle the meanings of words together with their context.
+- **It requires an understanding of human language.** Whether the Korean word "배" means a pear (fruit), a boat (vehicle), or the belly (body part) can only be decided from context. To resolve such ambiguity, a computer must handle the meanings of words together with their context.
 - **Languages vary widely in structure and form.** English separates words with spaces, so splitting words on whitespace is easy, but Chinese has no spaces, so even finding word boundaries is difficult. Korean uses spaces, but it is an agglutinative language in which a particle attaches to a noun to form one spacing unit, as in "나는" (noun "나" plus particle "는"), so a whitespace-separated unit is not necessarily a unit of meaning.
 
 ### 1.2 Corpus, Token, and Tokenization
@@ -265,7 +265,7 @@ Natural language processing is already used in many everyday services. Typical e
 
 *Table 5. Representative NLP tasks and related services*
 
-This lecture covers embedding, which turns text into numbers (Section 3), and sentiment analysis (Section 4); seq2seq, attention, and the Transformer, which underlie translation and generation, are covered in Lecture 8.
+Section 3 below covers embedding, which turns text into numbers, and Section 4 covers sentiment analysis; seq2seq, attention, and the Transformer, which underlie translation and generation, are covered in Lecture 8.
 
 ---
 
@@ -279,7 +279,7 @@ A neural network can only compute with numbers, so to use natural language as in
 
 > **Definition:** In natural language processing, an **embedding** is the result, or the process, of converting the language people use (natural language) into a numeric **vector** that a computer can understand. Turning one word into one vector is a **word embedding**, and turning a whole sentence or document into one vector is a **document embedding**.
 
-In a good word embedding, the vectors of words with similar meanings lie close together. The following figure shows the embeddings of several words on a two-dimensional plane. Means of transport such as Train, Bus, Taxi, Car, and Bicycle, drinks and ingredients such as Espresso, Cappuccino, Sugar, and Lemon, education words such as Tutor, Student, School, and University, and pet words such as Cat, Dog, Pet, and Grooming each form a cluster, and King and Queen lie close together.
+In a good word embedding, the vectors of words with similar meanings lie close together. The following figure shows the embeddings of several words on a two-dimensional plane. Means of transport such as Train, Bus, Taxi, Car, and Bicycle (with Cycling and Athlete next to them), drinks and ingredients such as Espresso, Cappuccino, Sugar, and Lemon, education words such as Tutor, Student, School, and University, exercise words such as Yoga and Pilates, and pet words such as Cat, Dog, Pet, and Grooming each form a cluster, and King and Queen lie close together.
 
 ![Figure 2. A two-dimensional visualization of word embeddings in which words with similar meanings cluster](../../images/Lec07_p09.png)
 
@@ -502,7 +502,7 @@ TF-IDF has the following limitations.
 
 *Figure 3. A real-valued vector for each word (left) and a vector space in which the difference from man to woman resembles the difference from king to queen (right)*
 
-Word2Vec rests on the **distributional hypothesis**, the idea that words appearing in similar contexts have similar meanings [9]. Word2Vec trains a neural network to predict which words appear around a word and uses the weights obtained in the process as word vectors. In vectors trained this way, semantic relations appear as vector differences. As on the right of Figure 3, $\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}$ and $\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}$ point in similar directions, so computing $\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}$ yields a vector close to $\mathbf{v}_{\text{queen}}$ [10].
+Word2Vec rests on the **distributional hypothesis**, the idea that words appearing in similar contexts have similar meanings [9]. Word2Vec trains a neural network to predict which words appear around a word and uses the weights obtained in the process as word vectors. In vectors trained this way, semantic relations appear as vector differences. As on the right of Figure 3, $\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}$ and $\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}$ point in similar directions, so computing $\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}$ yields a vector close to $\mathbf{v}_{\text{queen}}$ [10]. A public web demo lets one try such addition and subtraction of words directly with Korean Word2Vec vectors trained on Korean Wikipedia and Namu Wiki [11].
 
 Word2Vec has two models with different training schemes, CBOW and skip-gram.
 
@@ -617,7 +617,7 @@ Skip-gram is generally known to perform better than CBOW. Because one center wor
 
 The output layer of CBOW and skip-gram uses softmax to compute probabilities for all $V$ words of the vocabulary. Computing the softmax denominator $\sum_k e^{z_k}$ requires all $V$ scores at every training step, so training becomes very slow when the vocabulary has hundreds of thousands of words.
 
-**Negative sampling** is a Word2Vec optimization technique that trains by binary classification on only a few sampled words [11]. It replaces the $V$-way classification "which word in the whole vocabulary is a context word" with the **binary classification** problem "is this pair of words a pair that actually occurred together".
+**Negative sampling** is a Word2Vec optimization technique that trains by binary classification on only a few sampled words [12]. It replaces the $V$-way classification "which word in the whole vocabulary is a context word" with the **binary classification** problem "is this pair of words a pair that actually occurred together".
 
 - A word that actually appeared nearby (**positive**) gets the target 1.
 - Another word sampled at random from the corpus (**negative**) gets the target 0.
@@ -632,11 +632,11 @@ $$
 L = -\log \sigma(\mathbf{u}_o \cdot \mathbf{v}_c) - \sum_{i=1}^{k} \log \sigma(-\mathbf{u}_i \cdot \mathbf{v}_c)
 $$
 
-The first term makes the dot product of the positive pair large, and the second term makes the dot products of the negative pairs small (since $\sigma(-x) = 1 - \sigma(x)$, it raises the probability that a negative pair is classified as 0). Each training step computes only $k + 1$ dot products instead of $V$, which greatly speeds up training. The original paper reports using $k$ of 5-20 for small datasets and 2-5 for large datasets, and that sampling negative words with probability proportional to word frequency raised to the $3/4$ power worked best [11].
+The first term makes the dot product of the positive pair large, and the second term makes the dot products of the negative pairs small (since $\sigma(-x) = 1 - \sigma(x)$, it raises the probability that a negative pair is classified as 0). Each training step computes only $k + 1$ dot products instead of $V$, which greatly speeds up training. The original paper reports using $k$ of 5-20 for small datasets and 2-5 for large datasets, and that sampling negative words with probability proportional to word frequency raised to the $3/4$ power worked best [12].
 
 ### 3.9 FastText
 
-**FastText** is a word embedding method, published in 2016 by researchers at Facebook (now Meta), that represents text in units of **subwords**, small units inside words, rather than whole words [12]. It performs strongly in diverse text situations such as rare words, emoticons, and spelling errors.
+**FastText** is a word embedding method, published in 2016 by researchers at Facebook (now Meta), that represents text in units of **subwords**, small units inside words, rather than whole words [13]. It performs strongly in diverse text situations such as rare words, emoticons, and spelling errors.
 
 FastText treats each word as a collection of character **n-grams** (pieces of $n$ consecutive characters). It adds the symbols `<` and `>` marking the start and end of the word, cuts pieces of length $n$ while sliding one character at a time, and also adds the whole word `<apple>` as one unit. Applying $n = 3$ to 'apple' gives the following.
 
@@ -655,12 +655,12 @@ print(char_ngrams("birthday"))
 ['<bi', 'bir', 'irt', 'rth', 'thd', 'hda', 'day', 'ay>', '<birthday>']
 ```
 
-`<apple>` is a 7-character string, and cutting 3 characters at each start position in `range(len(w) - n + 1)`, that is, 0 through 4, yields 5 n-grams. The boundary symbols distinguish a piece inside a word from a word itself. For example, the piece `her` inside the word "where" and `<her>`, which represents the word "her", become different units [12]. The original paper uses not only pieces with $n = 3$ but all pieces with $3 \le n \le 6$.
+`<apple>` is a 7-character string, and cutting 3 characters at each start position in `range(len(w) - n + 1)`, that is, 0 through 4, yields 5 n-grams. The boundary symbols distinguish a piece inside a word from a word itself. For example, the piece `her` inside the word "where" and `<her>`, which represents the word "her", become different units [13]. The original paper uses not only pieces with $n = 3$ but all pieces with $3 \le n \le 6$.
 
 The vector of the word apple is the sum of the vectors of the pieces obtained in this way.
 
 $$
-\mathbf{v}_{\text{apple}} = \mathbf{z}_{\text{<ap}} + \mathbf{z}_{\text{app}} + \mathbf{z}_{\text{ppl}} + \mathbf{z}_{\text{ple}} + \mathbf{z}_{\text{le>}} + \mathbf{z}_{\text{<apple>}}
+\mathbf{v}_{\text{apple}} = \mathbf{z}_{\lt\text{ap}} + \mathbf{z}_{\text{app}} + \mathbf{z}_{\text{ppl}} + \mathbf{z}_{\text{ple}} + \mathbf{z}_{\text{le}\gt} + \mathbf{z}_{\lt\text{apple}\gt}
 $$
 
 The rest of the training is almost the same as Word2Vec (skip-gram with negative sampling). What is learned, however, is not a vector per word but the vector $\mathbf{z}$ of each n-gram. FastText has the following advantages.
@@ -771,7 +771,7 @@ Training minimizes the binary cross entropy loss (`nn.BCELoss`) between this pro
 
 ### 4.3 Research Cases
 
-Sentiment analysis with deep learning has been studied actively. The survey by Zhang et al. [13] summarizes the deep learning methods used for document-level sentiment classification as follows.
+Sentiment analysis with deep learning has been studied actively. The survey by Zhang et al. [14] summarizes the deep learning methods used for document-level sentiment classification as follows.
 
 | Research work | Document representation | Neural network model | Attention used | Information modeled jointly with sentiment |
 |:-----|:-----|:-----|:-----|:-----|
@@ -794,7 +794,7 @@ Sentiment analysis with deep learning has been studied actively. The survey by Z
 
 Table 14 shows how the research evolved. Early work fed BoW (Bag of Words, a vector of word counts) to shallow neural networks or autoencoders, after which combining word embeddings with CNNs, LSTMs, and GRUs became mainstream. Research then moved on to attention (Lecture 8), which weights the important parts of sentences and documents, and to jointly modeling additional information such as users and products, aspects, languages, and domains.
 
-A Korean case is a study that analyzed Twitter posts about foot-and-mouth disease (FMD) [14]. The study collected FMD-related tweets from July 2010 to December 2011, preprocessed them by stop word removal, word conversion, and POS tagging, classified the polarity (positive or negative) of each tweet with a deep learning model, and then extracted topics and keywords for each polarity to analyze keyword networks.
+A Korean case is a study that analyzed Twitter posts about foot-and-mouth disease (FMD) [15]. The study collected FMD-related tweets from July 2010 to December 2011, preprocessed them by stop word removal, word conversion, and POS tagging, classified the polarity (positive or negative) of each tweet with a deep learning model, and then extracted topics and keywords for each polarity to analyze keyword networks.
 
 ![Figure 9. The system architecture of data collection and preprocessing, tweet classification, and network analysis (top), and the LSTM-CNN model of embedding, LSTM, convolution, max pooling, and fully connected layers (bottom)](../../images/Lec07_p33.png)
 
@@ -816,7 +816,7 @@ Figure 10 aggregates the classification results by month. The number of tweets s
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | The result of stemming is always a dictionary word. | **F.** Stemming cuts suffixes by rules, so forms not in the dictionary can appear, such as 'flies' → 'fli'. Lemmatization is the method that returns the dictionary base form. |
 | The cosine similarity of the one-hot vectors of two different words is always 0. | **T.** The positions of their 1s differ, so the dot product is 0 and so is the similarity. This is why one-hot encoding cannot capture relations between words. |
@@ -959,7 +959,8 @@ Figure 10 aggregates the classification results by month. The number of tweets s
 8. T. Mikolov, K. Chen, G. Corrado, and J. Dean, "Efficient estimation of word representations in vector space," arXiv:1301.3781, 2013.
 9. Z. S. Harris, "Distributional structure," *Word*, vol. 10, no. 2-3, pp. 146-162, 1954.
 10. T. Mikolov, W. Yih, and G. Zweig, "Linguistic regularities in continuous space word representations," in *Proc. NAACL-HLT*, pp. 746-751, 2013.
-11. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, and J. Dean, "Distributed representations of words and phrases and their compositionality," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 26, pp. 3111-3119, 2013.
-12. P. Bojanowski, E. Grave, A. Joulin, and T. Mikolov, "Enriching word vectors with subword information," *Transactions of the Association for Computational Linguistics*, vol. 5, pp. 135-146, 2017.
-13. L. Zhang, S. Wang, and B. Liu, "Deep learning for sentiment analysis: A survey," *Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery*, vol. 8, no. 4, e1253, 2018.
-14. H. Chae, J. Lee, Y. Choi, D. Park, and Y. Chung, "Sentiment analysis of foot-and-mouth disease using tweet text-mining technique," *KIPS Transactions on Software and Data Engineering*, vol. 7, no. 11, pp. 419-426, 2018.
+11. "Korean Word2Vec," web demo, accessed Nov. 4, 2026. https://word2vec.kr/search/
+12. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, and J. Dean, "Distributed representations of words and phrases and their compositionality," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 26, pp. 3111-3119, 2013.
+13. P. Bojanowski, E. Grave, A. Joulin, and T. Mikolov, "Enriching word vectors with subword information," *Transactions of the Association for Computational Linguistics*, vol. 5, pp. 135-146, 2017.
+14. L. Zhang, S. Wang, and B. Liu, "Deep learning for sentiment analysis: A survey," *Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery*, vol. 8, no. 4, e1253, 2018.
+15. H. Chae, J. Lee, Y. Choi, D. Park, and Y. Chung, "Sentiment analysis of foot-and-mouth disease using tweet text-mining technique," *KIPS Transactions on Software and Data Engineering*, vol. 7, no. 11, pp. 419-426, 2018.

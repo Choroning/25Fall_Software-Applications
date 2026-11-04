@@ -70,7 +70,7 @@ Lec01_Deep-Learning-Fundamentals/
 └── data/
     ├── goldenretriever-3724972_640.jpg  golden retriever photo to classify (640×426)
     ├── imagenet_class_index.json        indices and names of the 1,000 ImageNet classes
-    └── white_rabbit.png                 white rabbit photo for an extra test (707×560)
+    └── white_rabbit.png                 additional white rabbit photo to classify (707×560)
 ```
 
 The notebook opens files with **relative paths** such as `data/goldenretriever-3724972_640.jpg`. A relative path is interpreted with respect to the current working directory, so the `data/` folder must be under the directory in which the notebook runs. In contrast, an **absolute path** written from the root (`/`), such as `/content/drive/MyDrive/...`, is tied to the folder structure of a particular computer and does not work in other environments.
@@ -97,6 +97,8 @@ jupyter lab
 ```
 
 > **Caution:** The notebook's `from google.colab import drive` cell works only on Colab. On a local computer it raises `ModuleNotFoundError`, so skip that cell. The first run downloads the pretrained weights of VGG-16 (about 528 MB), which requires an internet connection and some time.
+
+> **Note:** The preparation cell at the top of the notebook says to download the data with `make_folders_and_data_downloads.ipynb` from the original book's example repository and to install PyTorch 1.0 and Matplotlib with conda. These instructions date from the PyTorch 1.0 era, so today follow the pip commands above or the installation guide on the PyTorch website (https://pytorch.org/get-started/locally/), and use the three files in the `data/` folder of Section 1.2.
 
 ---
 
@@ -173,7 +175,7 @@ print(net)
 - `net.eval()` switches the model to **evaluation mode**. Layers that behave differently in training and inference, such as dropout (Section 7.3 of Lecture 1), then behave as in inference. In evaluation mode dropout does not switch nodes off, so the same input always gives the same output. Use `net.train()` to switch back for training.
 - `print(net)` prints the layers that make up the model in order.
 
-With a recent torchvision, running this cell also prints the following warnings.
+With torchvision 0.13 or later, running this cell also prints the following warnings. The last two lines are the progress display of the first download of the weight file.
 
 ```text
 UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
@@ -299,11 +301,11 @@ The golden retriever photo (width 640, height 426) goes through the steps as fol
 | `Resize(224)` | PIL image 336 × 224 | Shorter side 426 → 224, longer side $\lfloor 640 \times 224/426 \rfloor = \lfloor 336.5 \rfloor = 336$ |
 | `CenterCrop(224)` | PIL image 224 × 224 | $(336 - 224)/2 = 56$ pixels cut from each side horizontally |
 | `ToTensor()` | Tensor `[3, 224, 224]`, values 0.0-1.0 | Each value ÷ 255, axes reordered to (channels, height, width) |
-| `Normalize(mean, std)` | Tensor `[3, 224, 224]`, values about −2.1-2.6 | $(x - \text{mean})/\text{std}$ per channel |
+| `Normalize(mean, std)` | Tensor `[3, 224, 224]`, values from about −2.1 to 2.6 | $(x - \text{mean})/\text{std}$ per channel |
 
 *Table 3. Results of each preprocessing step applied to the golden retriever photo*
 
-`mean = (0.485, 0.456, 0.406)` and `std = (0.229, 0.224, 0.225)` are the per-channel means and standard deviations of R, G, and B computed over the ImageNet training images [4]. For example, an orange pixel with color (255, 128, 0) changes as follows.
+`mean = (0.485, 0.456, 0.406)` and `std = (0.229, 0.224, 0.225)` are the per-channel means and standard deviations of R, G, and B computed over the ImageNet training images, the values shared by the pretrained models of torchvision [5]. For example, an orange pixel with color (255, 128, 0) changes as follows.
 
 $$
 \text{ToTensor: } \left(\frac{255}{255}, \frac{128}{255}, \frac{0}{255}\right) = (1.000, 0.502, 0.000)
@@ -315,7 +317,7 @@ $$
 
 The normalized values range from $(0 - 0.485)/0.229 \approx -2.118$ to $(1 - 0.485)/0.229 \approx 2.249$ in the R channel and from $-1.804$ to $2.640$ in the B channel. Normalization stabilizes training by bringing the values of each channel near mean 0 and standard deviation 1, and a pretrained model must receive input normalized with exactly the same values as during training.
 
-> **Note:** The standard preprocessing for VGG-16 given in the torchvision documentation resizes the shorter side to 256 and then crops the central 224×224 region [4]. Resizing the shorter side to 224 and then cropping 224×224, as the notebook does, keeps a wider region of the original. Both approaches are used; the predicted class is usually the same, but the probabilities can differ slightly.
+> **Note:** The standard preprocessing for VGG-16 given in the torchvision documentation resizes the shorter side to 256 and then crops the central 224×224 region [5]. Resizing the shorter side to 224 and then cropping 224×224, as the notebook does, keeps a wider region of the original. Both approaches are used; the predicted class is usually the same, but the probabilities can differ slightly.
 
 ### 4.3 Checking the Preprocessing Result
 
@@ -485,7 +487,7 @@ tensor([[-1.5478e+00, -1.0093e+00, -2.8853e+00, -3.0570e+00, -3.2550e+00,
 
 The logit at index 207 is the largest, and `'207'` in the class index is `golden_retriever`, so the model correctly classifies the photo as a golden retriever. `grad_fn=<AddmmBackward0>` indicates that this tensor keeps an operation record for gradient computation (it comes from `addmm`, the matrix multiplication and addition of the last fully connected layer).
 
-> **Note:** In the output stored in the notebook, the last line shows `(인덱스: 207)` ("index" in Korean). That output was produced before the message was changed to `index`, and running the current code prints `(index: 207)`.
+> **Note:** The last line of the output stored in the notebook is `(인덱스: 207)` ("index" in Korean), but the cell's code prints the word `index`, so running the current code prints `(index: 207)`.
 
 ### 7.2 Probabilities and the Top Five Classes
 
@@ -591,4 +593,5 @@ In the same way, changing `image_file_path` to `'data/white_rabbit.png'` classif
 1. J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei, "ImageNet: A Large-Scale Hierarchical Image Database," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 248-255, 2009.
 2. O. Russakovsky et al., "ImageNet Large Scale Visual Recognition Challenge," *International Journal of Computer Vision*, vol. 115, no. 3, pp. 211-252, 2015.
 3. K. Simonyan and A. Zisserman, "Very Deep Convolutional Networks for Large-Scale Image Recognition," in *Proc. Int. Conf. Learning Representations (ICLR)*, 2015.
-4. PyTorch, "vgg16," *Torchvision Documentation*, accessed Nov. 4, 2026. https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.vgg16.html
+4. PyTorch, "Models and pre-trained weights," *Torchvision Documentation*, accessed Nov. 4, 2026. https://docs.pytorch.org/vision/stable/models.html
+5. PyTorch, "vgg16," *Torchvision Documentation*, accessed Nov. 4, 2026. https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.vgg16.html

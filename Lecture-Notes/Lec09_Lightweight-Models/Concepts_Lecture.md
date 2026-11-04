@@ -86,7 +86,7 @@ Edge devices have far less computing power and memory than cloud servers, so AI 
 
 ### 1.3 Edge Devices and an Application Case
 
-A representative edge AI hardware is NVIDIA's embedded board series, **Jetson**. A palm-sized board contains a GPU, so deep learning inference can run on site. There are module products and developer kits with input/output ports, divided into several grades by performance and power consumption.
+A representative piece of edge AI hardware is NVIDIA's embedded board series, **Jetson**. A palm-sized board contains a GPU, so deep learning inference can run on site. There are module products and developer kits with input/output ports, divided into several grades by performance and power consumption.
 
 ![Figure 2. Several embedded modules and developer kits of the NVIDIA Jetson family](../../images/Lec09_p04.jpg)
 
@@ -758,7 +758,7 @@ All four models share the approach of replacing the expensive 3×3 standard conv
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | In edge computing, all raw data must be sent to the cloud, so the bandwidth requirement grows. | **F.** The edge device processes data directly and sends only results, so traffic to the cloud and the bandwidth requirement decrease. |
 | Quantizing FP32 weights to INT8 reduces the storage of the weights to a quarter. | **T.** Representing 32 bits with 8 bits makes the bits needed to store the same number of weights a quarter. |

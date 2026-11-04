@@ -560,7 +560,7 @@ print(round(d(pe[0], pe[1]), 3), round(d(pe[3], pe[4]), 3), round(d(pe[40], pe[4
 
 Like seq2seq, the Transformer is trained with teacher forcing. An RNN decoder receives words one step at a time, so it could not see future answers, but the Transformer decoder receives the whole target sentence matrix at once. Performing self-attention as is would let the position that must predict "suis" consult "suis" and "étudiant", which are already in the input matrix, amounting to predicting with the answer known. Therefore, **words after the current step are masked.**
 
-Concretely, in the attention score matrix the cells of keys that come after each query are replaced with $-\infty$ (a very large negative number in implementations) before softmax is applied. Since $e^{-\infty} = 0$, the masked cells get weight 0. The following shows the masked cells (■) in the attention score matrix of the French sentence "<sos> je suis étudiant" ("I am a student").
+Concretely, in the attention score matrix the cells of keys that come after each query are replaced with $-\infty$ (a very large negative number in implementations) before softmax is applied. Since $e^{-\infty} = 0$, the masked cells get weight 0. The following shows the masked cells (■) in the attention score matrix of the French sentence `<sos> je suis étudiant` ("I am a student").
 
 ```text
               keys: <sos>   je    suis  étudiant
@@ -685,7 +685,7 @@ ViT-Base has 12 layers, hidden dimension 768, and 12 heads, about 86 million par
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | The decoder of a seq2seq model with attention uses the same context vector at every output step. | **F.** The attention weights are recomputed at every step, so the context vector also differs at every output step. A single fixed context vector is used by seq2seq without attention. |
 | In scaled dot-product attention, dividing by $\sqrt{d_k}$ prevents softmax from saturating and its gradients from becoming small. | **T.** The larger the dimension, the larger the variance of the dot product ($d_k$), which concentrates softmax on one position, so dividing by $\sqrt{d_k}$ brings the variance back to 1. |

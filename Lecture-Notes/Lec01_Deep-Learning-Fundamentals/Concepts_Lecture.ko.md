@@ -79,7 +79,7 @@
 | 1차 산업혁명 | 18세기 | 증기기관을 이용한 기계화 |
 | 2차 산업혁명 | 19세기 ~ 20세기 초 | 전기 에너지를 이용한 대량 생산 |
 | 3차 산업혁명 | 20세기 후반 | 컴퓨터와 인터넷을 이용한 정보화 |
-| 4차 산업혁명 | 21세기 초반 | 인공지능, 빅데이터, 초연결을 이용한 지능화 |
+| 4차 산업혁명 | 21세기 초반 | 인공지능, 빅데이터, 초연결을 이용한 지능화 (바이오, 에너지, 지구공학, 우주 기술 등으로 확산) |
 
 *표 1. 네 차례의 산업혁명과 핵심 기술*
 
@@ -131,7 +131,7 @@ graph LR
 - **응용(application):** 사용자가 쓰는 서비스나 제품이다. 자율주행 자동차, 얼굴 인식 출입 시스템 등이 있다.
 - **태스크(task):** 응용이 풀어야 하는 구체적인 문제이다. 자율주행은 보행자와 차량을 찾는 객체 탐지, 차선과 도로를 구분하는 의미론적 분할 등 여러 태스크로 나뉜다.
 - **모델(model):** 태스크를 푸는 구체적인 신경망 설계이다. VGG, GoogLeNet, ResNet은 이미지 분류에서 좋은 성능을 보인 대표적인 모델이다(VGG는 1강 실습과 3강, ResNet은 3\~4강에서 다룬다).
-- **네트워크(network):** 모델을 이루는 신경망의 기본 형식이다. **DNN(deep neural network)** 은 완전 연결층을 깊게 쌓은 신경망, **CNN(convolutional neural network)** 은 합성곱 연산을 쓰는 신경망, **RNN(recurrent neural network)** 은 순환 구조로 순서 있는 데이터를 처리하는 신경망이다. CNN과 RNN은 2강에서 다룬다.
+- **네트워크(network):** 모델을 이루는 신경망의 기본 형식이다. **DNN(deep neural network)** 은 넓게는 깊은 신경망 전체를 뜻하지만 CNN, RNN과 나란히 쓸 때는 완전 연결 층을 깊게 쌓은 신경망을 가리키고, **CNN(convolutional neural network)** 은 합성곱 연산을 쓰는 신경망, **RNN(recurrent neural network)** 은 순환 구조로 순서 있는 데이터를 처리하는 신경망이다. CNN과 RNN은 2강에서 다룬다.
 
 > **핵심:** 응용 개발자는 응용을 태스크로 분해하고, 태스크에 맞는 모델을 고른다. 이 과목은 그중 가운데 두 단계, 즉 태스크를 정의하고 그에 맞는 모델을 이해하고 사용하는 방법에 초점을 둔다.
 
@@ -172,7 +172,7 @@ graph LR
 |:-----|:-----|:-----|:-----|
 | **지도학습(supervised learning)** | 입력과 정답(레이블)의 쌍 | 입력에서 정답을 예측하는 함수 | 분류(이미지 분류, 고객 이탈 방지, 신원 사기 탐지, 진단), 회귀(광고 인기도 예측, 날씨 예보, 시장 예측, 기대 수명 추정, 인구 증가 예측) |
 | **비지도학습(unsupervised learning)** | 정답이 없는 입력 | 데이터에 숨은 구조나 패턴 | 차원 축소(의미 있는 압축, 구조 발견, 빅데이터 시각화, 특징 추출), 군집화(추천 시스템, 표적 마케팅, 고객 세분화) |
-| **강화학습(reinforcement learning)** | 환경과 상호작용하며 받는 보상과 벌점 | 누적 보상을 최대화하는 행동 | 실시간 의사결정, 게임 AI, 로봇 내비게이션, 기술 습득 |
+| **강화학습(reinforcement learning)** | 환경과 상호작용하며 받는 보상과 벌점 | 누적 보상을 최대화하는 행동 | 실시간 의사결정, 게임 AI, 로봇 내비게이션, 기술 습득, 학습 태스크 |
 
 *표 5. 세 가지 학습 방식의 비교*
 
@@ -244,7 +244,7 @@ graph LR
 
 *그림 7. 이미지를 행, 열, 채널의 배열로 바꾸어 신경망에 넣고 개는 0, 고양이는 1을 출력하는 분류 모델*
 
-컴퓨터는 모든 데이터를 숫자의 배열, 즉 **텐서(tensor)** 로 처리한다. 컬러 이미지는 행(row), 열(column), 채널(channel)의 3차원 배열이다. 채널은 빨강(R), 초록(G), 파랑(B)의 세 가지이고, 각 원소는 그 위치와 색의 밝기를 0\~255의 정수로 나타낸다. 그림 7의 작은 예는 행 3개, 열 3개, 채널 3개인 $3 \times 3 \times 3$ 배열이다. 이 배열의 값이 입력층으로 들어가 은닉층을 거치고, 출력층에서 0 또는 1에 가까운 값이 나온다.
+컴퓨터는 모든 데이터를 숫자의 배열, 즉 **텐서(tensor)** 로 처리한다. 컬러 이미지는 행(row), 열(column), 채널(channel)의 3차원 배열이다. 채널은 빨강(R), 초록(G), 파랑(B)의 세 가지이고, 채널마다 8비트로 저장한 이미지에서 각 원소는 그 위치와 색의 밝기를 0\~255의 정수로 나타낸다. 그림 7의 작은 예는 행 3개, 열 3개, 채널 3개인 $3 \times 3 \times 3$ 배열이다. 이 배열의 값이 입력층으로 들어가 은닉층을 거치고, 출력층에서 0 또는 1에 가까운 값이 나온다.
 
 학습 전의 신경망은 가중치가 임의의 값이라서 개 사진에도 0과 거리가 먼 값을 낼 수 있다. 수많은 개와 고양이 사진을 대상으로 개는 0, 고양이는 1이 나오도록 가중치를 조정하는 과정이 **학습(training)** 이다.
 
@@ -394,7 +394,7 @@ $$
 
 층을 아무리 쌓아도 하나의 행렬 $W'$과 벡터 $\mathbf{b}'$으로 된 한 층과 같다. 비선형 활성화 함수를 층 사이에 넣어야 이 합쳐짐이 일어나지 않고, 층을 쌓을수록 더 복잡한 함수를 표현할 수 있다.
 
-> **[선형대수학]** 선형대수학에서 배우는 선형 변환의 합성은 다시 선형 변환이며, 그 행렬은 두 행렬의 곱 $W_2W_1$이다. 행렬 곱은 결합 법칙을 만족하므로 선형 변환을 $n$번 합성해도 행렬 하나 $W_n \cdots W_2W_1$로 표현된다. 위의 식은 신경망의 층이 선형이면 이 성질 때문에 깊이가 의미를 잃는다는 것을 보인다.
+> **[선형대수학]** 선형대수학에서 배우는 선형 변환의 합성은 다시 선형 변환이며, 그 행렬은 두 행렬의 곱 $W_2W_1$이다. 행렬 곱은 결합 법칙을 만족하므로 선형 변환을 $n$번 합성해도 행렬 하나 $W_n \cdots W_2W_1$로 표현된다. 편향이 있는 층 $W\mathbf{x} + \mathbf{b}$는 아핀 변환이며, 아핀 변환을 합성해도 다시 아핀 변환이 된다. 위의 식은 신경망의 층이 선형이면 이 성질 때문에 깊이가 의미를 잃는다는 것을 보인다.
 
 ### 3.5 비선형성이 필요한 이유: 개념적 검증
 
@@ -605,9 +605,9 @@ graph LR
 
 *표 16. 주요 옵티마이저의 아이디어*
 
-안장점(saddle point)처럼 한 방향으로는 내려가고 다른 방향으로는 올라가는 곡면에서 여러 옵티마이저의 경로를 비교하면, SGD는 안장점 근처에서 오래 머무르고, Adagrad, AdaDelta, RMSProp처럼 가중치마다 보폭을 조절하는 방법은 빨리 벗어나며, Momentum과 NAG는 관성 때문에 크게 돌아서 벗어나는 경향을 보인다 [3].
+안장점(saddle point)처럼 한 방향으로는 내려가고 다른 방향으로는 올라가는 곡면에서 여러 옵티마이저의 경로를 비교하면, SGD, Momentum, NAG는 안장점 근처를 쉽게 벗어나지 못하며 그중 Momentum과 NAG만 결국 벗어나고, Adagrad, AdaDelta, RMSProp처럼 가중치마다 보폭을 조절하는 방법은 내려가는 방향으로 빠르게 벗어난다 [3].
 
-현재 가장 널리 쓰이는 Adam은 기울기 $g_t$의 이동 평균 $m_t$(방향)와 기울기 제곱의 이동 평균 $v_t$(보폭)를 함께 유지한다 [4].
+널리 쓰이는 옵티마이저인 Adam은 기울기 $g_t$의 이동 평균 $m_t$(방향)와 기울기 제곱의 이동 평균 $v_t$(보폭)를 함께 유지한다 [4].
 
 $$
 m_t = \beta_1 m_{t-1} + (1 - \beta_1)g_t, \quad v_t = \beta_2 v_{t-1} + (1 - \beta_2)g_t^2, \quad \hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}, \quad w_t = w_{t-1} - \eta\frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
@@ -805,7 +805,7 @@ $$
 
 ### 7.2 과적합과 과소적합
 
-**과적합(overfitting)** 은 모델이 훈련 데이터는 거의 완벽하게 예측하지만, 학습 때 보지 못한 새로운 데이터에서는 성능이 크게 떨어지는 현상이다. 시험공부를 하면서 문제집의 문제와 답을 통째로 외워 버린 학생이 새로운 문제를 풀지 못하는 상황과 같다.
+**과적합(overfitting)** 은 모델이 훈련 데이터는 거의 완벽하게 예측하지만, 학습 때 보지 못한 새로운 데이터에서는 성능이 크게 떨어지는 현상이다. 문제집의 문제와 답을 통째로 외워 버린 학생이 처음 보는 문제를 풀지 못하는 상황과 같다.
 
 ![그림 16. 과소적합, 적절한 적합, 과적합 상태의 결정 경계](../../images/Lec01_p34.png)
 
@@ -941,7 +941,9 @@ print(torch.cuda.is_available())  # GPU 런타임이면 True
 - 셀을 실행하는 프로그램을 **커널(kernel)** 이라 하며, 커널은 셀 사이에서 변수를 계속 기억한다. 그래서 데이터를 한 번 읽어 두고 여러 셀에서 나누어 실험하기 편하다.
 - 로컬 컴퓨터에서는 `pip install jupyterlab`으로 설치하고 `jupyter lab` 명령으로 실행한다.
 
-| Python IDE와 편집기 | 사용 비율 |
+다음 표는 데이터 과학과 기계학습을 다루는 웹 사이트 KDnuggets가 2018년에 독자 1,900여 명에게 그해 가장 많이 쓴 Python 편집기와 IDE를 묻고(최대 세 개까지 선택) 집계한 결과이며, Jupyter가 가장 많이 쓰였다 [9]. 복수 응답이므로 비율의 합은 100%를 넘는다.
+
+| Python IDE와 편집기 | 응답 비율 |
 |:-----|:-----:|
 | Jupyter | 57% |
 | PyCharm | 35% |
@@ -957,7 +959,7 @@ print(torch.cuda.is_available())  # GPU 런타임이면 True
 | gedit | 1.3% |
 | Rodeo | 1.2% |
 
-*표 24. Python 개발자를 대상으로 한 설문에서 가장 많이 쓰이는 Python IDE와 편집기*
+*표 24. 2018년 독자 설문에서 가장 많이 썼다고 답한 Python IDE와 편집기의 응답 비율*
 
 > **주의:** 노트북은 셀을 아무 순서로나 실행할 수 있으므로, 화면에 보이는 코드 순서와 커널의 실제 상태가 달라질 수 있다. 결과를 다른 사람이 재현할 수 있도록 마지막에는 커널을 재시작하고 모든 셀을 위에서부터 다시 실행해 확인하는 것이 좋다.
 
@@ -967,7 +969,7 @@ print(torch.cuda.is_available())  # GPU 런타임이면 True
 
 | 프레임워크 | 개발 주체 | 특징 |
 |:-----|:-----|:-----|
-| Keras | Google | 층을 블록처럼 쌓는 간결한 고수준 API를 제공하며, TensorFlow와 함께 쓰인다. |
+| Keras | Google | 층을 블록처럼 쌓는 간결한 고수준 API를 제공한다. 오랫동안 TensorFlow와 함께 쓰였으며, Keras 3부터는 JAX, TensorFlow, PyTorch 중 하나를 백엔드로 골라 실행한다 [10]. |
 | PyTorch | Facebook(현재 Meta) | Python 코드를 실행하는 순서대로 계산 그래프가 만들어져 디버깅이 쉽고, 연구와 실무에서 널리 쓰인다. 이 과목의 실습은 PyTorch를 쓴다. |
 
 *표 25. Keras와 PyTorch의 비교*
@@ -1006,7 +1008,7 @@ tensor([-0.000183, -0.000109])
 
 ### 8.4 Docker
 
-**Docker**는 응용 프로그램과 그 실행에 필요한 라이브러리, 설정을 **컨테이너(container)** 라는 격리된 단위로 묶어 어디서나 같은 방식으로 실행하게 하는 도구이다 [9]. 딥러닝에서는 Python, CUDA, PyTorch의 버전 조합처럼 맞추기 까다로운 환경을 그대로 재현하는 데 쓰인다.
+**Docker**는 응용 프로그램과 그 실행에 필요한 라이브러리, 설정을 **컨테이너(container)** 라는 격리된 단위로 묶어 어디서나 같은 방식으로 실행하게 하는 도구이다 [11]. 딥러닝에서는 Python, CUDA, PyTorch의 버전 조합처럼 맞추기 까다로운 환경을 그대로 재현하는 데 쓰인다.
 
 ![그림 21. Docker 컨테이너 구조와 가상 머신 구조의 비교](../../images/Lec01_p43.png)
 
@@ -1172,4 +1174,6 @@ docker run -it pytorch/pytorch python -c "import torch; print(torch.__version__)
 6. N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever, and R. Salakhutdinov, "Dropout: A Simple Way to Prevent Neural Networks from Overfitting," *Journal of Machine Learning Research*, vol. 15, pp. 1929-1958, 2014.
 7. NVIDIA, "CUDA C++ Programming Guide," accessed Nov. 4, 2026. https://docs.nvidia.com/cuda/cuda-c-programming-guide/
 8. Google, "Colaboratory Frequently Asked Questions," accessed Nov. 4, 2026. https://research.google.com/colaboratory/faq.html
-9. Docker, "What is a Container?," accessed Nov. 4, 2026. https://www.docker.com/resources/what-container/
+9. G. Piatetsky, "Here are the most popular Python IDEs / Editors," *KDnuggets*, Dec. 2018, accessed Nov. 4, 2026. https://www.kdnuggets.com/2018/12/most-popular-python-ide-editor.html
+10. Keras, "Getting started with Keras," accessed Nov. 4, 2026. https://keras.io/getting_started/
+11. Docker, "What is a Container?," accessed Nov. 4, 2026. https://www.docker.com/resources/what-container/

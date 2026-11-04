@@ -115,7 +115,7 @@ $$
 f(i) = z(i) \circledast u = \sum_{x=-(h-1)/2}^{(h-1)/2} z(i + x)\,u(x)
 $$
 
-The kernel positions are numbered $-(h-1)/2, \dots, (h-1)/2$ so that the center is 0. For a kernel of size 3, $u = (-1, 0, 1)$, we have $u(-1) = -1$, $u(0) = 0$, $u(1) = 1$, and $f(i) = -z(i - 1) + z(i + 1)$. Sliding the kernel one position at a time, multiplying the values at each position, and adding them all gives a result called a **feature map**.
+The kernel positions are numbered $-(h-1)/2, \dots, (h-1)/2$ so that the center is 0. For a kernel of size 3, $u = (-1, 0, 1)$, the values are $u(-1) = -1$, $u(0) = 0$, $u(1) = 1$, and $f(i) = -z(i - 1) + z(i + 1)$. Sliding the kernel one position at a time, multiplying the values at each position, and adding them all gives a result called a **feature map**.
 
 **Example of one-dimensional convolution.** Apply the kernel $(-1, 0, 1)$ to the signal $z = (2, 2, 2, 2, 2, 9, 9, 9)$.
 
@@ -485,7 +485,7 @@ $$
 - $\mathbf{U}$ is the weight matrix from the input to the hidden layer, $\mathbf{W}$ from the previous hidden state to the current hidden state, and $\mathbf{V}$ from the hidden layer to the output. $\mathbf{b}, \mathbf{c}$ are biases, $\tau_1$ is usually tanh, and $\tau_2$ is an output function suited to the problem (for example, softmax).
 - Without the term $\mathbf{W}\mathbf{h}^{t-1}$, this is the same as a multi-layer perceptron. That term is the recurrent connection that carries past information into the present.
 - The top left of Figure 13 shows the recurrence, in which the same cell (green) loops back to itself, unrolled along time. The cells in the unrolled picture are not different cells but one cell used repeatedly at every time point.
-- **Weight sharing:** the time points do not each have different weights; all of them share the same $\{\mathbf{U}, \mathbf{V}, \mathbf{W}\}$. The same model can therefore handle time series of different lengths, and the number of parameters stays the same as the length grows.
+- **Weight sharing:** the time points do not each have different weights; all of them share the same $\lbrace\mathbf{U}, \mathbf{V}, \mathbf{W}\rbrace$. The same model can therefore handle time series of different lengths, and the number of parameters stays the same as the length grows.
 
 The bottom left of Figure 13 draws an RNN with input dimension 4, hidden state size 2, and output dimension 2 over two time points (time steps 1 and 2). Here $\mathbf{U}$ is a $2 \times 4$ matrix, $\mathbf{W}$ is $2 \times 2$, and $\mathbf{V}$ is $2 \times 2$, so there are $8 + 4 + 4 = 16$ weights, or 20 including the biases $\mathbf{b}, \mathbf{c}$ (2 each). The curves between the hidden nodes are $\mathbf{W}$, which carries the hidden state of time step 1 to time step 2.
 
@@ -544,9 +544,9 @@ The **LSTM (long short-term memory)** is a structure that remedies the vanishing
 - Like the hidden state, the cell state passes the cell state of the previous time point on to the next time point.
 - The main role of the cell state is to work with three gates, the **forget gate**, the **input gate**, and the **output gate**, so that information can be used selectively. A **gate** is a mechanism that multiplies elementwise by values between 0 and 1 to control how much information passes.
 
-![Figure 16. An RNN with a single tanh layer in its repeating module and an LSTM with four gate layers](../../images/Lec02_p29.png)
+![Figure 16. An RNN with a single tanh layer in its repeating module and an LSTM with three sigmoid gate layers and one tanh layer](../../images/Lec02_p29.png)
 
-*Figure 16. An RNN with a single tanh layer in its repeating module and an LSTM with four gate layers*
+*Figure 16. An RNN with a single tanh layer in its repeating module and an LSTM with three sigmoid gate layers and one tanh layer*
 
 The RNN at the top of Figure 16 has only one tanh layer in its repeating module, while the LSTM at the bottom has three sigmoid layers (σ) and one tanh layer, and the line running across the top of the module is the cell state [13]. The LSTM computes the following, where $\sigma$ is the sigmoid and $\odot$ is the elementwise product.
 
@@ -704,7 +704,7 @@ The Lecture 2 lab covers steps 4 and 5 (the model and the forward pass), and the
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | A convolution layer that applies 16 kernels of 3 × 3 to a 3-channel input has 3 output channels. | **F.** The number of output channels is the number of kernels, 16. Each kernel has depth 3. |
 | The more pixels the input image has, the more parameters a convolution layer has. | **F.** The same kernel is shared at every position, so the parameter count $C_{out}(C_{in}K^2) + C_{out}$ does not depend on the height and width of the input. |

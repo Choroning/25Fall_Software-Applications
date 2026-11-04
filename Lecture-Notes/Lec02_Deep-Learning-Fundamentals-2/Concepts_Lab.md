@@ -229,7 +229,7 @@ There are 60,843,624 parameters in total, and the three fully connected layers a
 
 ### 4.1 Problem Setting: Predicting the Next Day's Rise or Fall from 30 Days of Stock Prices
 
-The LSTM lab assumes data of the following form. A day's stock price is represented by four features, the opening, closing, high, and low prices, and the model looks at a record of 30 consecutive days to predict whether the price rises (label 1) or falls (label 0) on the next day. This is the many-to-one problem of Section 3.5 of Lecture 2.
+The LSTM lab assumes data of the following form. A day's stock price is represented by four features, the opening, closing, high, and low prices, and the model looks at a record of 30 consecutive days to predict whether the price rises (label 1) or falls (label 0) on the next day. This is the many-to-one problem of Section 3.5 of Lecture 2. The LSTM part of the notebook begins with a figure of a recurrent neural network unrolled along time (Section 3.4 of Lecture 2) and with Figure 1 below.
 
 ![Figure 1. Data format for predicting the next day's rise (1) or fall (0) from 30 days of opening, closing, high, and low prices](../../images/Lec02_Stock-Sequence.png)
 

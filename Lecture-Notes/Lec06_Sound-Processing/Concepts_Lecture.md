@@ -75,7 +75,7 @@ Deep learning is widely used not only for images (Lectures 3-5) and text (Lectur
 
 *Table 1. Representative tasks performed with sound data*
 
-There are many other tasks, such as speaker recognition, music genre classification, and anomalous sound detection that finds faults from machine sounds. This lecture focuses on audio classification and sound event detection, together with sound preprocessing, which is their common basis.
+There are many other tasks, such as speaker recognition, music genre classification, and anomalous sound detection that finds faults from machine sounds. The sections below focus on audio classification and sound event detection, together with sound preprocessing, which is their common basis.
 
 ### 1.2 Audio Classification
 
@@ -98,7 +98,7 @@ The top left is the **waveform**, which plots the amplitude of the sound over ti
 A deep-learning speech recognition system consists of the following steps, as in the figure above [1].
 
 1. **Feature extraction:** The audio signal is preprocessed with techniques such as normalization and the spectrogram or MFCC.
-2. **Acoustic model:** A neural network that predicts, at each time step $t$, the probability distribution $P_t(c)$ over vocabulary characters $c$. Jasper [2] and QuartzNet [3] in the figure are examples of such acoustic models. The vocabulary is the set of output characters such as the letters and the space.
+2. **Acoustic model:** A neural network that predicts, at each time step $t$, the probability distribution $P_t(c)$ over vocabulary characters $c$. Jasper [2] and QuartzNet [3] in the figure are examples of such acoustic models. The vocabulary is the set of characters the model can output, such as the letters and the space, and $c$ is an element of it.
 3. **Decoding:** The probability distribution at each time step is turned into a character string.
    - **Greedy decoding (argmax):** The simplest strategy. At each time step it emits the character with the highest probability, without regard to the meaning of the content.
    - **Using a language model:** A language model adds context, so it can correct the errors of the acoustic model. For example, even if the acoustic model mispredicts "apple" as "apble", the language model knows that the word "apble" is almost never used and that "apple" fits the context, so it corrects the error.
@@ -137,7 +137,7 @@ The figure above is the structure of SELDnet [5].
 - **Feature extractor:** From the multichannel input audio, it computes the magnitude and phase of the spectrogram for each channel to form an input of size $T \times M/2 \times 2C$. $T$ is the number of frames, $M/2$ the number of frequency bins, and $C$ the number of channels (microphones); it is $2C$ because there are two quantities, magnitude and phase.
 - **Three convolutional blocks:** They convolve with $P$ filters of size 3×3 and max-pool only along the frequency axis ($1 \times MP_i$), reducing the size to $T \times 2 \times P$ while keeping the time resolution.
 - **Two bidirectional GRU layers:** They learn context along the time axis and output $T \times Q$.
-- **Two output branches:** One branch is sound event detection (SED, $T \times N$), which outputs with sigmoids whether each of $N$ classes is active in each frame, and the other is **direction-of-arrival (DOA) estimation** ($T \times 3N$), which outputs for each class the direction the sound came from as a three-dimensional coordinate $(x, y, z)$. The lower figures are example ground truths for the classification task (class activity over time) and the regression task (direction coordinates over time), respectively.
+- **Two output branches:** Each branch passes through a linear fully connected layer of $R$ units before its output layer. One branch is sound event detection (SED, $T \times N$), which outputs with sigmoids whether each of $N$ classes is active in each frame, and the other is **direction-of-arrival (DOA) estimation** ($T \times 3N$), which outputs for each class the direction the sound came from as a three-dimensional coordinate $(x, y, z)$. The lower figures are example ground truths for the classification task (class activity over time) and the regression task (direction coordinates over time), respectively.
 
 > **Caution:** Estimating the direction of a sound requires multichannel audio recorded with several microphones, because the differences in arrival time (phase) and level of the same sound at each microphone are the cues to the direction. Single-channel audio recorded with one microphone has no such spatial information, so sound event detection is possible but localization is not.
 
@@ -175,14 +175,14 @@ Sound received by a microphone is air pressure that changes continuously over ti
 
 *Figure 7. The lower the sample rate, the more coarsely the original waveform is represented*
 
-The three pictures on the left show the original wave sampled at 192 kHz and 96 kHz with the points joined by straight lines; the lower the sample rate, the more coarsely it follows the original curve. The four pictures on the right show one period of the same sine wave sampled at 2, 6, and 10 points, illustrating the relationship between sample rate and resolution: the more samples, the closer to the original shape.
+The three pictures on the left show the original wave sampled at 192 kHz and 96 kHz with the points joined by straight lines; the lower the sample rate, the more coarsely it follows the original curve. The four pictures on the right show the original waveform of one period of a sine wave and the same wave sampled at 2, 6, and 10 points, illustrating the relationship between sample rate and resolution: the more samples, the closer to the original shape.
 
 Recording for $T$ seconds at sample rate $f_s$ gives $f_s \times T$ samples. For example, recording 3 seconds at 16,000 Hz gives $16000 \times 3 = 48000$ samples. The value of each sample is also stored with finite precision; stored as a 16-bit integer, it is represented in $2^{16} = 65536$ levels. Libraries such as librosa read it after converting it to a real number between $-1$ and 1.
 
 | Sample rate | Nyquist frequency | Main use |
 |:-----|:-----|:-----|
 | 8,000 Hz | 4,000 Hz | Landline telephone speech |
-| 16,000 Hz | 8,000 Hz | Speech recognition, the examples of this lecture |
+| 16,000 Hz | 8,000 Hz | Speech recognition, the example of Section 4.4 |
 | 44,100 Hz | 22,050 Hz | Music CDs |
 | 48,000 Hz | 24,000 Hz | Video production and digital audio equipment |
 | 96,000 Hz, 192,000 Hz | 48,000 Hz, 96,000 Hz | High-resolution recording |
@@ -315,7 +315,7 @@ $$
 
 The figure above is a synthetic signal 6 seconds long made at 16 kHz. From 0 to 1.5 s it contains a tone mixing 440 Hz with its 2nd and 3rd harmonics (880 Hz, 1320 Hz), from 1.5 to 3.5 s a sound whose frequency rises steadily from 200 Hz to 5000 Hz, and from 3.6 to 6 s a 3000 Hz tone and three bursts of noise 0.25 s long.
 
-- **Waveform (top):** It shows when the loudness of the sound changes, but not which frequencies the sound has. In particular, 0-1.5 s and 1.5-3.5 s look almost the same.
+- **Waveform (top):** It shows when the loudness of the sound changes, but not which frequencies the sound has. In particular, 0-1.5 s and 1.5-3.5 s appear as solid bands that differ only slightly in height, so it is impossible to tell what sound each one is.
 - **Spectrogram (middle):** The 440, 880, and 1320 Hz tones appear as three horizontal lines, the rising sound as a slanted straight line, the 3000 Hz tone as one horizontal line, and the noise as vertical bands across all frequencies, so the composition of the sound is visible at a glance.
 - **Mel spectrogram (bottom):** Explained in Section 4.2, it changes the vertical axis to match human hearing.
 
@@ -474,10 +474,11 @@ Although spectrogram features come from old, traditional sound-processing techni
 | 4 | Jiang_THUEE_task2_1 | Pre-trained models, CNN, ensemble | 360M | Spectrogram, raw waveform | specaug | median |
 | 5 | Lv_AITHU_task2_2 | Pre-trained models, ensemble | 360M | Spectrogram | specaug | median |
 | 6 | Jiang_THUEE_task2_2 | Pre-trained models, flow model, ensemble | 360M | Spectrogram | specaug | median |
+| 7 | Jiang_THUEE_task2_3 | Pre-trained models, CNN, flow model, ensemble | 360M | Spectrogram | specaug | median |
 
 *Table 5. Composition of the top systems of DCASE 2024 Task 2*
 
-All of the top systems use the spectrogram as the acoustic feature, and the raw waveform was used only in one system, as an auxiliary input alongside the spectrogram. System complexity is the number of parameters (700M is 700 million), and most are ensembles combining several models pre-trained on large data. In data augmentation, specaug is SpecAugment, a technique that increases training data by masking some time intervals and frequency bands of the spectrogram [16].
+All of the top systems use the spectrogram as the acoustic feature, and the raw waveform was used only in one system, as an auxiliary input alongside the spectrogram. System complexity is the number of parameters (700M is 700 million), and all of them are ensembles combining several models pre-trained on large data. In data augmentation, specaug is SpecAugment, a technique that increases training data by masking some time intervals and frequency bands of the spectrogram [16].
 
 ---
 
@@ -495,7 +496,7 @@ Why bother converting sound into a spectrogram? The image-processing field alrea
 
 ### 5.2 VGGish and Transfer Learning
 
-**VGGish** is a study that applied the VGG model used for images to audio [17]. The suffix "-ish" in the name means that the model is similar to VGG. Google trained several CNN architectures on the sounds of a large number of YouTube videos and showed that image CNNs work well for audio classification, and released the VGG-like model among them as VGGish. The released VGGish takes a log mel spectrogram 0.96 seconds long (96 frames × 64 mel bands) as input and outputs a 128-dimensional feature vector (embedding) [18]. The VGG architecture was covered in Lecture 3.
+**VGGish** is a study that applied the VGG model used for images to audio [17]. The suffix "-ish" in the name means that the model is similar to VGG. Google trained several CNN architectures on the sounds of about 70 million YouTube training videos and showed that image CNNs work well for audio classification, and released the VGG-like model among them as VGGish. The released VGGish takes a log mel spectrogram 0.96 seconds long (96 frames × 64 mel bands) as input and outputs a 128-dimensional feature vector (embedding) [18]. The VGG architecture was covered in Lecture 3.
 
 VGGish is mainly used to extract features of sound data, that is, for **transfer learning**. The front part, already trained on large sound data, is taken as it is and used as a feature extractor, and only the back part suited to the target task is newly trained.
 
@@ -503,7 +504,7 @@ VGGish is mainly used to extract features of sound data, that is, for **transfer
 
 *Figure 17. A lung-sound recognition model that transfers the parameters of VGGish and newly trains a Bi-GRU*
 
-The figure above is an example of applying VGGish to lung-sound recognition [19]. The right is the VGGish network trained on a large audio dataset (AudioSet), which repeats convolution (Conv) and max pooling (Maxpool) and ends with three fully connected layers (FC×3) and a classification layer (FC, Softmax). The lung-sound recognition model on the left transfers the parameters of VGGish from the convolutional layers through FC×3 as they are in the transfer section (Transfer the parameters of VGGish network), and in the retraining section it attaches a bidirectional GRU (Bi-GRU) and a softmax in place of the original classification layer and trains them anew on lung-sound data. Even in fields with little data, such as medical recordings, good performance can be achieved by reusing general sound features learned from large data.
+The figure above is an example of applying VGGish to lung-sound recognition [19]. The right is the VGGish network pre-trained on the sounds of a large number of YouTube videos (the AudioSet at the top of the figure is a YouTube-based audio dataset released together with features extracted by the same model as VGGish), which repeats convolution (Conv) and max pooling (Maxpool) and ends with three fully connected layers (FC×3) and a classification layer (FC, Softmax). The lung-sound recognition model on the left transfers the parameters of VGGish from the convolutional layers through FC×3 as they are in the transfer section (Transfer the parameters of VGGish network), and in the retraining section it attaches a bidirectional GRU (Bi-GRU) and a softmax in place of the original classification layer and trains them anew on lung-sound data. Even in fields with little data, such as medical recordings, good performance can be achieved by reusing general sound features learned from large data.
 
 ---
 
@@ -606,7 +607,7 @@ The accuracy of SED is evaluated in two ways, **segment-based** and **event-base
 1. The event bars of the reference and the system output are divided into 4 segments, and every segment that an event touches even partially is marked active (1) (Segment-based event activity).
 2. For each cell of class and segment, the reference and the output are compared (Segment by segment comparison): TP if both are 1, FP if only the output is 1, FN if only the reference is 1, and TN if both are 0.
 
-Transcribing the five classes (rows) and four segments (columns) of the figure into a table gives the following.
+Writing the five classes (rows) and four segments (columns) of the figure as a table gives the following.
 
 | Class | Reference activity | System output activity | Judgment (segments 1-4) |
 |:-----|:-----|:-----|:-----|
@@ -685,7 +686,7 @@ As an example of accuracy, consider the results of DCASE 2017 Task 3 (sound even
 
 *Table 8. Segment-based error rates and F1 scores of the top systems of DCASE 2017 Task 3*
 
-Even the first-ranked system has an ER of about 0.79 and an F1 of about 42%. This shows that finding acoustic events accurately in real-life recordings, where many sounds overlap and background noise is heavy, is still harder than speech recognition. Also, because the ranking is by ER, the second-ranked system with a higher F1 (42.9%) is below the first-ranked system with a lower ER (0.7914).
+Even the first-ranked system has an ER of about 0.79 and an F1 of about 42%. This shows that finding acoustic events accurately in real-life recordings, where many sounds overlap and background noise is heavy, is difficult. Also, because the ranking is by ER, the second-ranked system with a higher F1 (42.9%) is below the first-ranked system with a lower ER (0.7914).
 
 ![Figure 27. The FarmSonic screen, which detects coughs in a barn and counts them by type](../../images/Lec06_p34.png)
 
@@ -834,7 +835,7 @@ As an application of SED, FarmSonic analyzes the sounds of a barn to detect live
 
 ## References
 
-1. NVIDIA, "How to build domain specific automatic speech recognition models on GPUs," *NVIDIA Technical Blog*, 2020. https://developer.nvidia.com/blog/how-to-build-domain-specific-automatic-speech-recognition-models-on-gpus/
+1. A. Flores Miranda, P. Chitale, and J. Cohen, "How to build domain specific automatic speech recognition models on GPUs," *NVIDIA Technical Blog*, 2019. https://developer.nvidia.com/blog/how-to-build-domain-specific-automatic-speech-recognition-models-on-gpus/
 2. J. Li, V. Lavrukhin, B. Ginsburg, R. Leary, O. Kuchaiev, J. M. Cohen, H. Nguyen, and R. T. Gadde, "Jasper: An end-to-end convolutional neural acoustic model," in *Proc. Interspeech*, 2019, pp. 71-75.
 3. S. Kriman, S. Beliaev, B. Ginsburg, J. Huang, O. Kuchaiev, V. Lavrukhin, R. Leary, J. Li, and Y. Zhang, "QuartzNet: Deep automatic speech recognition with 1D time-channel separable convolutions," in *Proc. IEEE Int. Conf. Acoustics, Speech and Signal Processing (ICASSP)*, 2020, pp. 6124-6128.
 4. A. Graves, S. Fernández, F. Gomez, and J. Schmidhuber, "Connectionist temporal classification: Labelling unsegmented sequence data with recurrent neural networks," in *Proc. Int. Conf. Machine Learning (ICML)*, 2006, pp. 369-376.

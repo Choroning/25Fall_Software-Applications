@@ -70,7 +70,7 @@ Lec01_Deep-Learning-Fundamentals/
 └── data/
     ├── goldenretriever-3724972_640.jpg  분류할 골든 리트리버 사진 (640×426)
     ├── imagenet_class_index.json        ImageNet 1,000개 클래스의 인덱스와 이름
-    └── white_rabbit.png                 추가로 시험해 볼 흰 토끼 사진 (707×560)
+    └── white_rabbit.png                 추가로 분류해 볼 흰 토끼 사진 (707×560)
 ```
 
 노트북은 파일을 `data/goldenretriever-3724972_640.jpg`처럼 **상대 경로**로 연다. 상대 경로는 현재 작업 디렉토리를 기준으로 해석되므로, 노트북을 실행하는 디렉토리 아래에 `data/` 폴더가 있어야 한다. 반대로 `/content/drive/MyDrive/...`처럼 루트(`/`)부터 적는 **절대 경로**는 특정 컴퓨터의 폴더 구조에 묶여 다른 환경에서는 동작하지 않는다.
@@ -97,6 +97,8 @@ jupyter lab
 ```
 
 > **주의:** 노트북의 `from google.colab import drive` 셀은 Colab 전용이다. 로컬 컴퓨터에서 실행하면 `ModuleNotFoundError`가 나므로 이 셀은 건너뛴다. 처음 실행할 때는 VGG-16의 학습된 가중치(약 528 MB)를 내려받으므로 인터넷 연결과 시간이 필요하다.
+
+> **참고:** 노트북 첫머리의 사전 준비 셀은 원서 예제 저장소의 `make_folders_and_data_downloads.ipynb`로 데이터를 내려받고 conda로 PyTorch 1.0과 Matplotlib을 설치하라고 안내한다. 이 안내는 PyTorch 1.0 시기의 설치 방법이므로, 지금은 위의 pip 명령이나 PyTorch 홈페이지(https://pytorch.org/get-started/locally/)의 설치 안내를 따르고, 데이터는 1.2절의 `data/` 폴더에 있는 세 파일을 쓴다.
 
 ---
 
@@ -173,7 +175,7 @@ print(net)
 - `net.eval()`은 모델을 **평가 모드(evaluation mode)** 로 바꾼다. 드롭아웃(1강 7.3절)처럼 학습할 때와 추론할 때 동작이 다른 층이 추론용으로 동작하게 한다. 평가 모드에서는 드롭아웃이 노드를 끄지 않으므로 같은 입력에 항상 같은 출력이 나온다. 학습할 때는 `net.train()`으로 되돌린다.
 - `print(net)`은 모델을 이루는 층을 순서대로 출력한다.
 
-최신 torchvision에서는 이 셀을 실행하면 다음 경고가 함께 출력된다.
+torchvision 0.13 이후 버전에서는 이 셀을 실행하면 다음 경고가 함께 출력된다. 마지막 두 줄은 가중치 파일을 처음 내려받을 때의 진행 표시이다.
 
 ```text
 UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
@@ -224,7 +226,7 @@ VGG(
 
 - **`features`:** 특징을 추출하는 부분이다. `Conv2d(입력 채널, 출력 채널, ...)`는 2차원 합성곱 층, `ReLU`는 활성화 함수, `MaxPool2d`는 최대 풀링 층이다(합성곱과 풀링은 2강에서 자세히 다룬다). `inplace=True`는 메모리를 아끼려고 입력 텐서를 덮어써서 결과를 저장한다는 뜻이다.
 - **`avgpool`:** 입력의 가로세로 크기가 무엇이든 출력이 $7 \times 7$이 되도록 평균을 내는 적응형 평균 풀링이다. 입력이 $224 \times 224$이면 `features`의 출력이 이미 $7 \times 7$이므로 값이 그대로 통과한다.
-- **`classifier`:** 분류를 담당하는 완전 연결층(`Linear`) 3개이다. 마지막 층의 출력이 1,000개이며, 각각이 ImageNet 클래스 하나의 점수(로짓)이다. 두 번의 `Dropout(p=0.5)`는 학습할 때 노드의 절반을 끈다.
+- **`classifier`:** 분류를 담당하는 완전 연결 층(`Linear`) 3개이다. 마지막 층의 출력이 1,000개이며, 각각이 ImageNet 클래스 하나의 점수(로짓)이다. 두 번의 `Dropout(p=0.5)`는 학습할 때 노드의 절반을 끈다.
 
 합성곱 층은 모두 커널 $3 \times 3$, 스트라이드 1, 패딩 1이므로 가로세로 크기가 유지된다. 출력 크기 공식(2강) $\lfloor (n + 2p - f)/s \rfloor + 1$에 넣으면 $(224 + 2 - 3)/1 + 1 = 224$이다. 최대 풀링은 커널 $2 \times 2$, 스트라이드 2이므로 크기가 절반이 된다: $(224 - 2)/2 + 1 = 112$. $224 \times 224$ RGB 이미지 한 장(배치 크기 1)이 지나가며 바뀌는 크기는 다음과 같다.
 
@@ -238,11 +240,11 @@ VGG(
 | 블록 5 | 24\~30 | 합성곱 3개(512채널), 최대 풀링 | 512 × 7 × 7 |
 | avgpool | | 적응형 평균 풀링 | 512 × 7 × 7 |
 | 펼치기 | | 1차원으로 펼침 | 25088 |
-| classifier | 0\~6 | 완전 연결층 3개 | 4096 → 4096 → 1000 |
+| classifier | 0\~6 | 완전 연결 층 3개 | 4096 → 4096 → 1000 |
 
 *표 2. VGG-16에서 224×224 이미지가 각 블록을 지날 때의 텐서 크기*
 
-$512 \times 7 \times 7 = 25088$이 첫 완전 연결층의 `in_features=25088`과 일치한다. 가중치가 있는 층은 합성곱 13개와 완전 연결층 3개, 모두 16개이다. 파라미터 수는 합성곱 층이 14,714,688개, 완전 연결층이 123,642,856개로 합계 138,357,544개(약 1억 3,800만 개)이며, 대부분이 첫 완전 연결층($25088 \times 4096$)에 몰려 있다.
+$512 \times 7 \times 7 = 25088$이 첫 완전 연결 층의 `in_features=25088`과 일치한다. 가중치가 있는 층은 합성곱 13개와 완전 연결 층 3개, 모두 16개이다. 파라미터 수는 합성곱 층이 14,714,688개, 완전 연결 층이 123,642,856개로 합계 138,357,544개(약 1억 3,800만 개)이며, 대부분이 첫 완전 연결 층($25088 \times 4096$)에 몰려 있다.
 
 ---
 
@@ -303,7 +305,7 @@ class BaseTransform():
 
 *표 3. 골든 리트리버 사진에 적용한 전처리 단계별 결과*
 
-`mean = (0.485, 0.456, 0.406)`과 `std = (0.229, 0.224, 0.225)`는 ImageNet 훈련 이미지 전체에서 R, G, B 채널별로 구한 평균과 표준편차이다 [4]. 예를 들어 색이 (255, 128, 0)인 주황색 픽셀은 다음과 같이 바뀐다.
+`mean = (0.485, 0.456, 0.406)`과 `std = (0.229, 0.224, 0.225)`는 ImageNet 훈련 이미지에서 R, G, B 채널별로 구한 평균과 표준편차로, torchvision의 학습된 모델이 공통으로 쓰는 값이다 [5]. 예를 들어 색이 (255, 128, 0)인 주황색 픽셀은 다음과 같이 바뀐다.
 
 $$
 \text{ToTensor: } \left(\frac{255}{255}, \frac{128}{255}, \frac{0}{255}\right) = (1.000, 0.502, 0.000)
@@ -315,7 +317,7 @@ $$
 
 정규화된 값의 범위는 R 채널이 $(0 - 0.485)/0.229 \approx -2.118$부터 $(1 - 0.485)/0.229 \approx 2.249$까지, B 채널이 $-1.804$부터 $2.640$까지이다. 정규화는 각 채널의 값이 평균 0, 표준편차 1 근처에 오게 하여 학습을 안정시키며, 학습된 모델에는 학습 때와 똑같은 값으로 정규화한 입력을 넣어야 한다.
 
-> **참고:** torchvision 문서가 안내하는 VGG-16의 표준 전처리는 짧은 변을 256으로 줄인 뒤 가운데 224×224를 자르는 방식이다 [4]. 노트북처럼 짧은 변을 224로 줄인 뒤 224×224를 자르면 원본의 더 넓은 영역이 남는다. 두 방식 모두 쓰이며, 예측 클래스는 대개 같지만 확률값은 조금 달라질 수 있다.
+> **참고:** torchvision 문서가 안내하는 VGG-16의 표준 전처리는 짧은 변을 256으로 줄인 뒤 가운데 224×224를 자르는 방식이다 [5]. 노트북처럼 짧은 변을 224로 줄인 뒤 224×224를 자르면 원본의 더 넓은 영역이 남는다. 두 방식 모두 쓰이며, 예측 클래스는 대개 같지만 확률값은 조금 달라질 수 있다.
 
 ### 4.3 전처리 결과 확인
 
@@ -483,9 +485,9 @@ tensor([[-1.5478e+00, -1.0093e+00, -2.8853e+00, -3.0570e+00, -3.2550e+00,
 입력 화상의 예측 결과: golden_retriever (index: 207)
 ```
 
-인덱스 207의 로짓이 가장 크며, 클래스 인덱스의 `'207'`이 `golden_retriever`이므로 모델은 사진을 골든 리트리버로 올바르게 분류한다. `grad_fn=<AddmmBackward0>`는 이 텐서가 기울기 계산을 위해 연산 기록을 유지하고 있다는 표시이다(마지막 완전 연결층의 행렬 곱셈과 덧셈 `addmm`에서 나왔다).
+인덱스 207의 로짓이 가장 크며, 클래스 인덱스의 `'207'`이 `golden_retriever`이므로 모델은 사진을 골든 리트리버로 올바르게 분류한다. `grad_fn=<AddmmBackward0>`는 이 텐서가 기울기 계산을 위해 연산 기록을 유지하고 있다는 표시이다(마지막 완전 연결 층의 행렬 곱셈과 덧셈 `addmm`에서 나왔다).
 
-> **참고:** 노트북에 저장된 출력에는 마지막 줄이 `(인덱스: 207)`로 표시되어 있다. 이 출력은 출력 문구를 `index`로 고치기 전에 실행한 결과이며, 지금의 코드를 실행하면 `(index: 207)`이 출력된다.
+> **참고:** 노트북에 저장된 출력의 마지막 줄은 `(인덱스: 207)`이지만, 셀의 코드는 `index`라는 문구를 출력하므로 지금의 코드를 실행하면 `(index: 207)`이 출력된다.
 
 ### 7.2 확률과 상위 5개 클래스 구하기
 
@@ -516,7 +518,7 @@ for p, i in zip(top5.values[0], top5.indices[0]):
 | 사전 학습된 모델 | ImageNet 1,000개 클래스로 학습된 가중치를 내려받아, 학습 없이 순전파만으로 새 이미지를 분류한다. |
 | 경로 준비 | 노트북은 `data/...` 상대 경로를 쓰므로, 작업 디렉토리 아래에 `data/` 폴더를 둔다. Colab은 `/content`에 업로드하거나 Drive 연결 후 `%cd`로 이동한다. |
 | `models.vgg16` | `pretrained=True`(또는 `weights=VGG16_Weights.IMAGENET1K_V1`)로 학습된 가중치를 불러오고, `eval()`로 드롭아웃을 끈 평가 모드로 바꾼다. |
-| VGG-16의 구조 | 3×3 합성곱(패딩 1)이 크기를 유지하고 2×2 최대 풀링이 크기를 절반으로 줄여 224 → 7이 되며, $512 \times 7 \times 7 = 25088$개의 값이 완전 연결층 3개를 지나 1,000개의 로짓이 된다. 파라미터는 약 1억 3,800만 개이다. |
+| VGG-16의 구조 | 3×3 합성곱(패딩 1)이 크기를 유지하고 2×2 최대 풀링이 크기를 절반으로 줄여 224 → 7이 되며, $512 \times 7 \times 7 = 25088$개의 값이 완전 연결 층 3개를 지나 1,000개의 로짓이 된다. 파라미터는 약 1억 3,800만 개이다. |
 | 전처리 | 짧은 변을 224로 맞추고, 가운데 224×224를 자르고, (채널, 높이, 너비)의 0\~1 텐서로 바꾼 뒤, ImageNet의 채널별 평균과 표준편차로 정규화한다. |
 | 배치 축 | 모델은 (배치, 채널, 높이, 너비) 입력을 받으므로 `unsqueeze_(0)`으로 `[1, 3, 224, 224]`를 만든다. |
 | 후처리 | 로짓의 최댓값 인덱스를 문자열 키로 바꾸어 클래스 인덱스 딕셔너리에서 라벨 이름을 찾는다. 골든 리트리버 사진은 207번 `golden_retriever`로 분류된다. |
@@ -551,7 +553,7 @@ for p, i in zip(top5.values[0], top5.indices[0]):
    <details>
    <summary>정답</summary>
 
-   합성곱은 크기를 유지하고 최대 풀링 5번이 크기를 절반씩 줄이므로 $256 \to 128 \to 64 \to 32 \to 16 \to 8$이 되어 `features`의 출력은 $512 \times 8 \times 8$이다. `avgpool`은 출력을 $7 \times 7$로 맞추므로 $512 \times 7 \times 7$이 되어, 완전 연결층은 그대로 동작한다.
+   합성곱은 크기를 유지하고 최대 풀링 5번이 크기를 절반씩 줄이므로 $256 \to 128 \to 64 \to 32 \to 16 \to 8$이 되어 `features`의 출력은 $512 \times 8 \times 8$이다. `avgpool`은 출력을 $7 \times 7$로 맞추므로 $512 \times 7 \times 7$이 되어, 완전 연결 층은 그대로 동작한다.
 
    </details>
 
@@ -578,7 +580,7 @@ for p, i in zip(top5.values[0], top5.indices[0]):
    <details>
    <summary>정답</summary>
 
-   `Conv2d`는 배치 축이 없는 3차원 입력을 이미지 한 장으로 처리할 수 있지만, `features` 뒤에서 `torch.flatten(x, 1)`이 1번 축부터 펼치므로 채널 축이 배치 축처럼 취급되어 완전 연결층의 입력 크기가 25088과 맞지 않아 오류가 난다. 모델의 입력은 항상 (배치, 채널, 높이, 너비)로 맞춘다. `str(maxid)`는 JSON에서 읽은 딕셔너리의 키가 `'207'`처럼 문자열이므로, 정수 207로는 키를 찾을 수 없기 때문에 필요하다.
+   `Conv2d`는 배치 축이 없는 3차원 입력을 이미지 한 장으로 처리할 수 있지만, `features` 뒤에서 `torch.flatten(x, 1)`이 1번 축부터 펼치므로 채널 축이 배치 축처럼 취급되어 완전 연결 층의 입력 크기가 25088과 맞지 않아 오류가 난다. 모델의 입력은 항상 (배치, 채널, 높이, 너비)로 맞춘다. `str(maxid)`는 JSON에서 읽은 딕셔너리의 키가 `'207'`처럼 문자열이므로, 정수 207로는 키를 찾을 수 없기 때문에 필요하다.
 
    </details>
 
@@ -591,4 +593,5 @@ for p, i in zip(top5.values[0], top5.indices[0]):
 1. J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei, "ImageNet: A Large-Scale Hierarchical Image Database," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 248-255, 2009.
 2. O. Russakovsky et al., "ImageNet Large Scale Visual Recognition Challenge," *International Journal of Computer Vision*, vol. 115, no. 3, pp. 211-252, 2015.
 3. K. Simonyan and A. Zisserman, "Very Deep Convolutional Networks for Large-Scale Image Recognition," in *Proc. Int. Conf. Learning Representations (ICLR)*, 2015.
-4. PyTorch, "vgg16," *Torchvision Documentation*, accessed Nov. 4, 2026. https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.vgg16.html
+4. PyTorch, "Models and pre-trained weights," *Torchvision Documentation*, accessed Nov. 4, 2026. https://docs.pytorch.org/vision/stable/models.html
+5. PyTorch, "vgg16," *Torchvision Documentation*, accessed Nov. 4, 2026. https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.vgg16.html

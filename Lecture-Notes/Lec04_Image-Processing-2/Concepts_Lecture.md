@@ -16,7 +16,7 @@
 
 ## Table of Contents
 
-- [1. The ImageNet Challenge and the Flow of This Lecture](#1-the-imagenet-challenge-and-the-flow-of-this-lecture)
+- [1. The ImageNet Challenge and an Overview of the Topics](#1-the-imagenet-challenge-and-an-overview-of-the-topics)
 - [2. VGGNet](#2-vggnet)
   - [2.1 Key Idea](#21-key-idea)
   - [2.2 Contributions of VGGNet](#22-contributions-of-vggnet)
@@ -54,9 +54,9 @@
 
 <br>
 
-## 1. The ImageNet Challenge and the Flow of This Lecture
+## 1. The ImageNet Challenge and an Overview of the Topics
 
-In the ImageNet classification challenge seen in Section 2.6 of Lecture 3, the top-5 error rate fell rapidly after AlexNet in 2012 (15.3%), passing through VGGNet (7.3%) and GoogLeNet (6.7%) in 2014 until ResNet (3.6%) in 2015 recorded an error rate lower than humans (about 5%). This lecture summarizes the contributions of these two models and then covers, in order, transfer learning, which reuses models trained this way for other problems, data augmentation, which is used when data is scarce, metrics for evaluating models, and techniques for pushing up performance in competitions.
+In the ImageNet classification challenge seen in Section 2.6 of Lecture 3, the top-5 error rate fell rapidly after AlexNet in 2012 (15.3%), passing through VGGNet (7.3%) and GoogLeNet (6.7%) in 2014 until ResNet (3.6%) in 2015 recorded an error rate lower than humans (about 5%). The sections below summarize the contributions of these two models and then cover, in order, transfer learning, which reuses models trained this way for other problems, data augmentation, which is used when data is scarce, metrics for evaluating models, and techniques for pushing up performance in competitions.
 
 ---
 
@@ -297,7 +297,7 @@ In binary classification there are four combinations of prediction and actual an
 
 *Table 5. Confusion matrix of binary classification*
 
-The first word of each name (True/False) says whether the prediction was correct, and the second word (Positive/Negative) says what was predicted. FP means a negative wrongly predicted as positive, and FN a positive wrongly predicted as negative. In the confusion matrices of this lecture, rows are predictions and columns are actual answers. scikit-learn's `confusion_matrix` is the other way around, with rows as actual answers and columns as predictions, so check the orientation when reading such a table.
+The first word of each name (True/False) says whether the prediction was correct, and the second word (Positive/Negative) says what was predicted. FP means a negative wrongly predicted as positive, and FN a positive wrongly predicted as negative. In the confusion matrices used here, rows are predictions and columns are actual answers. scikit-learn's `confusion_matrix` is the other way around, with rows as actual answers and columns as predictions, so check the orientation when reading such a table.
 
 **Accuracy** is the fraction of all samples that were predicted correctly.
 
@@ -431,7 +431,7 @@ In this example, Cat, the class with the most samples, has the lowest F1 score, 
 
 A **hackathon** is a blend of hacking and marathon: an event in which experts from various fields, such as programmers, graphic designers, and UI designers, gather to come up with ideas and build results within a limited time. In artificial intelligence, platforms such as DACON in Korea and Kaggle internationally hold competitions that publish data and problems. Participants submit predictions for the test data and are ranked on the leaderboard by their score on the evaluation metric set by the competition (accuracy, weighted F1 score, RMSE, LogLoss, and so on).
 
-The score differences near the top of a leaderboard are very small (for example, 0.7355 versus 0.7197), so raising accuracy even slightly is the key. Techniques often used for this are model selection, TTA, voting, stacking, and model soups.
+The score differences near the top of a leaderboard are very small (for example, the second-place score 0.71965 and the third-place score 0.71585 of one competition differ by 0.0038), so raising accuracy even slightly is the key. Techniques often used for this are model selection, TTA, voting, stacking, and model soups.
 
 ### 7.2 Model Selection
 

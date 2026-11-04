@@ -127,7 +127,7 @@ The 2×2 in the table is padding 2 added on both sides. The 6×6×256 = 9216 val
 
 A **dataset** is an object that bundles pairs of inputs and answers so that they can be taken out one at a time by index, and a **data loader** is an object that takes a given number of samples from a dataset and groups them into mini-batches.
 
-**torchvision.** torchvision is the computer vision library used with PyTorch. It provides datasets (`torchvision.datasets`), model architectures and pretrained weights (`torchvision.models`), and image transformation functions (`torchvision.transforms`) for tasks such as image classification, object detection, and video analysis. It is a core component of the PyTorch ecosystem, designed so that researchers and developers can easily start, experiment with, and deploy vision projects.
+**torchvision.** torchvision is the computer vision library used with PyTorch. It provides datasets (`torchvision.datasets`), model architectures and pretrained weights (`torchvision.models`), and image transformation functions (`torchvision.transforms`) for tasks such as image classification, object detection, and video analysis. The datasets give easy access to major vision datasets such as CIFAR, MNIST, and ImageNet; the models include pretrained image classification models such as ResNet, AlexNet, VGG, and Inception and object detection models such as Faster R-CNN and Mask R-CNN; and the transforms provide common preprocessing and augmentation for images and video. It also provides utilities such as the data loader that simplify data processing and model training code. It is a core component of the PyTorch ecosystem, designed so that researchers and developers can easily start, experiment with, and deploy vision projects.
 
 **Tensors.** A **tensor** is a mathematical object meaning a multidimensional array, a generalization of scalars, vectors, and matrices. In deep learning, input data, model weights, and outputs are all represented as tensors, and training is a sequence of tensor operations. PyTorch's `Tensor` type supports GPU computation and **automatic differentiation** in addition to array computation similar to NumPy arrays. Automatic differentiation records the sequence of operations and computes the gradient of the loss automatically.
 
@@ -352,7 +352,7 @@ val_acc = corrects / len(testloader.dataset)
 print('val Loss: {:.4f} val Acc: {:.4f}'.format(val_loss, val_acc))
 ```
 
-`model.eval()` switches the model to evaluation mode. It is required whenever there are layers that behave differently in training and evaluation, such as dropout or batch normalization (Section 5.2). `torch.max(outputs, 1)` returns both the maximum values and their positions along dimension 1 (the class dimension). For example, if the rows of a 4×4 tensor `a` are [−1.2360, 0.2942, −0.1222, 0.8475], [1.1949, −1.1127, −2.2379, −0.6702], [1.5717, −0.9207, 0.1297, −1.8768], and [−0.6172, 1.0036, −0.6060, −0.2432], then `torch.max(a, 1)` returns the values [0.8475, 1.1949, 1.5717, 1.0036] and the positions [3, 0, 0, 1]. In classification the position is the predicted class, so the values are discarded into `_` and only the positions are kept in `preds`. The number of correct predictions divided by all 10,000 images is the accuracy, and the validation accuracy of this model trained for only one epoch is around 50% depending on the run.
+`model.eval()` switches the model to evaluation mode. It is required whenever there are layers that behave differently in training and evaluation, such as dropout or batch normalization (Section 5.2). `torch.max(outputs, 1)` returns both the maximum values and their positions along dimension 1 (the class dimension). For example, if the rows of a 4×4 tensor `a` are [−1.2360, −0.2942, −0.1222, 0.8475], [1.1949, −1.1127, −2.2379, −0.6702], [1.5717, −0.9207, 0.1297, −1.8768], and [−0.6172, 1.0036, −0.6060, −0.2432], then `torch.max(a, 1)` returns the values [0.8475, 1.1949, 1.5717, 1.0036] and the positions [3, 0, 0, 1]. In classification the position is the predicted class, so the values are discarded into `_` and only the positions are kept in `preds`. The number of correct predictions divided by all 10,000 images is the accuracy, and the validation accuracy of this model trained for only one epoch is around 50% depending on the run.
 
 > **Caution:** This code uses the test data for validation. Strictly, part of the training data should be held out as validation data, and the test data should be used only once at the end, after the model and hyperparameters have been chosen. Choosing a model while looking at the test data makes the measured test performance better than the real one. Also, putting the evaluation loop inside `with torch.no_grad():` skips the recording needed for gradient computation and saves memory and time.
 
@@ -395,7 +395,7 @@ plt.show()
 print('예측 class:', classes[preds[0]])
 ```
 
-A 426×640 photo of a golden retriever is shrunk to 32×32 like the training data, converted to a tensor, and normalized with the same `transform`. The model's output is the logits of 10 classes, and if the position of the largest logit is 5, the model predicted `classes[5]`, which is `'dog'`. To see the logits as probabilities, apply softmax as postprocessing. The output values and what each line does are covered in detail in the [lab note](Concepts_Lab.md).
+A photo of a golden retriever, 426 pixels high and 640 pixels wide, is shrunk to 32×32 like the training data, converted to a tensor, and normalized with the same `transform`. The model's output is the logits of 10 classes, and if the position of the largest logit is 5, the model predicted `classes[5]`, which is `'dog'`. To see the logits as probabilities, apply softmax as postprocessing. The output values and what each line does are covered in detail in the [lab note](Concepts_Lab.md).
 
 ---
 
@@ -464,7 +464,7 @@ The process in Figure 11 has three steps. First it finds the region containing t
 
 *Figure 12. A super-resolution architecture that upsamples a low-resolution image and then restores details with convolutional layers*
 
-The architecture in Figure 12 first enlarges a small butterfly image to the target size by interpolation (upsampling), and then several convolutional layers learn to sharpen the blurred edges and patterns. A representative early model of this approach is SRCNN [5].
+The architecture in Figure 12 first enlarges a small butterfly image to the target size by interpolation (upsampling), and then several convolutional layers learn to sharpen the blurred edges and patterns. A representative early model of this approach is SRCNN [5]. As another example of the same task, a blurred, mosaic-like low-resolution face photo (Original) can be turned into a sharp high-resolution face photo (Result). The details missing from the low-resolution image are filled in with plausible content that the model learned from its training data, so the restored face can differ from the actual person.
 
 **Image generation.** **Image generation** is the task of creating new images similar to the training data. The widely used **diffusion models** learn to reverse a process that gradually adds noise to the data.
 
@@ -506,9 +506,9 @@ Figure 15 shows a camera housing about 51 cm × 17.5 cm × 14.5 cm in size and t
 
 Figure 16 is an example of detecting pigs in infrared footage and tracking them with an ID per animal, as in `pig (id:1)` and `pig (id:2)`. The blue vertical line on the screen and the number at the lower left are used to count the animals that cross the reference line.
 
-![Figure 17. Segmenting roads, buildings, and fields in an aerial image, with the monitored land parcel outlined in red](../../images/Lec03_p26.png)
+![Figure 17. Segmenting the pixels of an aerial image into classes such as roads and buildings, with the monitored land parcel outlined in red](../../images/Lec03_p26.png)
 
-*Figure 17. Segmenting roads, buildings, and fields in an aerial image, with the monitored land parcel outlined in red*
+*Figure 17. Segmenting the pixels of an aerial image into classes such as roads and buildings, with the monitored land parcel outlined in red*
 
 Figure 17 is an example of semantic segmentation. Each pixel of the aerial image receives a class such as road (blue) or building (orange), and the use of the land within the monitored parcel inside the red line is checked.
 
@@ -609,11 +609,11 @@ The derivative of the sigmoid function $\sigma(z) = 1/(1+e^{-z})$ is $\sigma'(z)
 
 *Figure 23. A deep neural network whose learning signal fades with distance from the output layer*
 
-In Figure 23 the layers near the output layer are drawn dark and the layers near the input layer faint. This means that the gradient shrinks with distance from the output layer, so the weights of the early layers hardly change. Even after backpropagation became widely known in 1986, this problem kept deep networks from training well, and neural network research stagnated from the mid-1990s until around 2006, when methods for training deep neural networks drew attention again; this period is sometimes called the second winter of neural networks. Vanishing gradients are covered in detail in Section 5, and they are largely mitigated by normalized weight initialization and techniques such as the batch normalization of Section 5.2.
+In Figure 23 the layers near the output layer are drawn dark and the layers near the input layer faint. This means that the gradient shrinks with distance from the output layer, so the weights of the early layers hardly change. Even after backpropagation became widely known in 1986, this problem kept deep networks from training well. The period from 1986 until 2006, when methods for training deep neural networks drew attention again, is therefore sometimes called the second winter of neural networks (NN winter 2), and neural network research stagnated especially from the mid-1990s onward. Vanishing gradients are covered in detail in Section 5, and they are largely mitigated by normalized weight initialization and techniques such as the batch normalization of Section 5.2.
 
 ### 4.3 The Residual Block
 
-**ResNet** solved the degradation problem of Section 4.1 through **residual learning** with skip connections, trained networks of up to 152 layers, and won the classification track of ILSVRC 2015 [9].
+**ResNet** solved the degradation problem of Section 4.1 through **residual learning** with skip connections, trained networks of up to 152 layers on ImageNet, and won the classification track of ILSVRC 2015 [9].
 
 ![Figure 24. A plain CNN block with two stacked layers (left) and a residual block that adds the input x to the output (right)](../../images/Lec03_p33.png)
 
@@ -682,7 +682,7 @@ The derivative of sigmoid is at most 0.25 and the derivative of tanh, $1 - \tanh
 
 *Figure 26. A batch normalization layer placed between a hidden layer and the activation function, normalizing the skewed distribution of each mini-batch*
 
-As in Figure 26, a BN layer is usually placed between a fully connected (or convolutional) layer and the activation function. For a mini-batch $B = \{x_1, \dots, x_m\}$, the following is computed for each feature (channel).
+As in Figure 26, a BN layer is usually placed between a fully connected (or convolutional) layer and the activation function. For a mini-batch $B = \lbrace x_1, \dots, x_m\rbrace$, the following is computed for each feature (channel).
 
 $$
 \mu_B = \frac{1}{m}\sum_{i=1}^{m} x_i, \qquad \sigma_B^2 = \frac{1}{m}\sum_{i=1}^{m} (x_i - \mu_B)^2, \qquad \hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \qquad y_i = \gamma \hat{x}_i + \beta
@@ -728,7 +728,7 @@ $\lVert \mathbf{g} \rVert_2$ is the L2 norm (length) of the gradient vector. For
 
 *Figure 28. Optimization paths without gradient clipping (left) and with gradient clipping (right)*
 
-On the left of Figure 28, where the gradient is large, a single step moves too far and overshoots the minimum (the red point) by a wide margin. With clipping, as on the right, the step size is limited and the path approaches the neighborhood of the minimum step by step. Clipping prevents explosion and has no effect on vanishing. In PyTorch, call `torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)` between `loss.backward()` and `optimizer.step()`.
+On the left of Figure 28, where the gradient is large, a single step moves too far and overshoots the minimum (the red + mark) by a wide margin. With clipping, as on the right, the step size is limited and the path approaches the neighborhood of the minimum step by step. Clipping prevents explosion and has no effect on vanishing. In PyTorch, call `torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)` between `loss.backward()` and `optimizer.step()`.
 
 ---
 

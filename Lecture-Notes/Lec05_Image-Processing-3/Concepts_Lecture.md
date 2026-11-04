@@ -144,7 +144,7 @@ The IoU of two corner-format boxes $A = (10, 10, 110, 110)$ (ground truth) and $
 4. Each box has area $100 \times 100 = 10000$, so the union area is $10000 + 10000 - 7200 = 12800$. The intersection is subtracted once because adding the two areas counts the overlapping part twice.
 5. $\text{IoU} = 7200 / 12800 = 0.5625$.
 
-IoU is used in many places in this lecture. YOLO defines the confidence of a predicted box with IoU (Section 3.4), NMS finds duplicate boxes with IoU (Section 3.7), and evaluation uses IoU to decide whether a prediction is correct (Section 4.1).
+IoU is used at several stages of object detection. YOLO defines the confidence of a predicted box with IoU (Section 3.4), NMS finds duplicate boxes with IoU (Section 3.7), and evaluation uses IoU to decide whether a prediction is correct (Section 4.1).
 
 ### 1.4 The Development of Object Detection and Its Two Families
 
@@ -585,9 +585,11 @@ A 2025 survey summarizes the key innovations from YOLOv1 to YOLOv13 and YOLOv26 
 
 *Table 8. Key innovations, tasks, and frameworks from YOLOv1 to YOLOv26*
 
-Several trends can be read from the table. First, after the introduction of anchor boxes in YOLOv2, the design moved to anchor-free detection in YOLOv6 and YOLOv8. Second, YOLOv10 and YOLOv26 detect end to end with a single model without the NMS post-processing of Section 3.7. Third, YOLOv12 adopted the attention techniques covered in Lecture 8, and YOLOv13 adopted lightweight techniques such as the depthwise-separable convolution covered in Lecture 9. Fourth, the tasks widened from object detection to segmentation, pose estimation, and tracking. However, the anchor-free head of YOLOv5, the self-attention of YOLOv6, the transformer modules of YOLOv7, and the GAN-based augmentation of YOLOv8 listed in the table are the descriptions of the survey and are not found in the original papers or official documentation of those models.
+Several trends can be read from the table. First, after the introduction of anchor boxes in YOLOv2, the design moved to anchor-free detection in YOLOv6 and YOLOv8. Second, YOLOv10 and YOLOv26 detect end to end with a single model without the NMS post-processing of Section 3.7. Third, YOLOv12 adopted the attention techniques covered in Lecture 8, and YOLOv13 adopted lightweight techniques such as the depthwise-separable convolution covered in Lecture 9. Fourth, the tasks widened from object detection to segmentation, pose estimation, and tracking.
 
-YOLO is also widely used in the field. One application is a system that detects incoming trucks in the CCTV footage (1920×1080, 6 frames per second) of a farm entrance. This system splits video reception, license-plate recognition, judging whether a person gets out of the vehicle, object tracking, and result visualization and server upload into separate threads that run concurrently, and it sends events, such as the device being powered on, to a server together with a timestamp. Another example is a system that detects pigs in a camera inside a pig barn and tracks them by assigning a number to each animal.
+> **Note:** Some entries of Table 8 differ from the original papers or official documentation of the models. The original YOLOv5 uses an anchor-based detection head; the anchor-free head was introduced later in YOLOv5u, which Ultralytics built by adopting the head of YOLOv8. The EfficientRep backbone of YOLOv6 consists of re-parameterizable convolution blocks (in the RepVGG style), not self-attention. The YOLOv7 paper contains no transformer-based modules, and the data augmentation of YOLOv8 (Mosaic, Mixup, and others) includes no GAN-based augmentation.
+
+YOLO is also widely used in the field. One application is a system that detects a truck in CCTV footage (1920×1080, 6 frames per second). This system splits video reception, license-plate recognition, judging whether a person gets out of the vehicle, object tracking, and result visualization and server upload into separate threads that run concurrently, and it sends events, such as the device being powered on, to a server together with a timestamp. Another example is a system that detects pigs in a camera inside a pig barn and tracks them by assigning a number to each animal.
 
 ![Figure 23. Pigs detected in barn footage and tracked with individual ID numbers](../../images/Lec05_p32.png)
 
@@ -947,17 +949,17 @@ With a single IoU threshold of 0.5, a box counts as TP even if it fits only roug
 
 ## References
 
-1. S. Ren, K. He, R. Girshick, and J. Sun, "Faster R-CNN: Towards real-time object detection with region proposal networks," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 28, 2015, pp. 91-99.
-2. J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You only look once: Unified, real-time object detection," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, 2016, pp. 779-788.
-3. W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, "SSD: Single shot multibox detector," in *Proc. European Conf. Computer Vision (ECCV)*, 2016, pp. 21-37.
-4. Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, "Object detection in 20 years: A survey," *Proceedings of the IEEE*, vol. 111, no. 3, pp. 257-276, 2023.
-5. R. Girshick, J. Donahue, T. Darrell, and J. Malik, "Rich feature hierarchies for accurate object detection and semantic segmentation," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, 2014, pp. 580-587.
-6. J. R. R. Uijlings, K. E. A. van de Sande, T. Gevers, and A. W. M. Smeulders, "Selective search for object recognition," *International Journal of Computer Vision*, vol. 104, no. 2, pp. 154-171, 2013.
-7. R. Girshick, "Fast R-CNN," in *Proc. IEEE Int. Conf. Computer Vision (ICCV)*, 2015, pp. 1440-1448.
-8. Ultralytics, "Ultralytics YOLO," GitHub repository. https://github.com/ultralytics/ultralytics
-9. R. Sapkota *et al.*, "YOLO26: Key architectural enhancements and performance benchmarking for real-time object detection," arXiv:2509.25164, 2025.
-10. R. Padilla, S. L. Netto, and E. A. B. da Silva, "A survey on performance metrics for object-detection algorithms," in *Proc. Int. Conf. Systems, Signals and Image Processing (IWSSIP)*, 2020, pp. 237-242.
-11. M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman, "The PASCAL visual object classes (VOC) challenge," *International Journal of Computer Vision*, vol. 88, no. 2, pp. 303-338, 2010.
-12. T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, "Microsoft COCO: Common objects in context," in *Proc. European Conf. Computer Vision (ECCV)*, 2014, pp. 740-755.
-13. COCO Consortium, "Detection evaluation," COCO Dataset. https://cocodataset.org/#detection-eval
-14. C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, 2023, pp. 7464-7475.
+1. S. Ren, K. He, R. Girshick, and J. Sun, "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 28, pp. 91-99, 2015.
+2. J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 779-788, 2016.
+3. W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, "SSD: Single Shot MultiBox Detector," in *Proc. European Conf. Computer Vision (ECCV)*, pp. 21-37, 2016.
+4. Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, "Object Detection in 20 Years: A Survey," *Proceedings of the IEEE*, vol. 111, no. 3, pp. 257-276, 2023.
+5. R. Girshick, J. Donahue, T. Darrell, and J. Malik, "Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 580-587, 2014.
+6. J. R. R. Uijlings, K. E. A. van de Sande, T. Gevers, and A. W. M. Smeulders, "Selective Search for Object Recognition," *Int. J. Computer Vision*, vol. 104, no. 2, pp. 154-171, 2013.
+7. R. Girshick, "Fast R-CNN," in *Proc. IEEE Int. Conf. Computer Vision (ICCV)*, pp. 1440-1448, 2015.
+8. Ultralytics, "Ultralytics YOLO," *GitHub*, accessed Nov. 4, 2026. https://github.com/ultralytics/ultralytics
+9. R. Sapkota, R. H. Cheppally, A. Sharda, and M. Karkee, "YOLO26: Key Architectural Enhancements and Performance Benchmarking for Real-Time Object Detection," arXiv:2509.25164, 2025.
+10. R. Padilla, S. L. Netto, and E. A. B. da Silva, "A Survey on Performance Metrics for Object-Detection Algorithms," in *Proc. Int. Conf. Systems, Signals and Image Processing (IWSSIP)*, pp. 237-242, 2020.
+11. M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman, "The PASCAL Visual Object Classes (VOC) Challenge," *Int. J. Computer Vision*, vol. 88, no. 2, pp. 303-338, 2010.
+12. T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, "Microsoft COCO: Common Objects in Context," in *Proc. European Conf. Computer Vision (ECCV)*, pp. 740-755, 2014.
+13. COCO Consortium, "Detection Evaluation," *COCO Dataset*, accessed Nov. 4, 2026. https://cocodataset.org/#detection-eval
+14. C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable Bag-of-Freebies Sets New State-of-the-Art for Real-Time Object Detectors," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 7464-7475, 2023.

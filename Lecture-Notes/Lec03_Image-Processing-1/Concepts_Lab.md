@@ -108,7 +108,7 @@ drive.mount('/content/drive')
 Mounted at /content/drive
 ```
 
-This cell connects the user's Google Drive to the path `/content/drive` in Colab. Once connected, files uploaded to Drive can be read like ordinary files. The same cell appears once more in the inference part (cell 14). The notebooks in this repository read the image used for inference from the relative path `data/goldenretriever-3724972_640.jpg`, so the Drive connection is not needed, and in a local environment without the `google.colab` module these two cells are not run.
+This cell connects the user's Google Drive to the path `/content/drive` in Colab. Once connected, files uploaded to Drive can be read like ordinary files. The same cell appears once more in the inference part (just before the code of Section 2.8). This notebook reads the image used for inference from the relative path `data/goldenretriever-3724972_640.jpg`, so the Drive connection is not needed, and in a local environment without the `google.colab` module these two cells are not run.
 
 ### 2.3 Checking the Data
 
@@ -309,7 +309,7 @@ val Loss: 1.3826 val Acc: 0.5029
 
 A validation loss of 1.3826 and an accuracy of 0.5029 mean that 5,029 of the 10,000 images were classified correctly. Random choice would give an accuracy of 0.1, so one epoch of training already achieves considerable performance, but half of the images are still wrong.
 
-> **Note:** This cell records the computation even though no gradients are needed. Putting the whole loop inside `with torch.no_grad():` gives the same result with less memory. The problem of using the test data for validation is summarized in the `Caution` box of Section 1.6 of the lecture note.
+> **Note:** This cell records the computation even though no gradients are needed. Putting the whole loop inside `with torch.no_grad():` gives the same result with less memory. The problem of using the test data for validation is discussed in the `Caution` box of Section 1.6 of the lecture note.
 
 ### 2.8 Inference on a New Image
 
@@ -385,7 +385,7 @@ tensor([[1.5964e-03, 3.7347e-04, 3.6052e-02, 4.3075e-01, 5.1477e-03, 4.7230e-01,
 
 In the saved output, the largest probability is 0.4723 for `dog`, followed by 0.4308 for `cat`. The model predicted a dog but was almost as confident about a cat. A photo shrunk to 32×32 loses many fine features, and the model was trained for only one epoch, so such an uncertain prediction is natural.
 
-> **Note:** The saved outputs of cell 15 and cell 16 in the notebook come from different runs. Applying softmax directly to the logits printed in cell 15 gives `dog` 0.534, `horse` 0.211, `cat` 0.136, and so on, which differ from the values of cell 16. Running the two cells again in sequence gives probabilities computed from the same logits. The predicted class (`dog`) is the same in both outputs.
+> **Note:** The saved outputs of the cells of Sections 2.8 and 2.9 in the notebook come from different runs. Applying softmax directly to the logits printed by the cell of Section 2.8 gives `dog` 0.534, `horse` 0.211, `cat` 0.136, and so on, which differ from the values of the cell of Section 2.9. Running the two cells again in sequence gives probabilities computed from the same logits. The predicted class (`dog`) is the same in both outputs.
 
 ---
 

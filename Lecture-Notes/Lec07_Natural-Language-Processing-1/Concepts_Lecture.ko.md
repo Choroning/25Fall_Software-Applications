@@ -265,7 +265,7 @@ graph LR
 
 *표 5. 대표적인 자연어 처리 태스크와 관련 서비스*
 
-이 강의에서는 텍스트를 숫자로 바꾸는 임베딩(3절)과 감성 분석(4절)을 다루고, 번역과 생성의 기반이 되는 seq2seq, 어텐션, Transformer는 8강에서 다룬다.
+아래 3절에서는 텍스트를 숫자로 바꾸는 임베딩을, 4절에서는 감성 분석을 다루며, 번역과 생성의 기반이 되는 seq2seq, 어텐션, Transformer는 8강에서 다룬다.
 
 ---
 
@@ -279,7 +279,7 @@ graph LR
 
 > **용어 정의:** 자연어 처리에서 **임베딩(embedding)** 은 사람이 사용하는 언어(자연어)를 컴퓨터가 이해할 수 있는 숫자의 **벡터(vector)** 로 변환한 결과, 또는 그 변환 과정을 뜻한다. 단어 하나를 벡터 하나로 바꾸면 **단어 임베딩(word embedding)**, 문장이나 문서 전체를 벡터 하나로 바꾸면 **문서 임베딩(document embedding)** 이라 한다.
 
-좋은 단어 임베딩에서는 의미가 비슷한 단어의 벡터가 서로 가까이 놓인다. 다음 그림은 여러 단어의 임베딩을 2차원 평면에 나타낸 것이다. Train, Bus, Taxi, Car, Bicycle 같은 교통수단, Espresso, Cappuccino, Sugar, Lemon 같은 음료와 재료, Tutor, Student, School, University 같은 교육 관련 단어, Cat, Dog, Pet, Grooming 같은 반려동물 관련 단어가 각각 무리를 이루고, King과 Queen이 가까이 있다.
+좋은 단어 임베딩에서는 의미가 비슷한 단어의 벡터가 서로 가까이 놓인다. 다음 그림은 여러 단어의 임베딩을 2차원 평면에 나타낸 것이다. Train, Bus, Taxi, Car, Bicycle 같은 교통수단(그 옆에 Cycling, Athlete), Espresso, Cappuccino, Sugar, Lemon 같은 음료와 재료, Tutor, Student, School, University 같은 교육 관련 단어, Yoga, Pilates 같은 운동, Cat, Dog, Pet, Grooming 같은 반려동물 관련 단어가 각각 무리를 이루고, King과 Queen이 가까이 있다.
 
 ![그림 2. 의미가 비슷한 단어끼리 모여 있는 단어 임베딩의 2차원 시각화](../../images/Lec07_p09.png)
 
@@ -502,7 +502,7 @@ TF-IDF에는 다음과 같은 한계가 있다.
 
 *그림 3. 단어마다 대응하는 실수 벡터(왼쪽)와 man에서 woman으로의 차이가 king에서 queen으로의 차이와 비슷한 벡터 공간(오른쪽)*
 
-Word2Vec의 바탕에는 **분포 가설(distributional hypothesis)**, 곧 비슷한 문맥에 나타나는 단어는 비슷한 의미를 가진다는 생각이 있다 [9]. Word2Vec은 단어가 주변에 어떤 단어와 함께 나타나는지를 예측하도록 신경망을 학습시키고, 그 과정에서 얻은 가중치를 단어 벡터로 쓴다. 이렇게 학습한 벡터에서는 의미 관계가 벡터의 차이로 나타난다. 그림 3의 오른쪽처럼 $\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}$과 $\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}$이 비슷한 방향을 가리키므로, $\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}$을 계산하면 $\mathbf{v}_{\text{queen}}$에 가까운 벡터가 나온다 [10].
+Word2Vec의 바탕에는 **분포 가설(distributional hypothesis)**, 곧 비슷한 문맥에 나타나는 단어는 비슷한 의미를 가진다는 생각이 있다 [9]. Word2Vec은 단어가 주변에 어떤 단어와 함께 나타나는지를 예측하도록 신경망을 학습시키고, 그 과정에서 얻은 가중치를 단어 벡터로 쓴다. 이렇게 학습한 벡터에서는 의미 관계가 벡터의 차이로 나타난다. 그림 3의 오른쪽처럼 $\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}$과 $\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}$이 비슷한 방향을 가리키므로, $\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}$을 계산하면 $\mathbf{v}_{\text{queen}}$에 가까운 벡터가 나온다 [10]. 한국어 위키백과와 나무위키로 학습한 한국어 Word2Vec 벡터로 이러한 단어의 덧셈과 뺄셈을 직접 해 볼 수 있는 웹 데모도 공개되어 있다 [11].
 
 Word2Vec에는 학습 방식이 다른 두 모델, CBOW와 skip-gram이 있다.
 
@@ -617,7 +617,7 @@ $$
 
 CBOW와 skip-gram의 출력층은 softmax로 어휘 전체 $V$개 단어의 확률을 계산한다. softmax의 분모 $\sum_k e^{z_k}$를 구하려면 학습 한 번마다 $V$개의 점수를 모두 계산해야 하므로, 어휘가 수십만 개이면 학습이 매우 느리다.
 
-**네거티브 샘플링(negative sampling)** 은 일부 단어만 뽑아 이진 분류로 학습하는 Word2Vec의 최적화 기법이다 [11]. "어휘 전체 가운데 어느 단어가 주변 단어인가"라는 $V$개 범주의 분류를, "이 두 단어가 실제로 함께 나타난 쌍인가"라는 **이진 분류(binary classification)** 문제로 바꾼다.
+**네거티브 샘플링(negative sampling)** 은 일부 단어만 뽑아 이진 분류로 학습하는 Word2Vec의 최적화 기법이다 [12]. "어휘 전체 가운데 어느 단어가 주변 단어인가"라는 $V$개 범주의 분류를, "이 두 단어가 실제로 함께 나타난 쌍인가"라는 **이진 분류(binary classification)** 문제로 바꾼다.
 
 - 실제로 주변에 나타난 단어(**positive**)는 정답을 1로 둔다.
 - 코퍼스에서 무작위로 뽑은 다른 단어(**negative**)는 정답을 0으로 둔다.
@@ -632,11 +632,11 @@ $$
 L = -\log \sigma(\mathbf{u}_o \cdot \mathbf{v}_c) - \sum_{i=1}^{k} \log \sigma(-\mathbf{u}_i \cdot \mathbf{v}_c)
 $$
 
-첫 항은 positive 쌍의 내적을 크게, 둘째 항은 negative 쌍의 내적을 작게 만든다($\sigma(-x) = 1 - \sigma(x)$이므로 negative 쌍이 0으로 분류될 확률을 높인다). 한 번의 학습에서 계산하는 내적은 $V$개가 아니라 $k + 1$개뿐이므로 속도가 크게 빨라진다. 원 논문은 작은 데이터셋에서 $k$를 5\~20, 큰 데이터셋에서 2\~5로 쓰고, negative 단어를 단어 빈도의 $3/4$제곱에 비례하는 확률로 뽑을 때 성능이 가장 좋았다고 보고한다 [11].
+첫 항은 positive 쌍의 내적을 크게, 둘째 항은 negative 쌍의 내적을 작게 만든다($\sigma(-x) = 1 - \sigma(x)$이므로 negative 쌍이 0으로 분류될 확률을 높인다). 한 번의 학습에서 계산하는 내적은 $V$개가 아니라 $k + 1$개뿐이므로 속도가 크게 빨라진다. 원 논문은 작은 데이터셋에서 $k$를 5\~20, 큰 데이터셋에서 2\~5로 쓰고, negative 단어를 단어 빈도의 $3/4$제곱에 비례하는 확률로 뽑을 때 성능이 가장 좋았다고 보고한다 [12].
 
 ### 3.9 FastText
 
-**FastText**는 2016년 Facebook(현재 Meta)의 연구진이 발표한, 텍스트를 단어 단위가 아니라 단어 안의 작은 단위인 **서브워드(subword)** 단위로 표현하는 단어 임베딩 방법이다 [12]. 특히 희소한 단어나 이모티콘, 철자 오류처럼 다양한 텍스트 상황에서 강력한 성능을 보인다.
+**FastText**는 2016년 Facebook(현재 Meta)의 연구진이 발표한, 텍스트를 단어 단위가 아니라 단어 안의 작은 단위인 **서브워드(subword)** 단위로 표현하는 단어 임베딩 방법이다 [13]. 특히 희소한 단어나 이모티콘, 철자 오류처럼 다양한 텍스트 상황에서 강력한 성능을 보인다.
 
 FastText는 각 단어를 문자 **n-gram**(연속한 $n$개 문자의 조각)의 모임으로 취급한다. 단어의 시작과 끝을 알리는 기호 `<`, `>`를 붙인 뒤 길이 $n$의 조각을 한 글자씩 밀며 잘라 내고, 단어 전체 `<apple>`도 하나의 단위로 추가한다. 'apple'에 $n = 3$을 적용하면 다음과 같다.
 
@@ -655,12 +655,12 @@ print(char_ngrams("birthday"))
 ['<bi', 'bir', 'irt', 'rth', 'thd', 'hda', 'day', 'ay>', '<birthday>']
 ```
 
-`<apple>`을 7글자 문자열로 보고 `range(len(w) - n + 1)`, 즉 0부터 4까지의 시작 위치에서 3글자씩 자르므로 5개의 n-gram이 나온다. 경계 기호는 단어 안의 조각과 단어 자체를 구별해 준다. 예를 들어 단어 "where" 안의 조각 `her`와 단어 "her"를 나타내는 `<her>`는 서로 다른 단위가 된다 [12]. 원 논문은 $n = 3$인 조각만이 아니라 $3 \le n \le 6$인 모든 조각을 사용한다.
+`<apple>`을 7글자 문자열로 보고 `range(len(w) - n + 1)`, 즉 0부터 4까지의 시작 위치에서 3글자씩 자르므로 5개의 n-gram이 나온다. 경계 기호는 단어 안의 조각과 단어 자체를 구별해 준다. 예를 들어 단어 "where" 안의 조각 `her`와 단어 "her"를 나타내는 `<her>`는 서로 다른 단위가 된다 [13]. 원 논문은 $n = 3$인 조각만이 아니라 $3 \le n \le 6$인 모든 조각을 사용한다.
 
 단어 apple의 벡터는 이렇게 나눈 세부 단어들의 벡터의 합이다.
 
 $$
-\mathbf{v}_{\text{apple}} = \mathbf{z}_{\text{<ap}} + \mathbf{z}_{\text{app}} + \mathbf{z}_{\text{ppl}} + \mathbf{z}_{\text{ple}} + \mathbf{z}_{\text{le>}} + \mathbf{z}_{\text{<apple>}}
+\mathbf{v}_{\text{apple}} = \mathbf{z}_{\lt\text{ap}} + \mathbf{z}_{\text{app}} + \mathbf{z}_{\text{ppl}} + \mathbf{z}_{\text{ple}} + \mathbf{z}_{\text{le}\gt} + \mathbf{z}_{\lt\text{apple}\gt}
 $$
 
 나머지 학습 과정은 Word2Vec(skip-gram과 네거티브 샘플링)과 거의 같다. 다만 학습되는 대상이 단어 벡터가 아니라 각 n-gram의 벡터 $\mathbf{z}$이다. FastText의 장점은 다음과 같다.
@@ -771,7 +771,7 @@ print(output)
 
 ### 4.3 연구 사례
 
-딥러닝을 이용한 감성 분석은 활발히 연구되어 왔다. Zhang 등의 서베이 논문 [13]은 문서 수준 감성 분류에 쓰인 딥러닝 방법을 다음과 같이 정리한다.
+딥러닝을 이용한 감성 분석은 활발히 연구되어 왔다. Zhang 등의 서베이 논문 [14]은 문서 수준 감성 분류에 쓰인 딥러닝 방법을 다음과 같이 정리한다.
 
 | 연구 | 문서 표현 | 신경망 모델 | 어텐션 사용 | 감성과 함께 모델링한 정보 |
 |:-----|:-----|:-----|:-----|:-----|
@@ -794,7 +794,7 @@ print(output)
 
 표 14에서 연구의 흐름을 읽을 수 있다. 초기에는 BoW(Bag of Words, 단어의 등장 횟수 벡터)를 얕은 신경망이나 오토인코더에 넣었고, 이후 단어 임베딩을 CNN, LSTM, GRU로 조합하는 방식이 주류가 되었다. 더 나아가 문장과 문서에서 중요한 부분에 가중치를 주는 어텐션(8강)을 쓰고, 사용자와 상품, 측면, 언어, 도메인 같은 부가 정보를 함께 모델링하는 방향으로 발전하였다.
 
-국내 사례로는 트위터의 구제역(foot-and-mouth disease, FMD) 관련 글을 분석한 연구가 있다 [14]. 이 연구는 2010년 7월부터 2011년 12월까지 구제역 관련 트윗을 수집하여 불용어 제거, 단어 변환, 품사 태깅으로 전처리하고, 딥러닝 모델로 각 트윗의 극성(긍정과 부정)을 분류한 뒤, 극성별로 토픽과 키워드를 추출하여 키워드 네트워크를 분석하였다.
+국내 사례로는 트위터의 구제역(foot-and-mouth disease, FMD) 관련 글을 분석한 연구가 있다 [15]. 이 연구는 2010년 7월부터 2011년 12월까지 구제역 관련 트윗을 수집하여 불용어 제거, 단어 변환, 품사 태깅으로 전처리하고, 딥러닝 모델로 각 트윗의 극성(긍정과 부정)을 분류한 뒤, 극성별로 토픽과 키워드를 추출하여 키워드 네트워크를 분석하였다.
 
 ![그림 9. 데이터 수집과 전처리, 트윗 분류, 네트워크 분석으로 이루어진 시스템 구조(위)와 임베딩, LSTM, 합성곱, 최대 풀링, 완전 연결 층으로 이루어진 LSTM-CNN 모델(아래)](../../images/Lec07_p33.png)
 
@@ -959,7 +959,8 @@ print(output)
 8. T. Mikolov, K. Chen, G. Corrado, and J. Dean, "Efficient estimation of word representations in vector space," arXiv:1301.3781, 2013.
 9. Z. S. Harris, "Distributional structure," *Word*, vol. 10, no. 2-3, pp. 146-162, 1954.
 10. T. Mikolov, W. Yih, and G. Zweig, "Linguistic regularities in continuous space word representations," in *Proc. NAACL-HLT*, pp. 746-751, 2013.
-11. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, and J. Dean, "Distributed representations of words and phrases and their compositionality," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 26, pp. 3111-3119, 2013.
-12. P. Bojanowski, E. Grave, A. Joulin, and T. Mikolov, "Enriching word vectors with subword information," *Transactions of the Association for Computational Linguistics*, vol. 5, pp. 135-146, 2017.
-13. L. Zhang, S. Wang, and B. Liu, "Deep learning for sentiment analysis: A survey," *Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery*, vol. 8, no. 4, e1253, 2018.
-14. H. Chae, J. Lee, Y. Choi, D. Park, and Y. Chung, "Sentiment analysis of foot-and-mouth disease using tweet text-mining technique," *KIPS Transactions on Software and Data Engineering*, vol. 7, no. 11, pp. 419-426, 2018.
+11. "Korean Word2Vec," web demo, accessed Nov. 4, 2026. https://word2vec.kr/search/
+12. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, and J. Dean, "Distributed representations of words and phrases and their compositionality," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 26, pp. 3111-3119, 2013.
+13. P. Bojanowski, E. Grave, A. Joulin, and T. Mikolov, "Enriching word vectors with subword information," *Transactions of the Association for Computational Linguistics*, vol. 5, pp. 135-146, 2017.
+14. L. Zhang, S. Wang, and B. Liu, "Deep learning for sentiment analysis: A survey," *Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery*, vol. 8, no. 4, e1253, 2018.
+15. H. Chae, J. Lee, Y. Choi, D. Park, and Y. Chung, "Sentiment analysis of foot-and-mouth disease using tweet text-mining technique," *KIPS Transactions on Software and Data Engineering*, vol. 7, no. 11, pp. 419-426, 2018.
