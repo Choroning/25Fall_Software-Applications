@@ -103,7 +103,7 @@ The key to summarizing a paper is not to copy its sentences but to reorganize it
 
 ### 2.1 Background: The Importance of Depth
 
-A **convolutional neural network (CNN)** learns features hierarchically as layers are stacked, from low-level features (edges, colors) to high-level features (object parts, whole objects). VGGNet [3] in 2014 stacked 3×3 convolutions to 16-19 layers and showed that depth matters for performance, and the leading models in the ImageNet challenge were all very deep models of 16 to 30 layers [1].
+A **convolutional neural network (CNN)** learns features hierarchically as layers are stacked, from low-level features (edges, colors) to high-level features (object parts, whole objects). VGGNet [3] in 2014 stacked 3×3 convolutions to 16-19 layers and showed that depth matters for performance, and the leading results on ImageNet all came from very deep models of 16-30 layers [1].
 
 Then, is learning a better network as easy as stacking more layers? The first obstacle to this question was **vanishing and exploding gradients**. In backpropagation the gradient is multiplied layer by layer, so in a deep network the gradients of the early layers approach zero or become too large. This problem has been largely addressed by normalized weight initialization and intermediate normalization layers such as **batch normalization (BN)** [4], which let networks with tens of layers start converging with stochastic gradient descent (SGD).
 
@@ -115,7 +115,7 @@ Once convergence became possible, a new problem was exposed: as the network gets
 
 > **Definition:** The **degradation problem** is the phenomenon in which adding more layers to a suitably deep model makes its training error larger. Because the training error grows, it differs from overfitting (a small training error with only a large test error).
 
-Why this phenomenon is strange is explained by the following **solution by construction**. Consider a shallower model that has been trained and a deeper model that adds more layers on top of it. If the added layers become an **identity mapping** that passes the input through unchanged and the other layers reuse the weights of the shallower model, the deeper model produces exactly the same output as the shallower one. Therefore the training error of the deeper model cannot, in theory, be larger than that of the shallower model. Yet it is larger in actual experiments, so the problem lies not in representational power but in **optimization**. In other words, current optimization methods such as SGD have difficulty finding a solution that approximates an identity mapping with several nonlinear layers.
+Why this phenomenon is strange is explained by the following **solution by construction**. Consider a shallower model that has been trained and a deeper model that adds more layers on top of it. If the added layers become an **identity mapping** that passes the input through unchanged and the other layers reuse the weights of the shallower model, the deeper model produces exactly the same output as the shallower one. Therefore the training error of the deeper model cannot, in theory, be larger than that of the shallower model. Yet it is larger in actual experiments, so the problem lies not in representational power but in **optimization**. This suggests that current optimization methods such as SGD have difficulty approximating an identity mapping with several nonlinear layers.
 
 > **Caution:** ResNet is often introduced as the model that solved the vanishing gradient problem, but the paper states that the degradation is unlikely to be caused by vanishing gradients. The plain networks in the experiments were trained with BN, so the forward signals had nonzero variances, and the norms of the backward gradients were also healthy [1]. The paper conjectures that deep plain networks may have exponentially low convergence rates that keep the training error from decreasing, and leaves the cause to future study. The gradient-path interpretation in Section 2.3 is a complementary view proposed by a follow-up study [5].
 
@@ -125,7 +125,7 @@ Let $\mathcal{H}(\mathbf{x})$ be the ideal function that a few layers should lea
 
 $$\mathcal{F}(\mathbf{x}) := \mathcal{H}(\mathbf{x}) - \mathbf{x} \quad\Longrightarrow\quad \mathcal{H}(\mathbf{x}) = \mathcal{F}(\mathbf{x}) + \mathbf{x}$$
 
-If several nonlinear layers can approximate complicated functions, they can also approximate the residual function, so the two forms have the same representational power. The difference lies in the **ease of learning**. If the optimal function is an identity mapping, a plain network must build $\mathcal{H}(\mathbf{x}) = \mathbf{x}$ exactly from a combination of nonlinear layers, whereas a residual network only needs to drive its weights toward zero to make $\mathcal{F}(\mathbf{x}) = \mathbf{0}$.
+If one assumes that several nonlinear layers can asymptotically approximate complicated functions, they can also approximate the residual function when the input and output have the same dimensions, so the two forms have the same representational power. The difference lies in the **ease of learning**. If the optimal function is an identity mapping, a plain network must build $\mathcal{H}(\mathbf{x}) = \mathbf{x}$ exactly from a combination of nonlinear layers, whereas a residual network only needs to drive its weights toward zero to make $\mathcal{F}(\mathbf{x}) = \mathbf{0}$.
 
 Let us check this with numbers. Suppose the input to a block is $\mathbf{x} = (2, 1)$, the output of a previous ReLU, and both weight layers of the block have been learned as zero. Then $\mathcal{F}(\mathbf{x}) = W_2\,\sigma(W_1\mathbf{x}) = \mathbf{0}$, and the output after the ReLU that follows the addition is as follows.
 
@@ -147,7 +147,7 @@ Because of the identity matrix $I$, the gradient of the loss has a path along th
 
 The residual form is implemented with **shortcut connections** that skip one or more layers. This is the same structure as the skip connection of Lecture 3. The basic building block of the paper is as follows [1].
 
-$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \{W_i\}) + \mathbf{x}$$
+$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + \mathbf{x}$$
 
 In a two-layer block, $\mathcal{F} = W_2\,\sigma(W_1\mathbf{x})$, where $\sigma$ is ReLU (biases are omitted from the notation). $\mathcal{F} + \mathbf{x}$ is computed by element-wise addition, and the second ReLU is applied after the addition. Identity shortcuts **add neither parameters nor computation** (except for the negligible element-wise addition), so plain and residual networks with the same depth, width, number of parameters, and computational cost can be compared fairly.
 
@@ -166,7 +166,7 @@ flowchart TB
 
 If the dimensions of $\mathbf{x}$ and $\mathcal{F}$ differ (when the number of channels increases), the addition is impossible, so a linear projection $W_s$ on the shortcut matches the dimensions.
 
-$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \{W_i\}) + W_s\mathbf{x}$$
+$$\mathbf{y} = \mathcal{F}(\mathbf{x}, \lbrace W_i\rbrace) + W_s\mathbf{x}$$
 
 The paper compared three options for the shortcuts that increase dimensions. Where the feature map size is halved, the shortcut is also applied with a stride of 2.
 
@@ -181,6 +181,10 @@ The paper compared three options for the shortcuts that increase dimensions. Whe
 All three options are much better than the plain network of the same depth (28.54%). The paper attributes B being slightly better than A to the zero-padded dimensions in A having no residual learning, and C being slightly better than B to the extra parameters of the thirteen projection shortcuts. Because the differences are small, **projection is not essential for addressing the degradation problem**, and the later experiments do not use C to reduce memory and computation [1].
 
 For example, a 1×1 projection shortcut where the channels increase from 64 to 128 adds $64 \times 128 = 8{,}192$ weights, and its stride of 2 reduces the spatial size from 56×56 to 28×28.
+
+**Comparison with related work.** The idea of working with residuals existed before. In image retrieval and classification, VLAD and the Fisher Vector represent an image by residual vectors with respect to a dictionary, and the multigrid method and hierarchical basis preconditioning for solving partial differential equations take the residuals between two scales as variables and converge much faster than standard solvers that are unaware of the residual structure. The paper cites these cases as evidence that a good reformulation or preconditioning can simplify optimization [1].
+
+Shortcut connections have also been studied for a long time. Early practice in training MLPs added a linear layer connected directly from the input to the output, and GoogLeNet and others connected intermediate layers directly to auxiliary classifiers to address vanishing and exploding gradients. **Highway networks**, which appeared at the same time as ResNet, put parameterized gates that open and close depending on the data on the shortcuts. When a gate is closed (approaching zero), the layers represent non-residual functions. In contrast, the identity shortcuts of ResNet have no parameters and are never closed, so all information always passes through and only residual functions are learned. Highway networks also did not show accuracy gains at depths over 100 layers [1].
 
 ### 2.5 Network Architectures
 
@@ -235,6 +239,7 @@ The number of layers is computed from the number of blocks and the layers per bl
 |:-----|:-----|
 | Data augmentation | Resize with the shorter side randomly sampled in [256, 480] (scale augmentation), randomly crop a 224×224 region, and apply horizontal flips, per-pixel mean subtraction, and standard color augmentation |
 | Normalization | BN right after each convolution and before activation, and no dropout |
+| Initialization | Weights are initialized with the method that He et al. proposed for ReLU networks, and all plain and residual networks are trained from scratch |
 | Optimization | SGD, mini-batch of 256, momentum 0.9, weight decay 0.0001 |
 | Learning rate | Starts from 0.1 and is divided by 10 when the error plateaus, for up to $60 \times 10^4$ iterations |
 | Evaluation | Standard 10-crop testing for comparisons, and scores averaged over multiple scales (shorter side 224, 256, 384, 480, 640) for the best results |
@@ -260,11 +265,11 @@ Three things can be read from this table.
 
 The error of ResNet-34 is $28.54 - 25.03 = 3.51$ percentage points lower than the plain network of the same depth (the "3.5%" of the paper). The deeper ResNet-50/101/152 (option B) are more accurate than the 34-layer ones (top-1 errors of 22.85, 21.75, and 21.43%), and no degradation appears. The single-model top-5 validation error of ResNet-152 is 4.49%, lower than all previous ensembles, and an ensemble of six models of different depths achieved a **top-5 error of 3.57%** on the ImageNet test set, winning first place in the ILSVRC 2015 classification task [1].
 
-**CIFAR-10.** The same phenomenon appeared on CIFAR-10, which has 10 classes of 32×32 images. The 110-layer ResNet achieved a test error of 6.43% (the best of 5 runs, with a mean of 6.61±0.16%). A 1202-layer network also reached a training error below 0.1% without optimization difficulty, but its test error of 7.93% was worse than that of the 110-layer network. The paper attributes this to overfitting by a model (19.4 million parameters) that is unnecessarily large for the small dataset.
+**CIFAR-10.** On CIFAR-10, a dataset of 32×32 images in 10 classes with 50,000 training images and 10,000 test images, deliberately simple architectures were used to isolate the effect of depth. After a first 3×3 convolution, $2n$ 3×3 convolutions are stacked for each feature map size of 32, 16, and 8 (with 16, 32, and 64 filters), followed by global average pooling and a 10-way fully connected layer, for $6n + 2$ weighted layers in total. Comparing $n = 3, 5, 7, 9$ (20, 32, 44, and 56 layers), the plain networks had a higher training error as they got deeper, whereas the ResNets became more accurate as they got deeper, the same phenomenon as on ImageNet. The 110-layer ResNet ($n = 18$) achieved a test error of 6.43% (the best of 5 runs, with a mean of 6.61±0.16%). A 1202-layer network ($n = 200$) also reached a training error below 0.1% without optimization difficulty, but its test error of 7.93% was worse than that of the 110-layer network. The paper attributes this to overfitting by a model (19.4 million parameters) that is unnecessarily large for the small dataset.
 
 **Analysis of layer responses.** Comparing the standard deviations of the outputs of each 3×3 layer (after BN and before the nonlinearity), ResNets have generally smaller responses than plain networks, and deeper ResNets have smaller ones. This supports the motivation of Section 2.3 that the residual functions tend to learn values close to zero.
 
-**Object detection.** Simply replacing the backbone of Faster R-CNN from VGG-16 with ResNet-101 raised COCO's standard metric mAP@[.5, .95] on the validation set from 21.2% to 27.2%, by 6.0 percentage points. Relatively, this is $6.0 / 21.2 \approx 0.28$, a **28% improvement**, and since the detection implementation is the same, the gain comes from better representation learning. ResNet-based models also won first place in ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation at ILSVRC & COCO 2015 [1]. Object detection and mAP are covered in Lecture 5.
+**Object detection.** Simply replacing the backbone of Faster R-CNN from VGG-16 with ResNet-101 raised COCO's standard metric mAP@[.5, .95] on the validation set from 21.2% to 27.2%, by 6.0 percentage points. Relatively, this is $6.0 / 21.2 \approx 0.28$, a **28% improvement**, and since the detection implementation is the same, the gain comes from better representation learning. With the same replacement, mAP@.5 on COCO rose from 41.5% to 48.4%, and the mAP on the PASCAL VOC 2007 and 2012 test sets rose from 73.2% to 76.4% and from 70.4% to 73.8%, respectively. ResNet-based models also won first place in ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation at ILSVRC & COCO 2015 [1]. Object detection and mAP are covered in Lecture 5.
 
 ### 2.8 Contributions and Significance
 
@@ -381,13 +386,13 @@ Writing each denominator inside the logarithms as $2 \cdot \frac{p_{\text{data}}
 
 $$C(G) = -\log 4 + \mathrm{KL}\!\left(p_{\text{data}} \,\Big\Vert\, m\right) + \mathrm{KL}\!\left(p_g \,\Big\Vert\, m\right) = -\log 4 + 2 \cdot \mathrm{JSD}(p_{\text{data}} \Vert p_g)$$
 
-The **Jensen-Shannon divergence (JSD)** is nonnegative and is zero only when the two distributions are equal, so the minimum of $C(G)$ is $-\log 4 \approx -1.386$, achieved only when $p_g = p_{\text{data}}$. Indeed, if $p_g = p_{\text{data}}$, then $D^* = 1/2$, so $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$, which agrees. In other words, **given enough capacity and training time, the generator reproduces the data distribution exactly, and the discriminator outputs 1/2 everywhere.**
+The **Jensen-Shannon divergence (JSD)** is nonnegative and is zero only when the two distributions are equal, so the minimum of $C(G)$ is $-\log 4 \approx -1.386$, achieved only when $p_g = p_{\text{data}}$. Indeed, if $p_g = p_{\text{data}}$, then $D^* = 1/2$, so $C(G) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$, which agrees. That is, in the space of arbitrary functions for the generator and the discriminator, **the unique solution of the game is the state in which the generator reproduces the data distribution exactly and the discriminator outputs 1/2 everywhere.** Proposition 2 of the paper also shows convergence. If $G$ and $D$ have enough capacity, the discriminator reaches its optimum given $G$ at each step of the algorithm, and $p_g$ is updated so as to improve the criterion $C(G)$, then $p_g$ converges to $p_{\text{data}}$. The argument is that $C(G)$ is convex in $p_g$ with a unique global optimum, so sufficiently small updates of $p_g$ reach that optimum.
 
 > **Caution:** This result holds in a nonparametric setting (infinite capacity) in which $G$ and $D$ can represent arbitrary functions. Real neural networks have finite capacity and are optimized in parameter space, so the paper notes that the theoretical guarantees do not apply directly, while considering that the excellent performance of MLPs suggests they are a reasonable model to use [2].
 
 ### 4.4 Training Algorithm
 
-Optimizing $D$ to completion in the inner loop is computationally prohibitive and would overfit a finite dataset, so the algorithm alternates between $k$ steps of updating $D$ and one step of updating $G$. In the experiments the paper used $k = 1$, the least expensive option, and used momentum in the updates.
+Optimizing $D$ to completion in the inner loop is computationally prohibitive and would overfit a finite dataset, so the algorithm alternates between $k$ steps of updating $D$ and one step of updating $G$. This keeps $D$ near its optimal solution as long as $G$ changes slowly enough. In the experiments the paper used $k = 1$, the least expensive option, and used momentum in the updates.
 
 ```text
 repeat (for the number of training iterations):
@@ -410,7 +415,7 @@ Let us check this with numbers. If the output of the discriminator is a sigmoid 
 
 $$\frac{\partial}{\partial a}\log(1 - \sigma(a)) = -\sigma(a) \approx -0.01, \qquad \frac{\partial}{\partial a}\log \sigma(a) = 1 - \sigma(a) \approx 0.99$$
 
-The original objective gives the generator a gradient of only about 0.01 in magnitude, whereas the non-saturating objective gives about 0.99, nearly 100 times larger. This non-saturating loss became the default in most later GAN implementations.
+The original objective gives the generator a gradient of only about 0.01 in magnitude, whereas the non-saturating objective gives about 0.99, nearly 100 times larger. This non-saturating loss became widely used in later GAN implementations.
 
 ### 4.5 Experiments and Limitations
 
@@ -439,6 +444,8 @@ The GAN scored highest on MNIST and second to the Stacked CAE on TFD. The paper 
 3. It showed a generative model trained **with backpropagation alone**, without Markov chains or approximate inference, that produces samples in one forward pass.
 4. It became the starting point of GAN research that led to DCGAN, conditional GANs, CycleGAN, StyleGAN, and others. The citation count of this paper far exceeds the 100 required by the assignment.
 
+Besides the computational advantages, the paper names a statistical advantage, namely that the generator is updated not directly with data examples but only with gradients flowing through the discriminator, so components of the input are not copied directly into the generator's parameters, and the advantage that it can represent very sharp distributions, unlike methods based on Markov chains. As future work, it proposed a conditional generative model $p(\mathbf{x} \mid c)$ obtained by adding a condition $c$ as input to both $G$ and $D$, approximate inference with an auxiliary network that predicts $\mathbf{z}$ from $\mathbf{x}$, semi-supervised learning with the features of the discriminator, and faster training through better ways of coordinating $G$ and $D$ [2]. The first direction was realized by the conditional GAN of Section 5.2.
+
 ---
 
 <br>
@@ -447,7 +454,7 @@ The GAN scored highest on MNIST and second to the Stacked CAE on TFD. The paper 
 
 ### 5.1 DCGAN
 
-The original GAN used MLPs. **DCGAN (deep convolutional GAN)** [10] built the generator and the discriminator as convolutional neural networks and presented architectural guidelines for stable training.
+The experiments of the original GAN paper mainly used MLPs (a convolutional discriminator and a transposed-convolution generator were also tried on CIFAR-10). **DCGAN (deep convolutional GAN)** [10] built the generator and the discriminator as convolutional neural networks and presented architectural guidelines for stable training.
 
 - Pooling layers are removed, and the size is changed by strided convolutions in the discriminator and fractionally strided convolutions (transposed convolutions) in the generator.
 - Batch normalization is used in both the generator and the discriminator.
@@ -464,7 +471,7 @@ DCGAN also showed that arithmetic on noise vectors (e.g., man with glasses - man
 
 ### 5.3 Stabilizing Training: WGAN
 
-As in Section 4.3, the original GAN objective amounts to reducing the JSD, but when the supports of the two distributions barely overlap, the JSD stays at a constant ($\log 2$) and gives the generator no useful gradient. **WGAN** [14] uses the **Wasserstein-1 distance (earth mover's distance)**, the minimum cost of moving one distribution onto the other. Instead of a discriminator it has a **critic** that outputs a real-valued score, and it clips the weights to a fixed range (weight clipping) so that the critic is K-Lipschitz for some constant K. This distance changes continuously even when the distributions do not overlap, so training is stable and the loss value moves together with the quality of the samples.
+When the discriminator is optimal, the original GAN objective amounts to reducing the JSD, as in Section 4.3, but when the supports of the two distributions do not overlap, the JSD stays at a constant ($\log 2$) and gives the generator no useful gradient. **WGAN** [14] uses the **Wasserstein-1 distance (earth mover's distance)**, the minimum cost of moving one distribution onto the other. Instead of a discriminator it has a **critic** that outputs a real-valued score, and it clips the weights to a fixed range (weight clipping) so that the critic is K-Lipschitz for some constant K. This distance changes continuously even when the distributions do not overlap, so training is stable and the loss value moves together with the quality of the samples.
 
 ### 5.4 High-Resolution Generation: ProGAN and StyleGAN
 
