@@ -229,7 +229,7 @@ There are 60,843,624 parameters in total, and the three fully connected layers a
 
 ### 4.1 Problem Setting: Predicting the Next Day's Rise or Fall from 30 Days of Stock Prices
 
-The LSTM lab assumes data of the following form. A day's stock price is represented by four features, the opening, closing, high, and low prices, and the model looks at a record of 30 consecutive days to predict whether the price rises (label 1) or falls (label 0) on the next day. This is the many-to-one problem of Section 3.5 of Lecture 2.
+The LSTM lab assumes data of the following form. A day's stock price is represented by four features, the opening, closing, high, and low prices, and the model looks at a record of 30 consecutive days to predict whether the price rises (label 1) or falls (label 0) on the next day. This is the many-to-one problem of Section 3.5 of Lecture 2. The LSTM part of the notebook begins with a figure of a recurrent neural network unrolled along time (Section 3.4 of Lecture 2) and with Figure 1 below.
 
 ![Figure 1. Data format for predicting the next day's rise (1) or fall (0) from 30 days of opening, closing, high, and low prices](../../images/Lec02_Stock-Sequence.png)
 
@@ -309,7 +309,7 @@ tensor([[0.5010],
 
 *Table 3. Tensor sizes of the unidirectional LSTM model*
 
-The Korean labels mean "before the operations" (연산 전), "output of the final layer" (최종층 출력), and "output of the last hidden unit" (마지막 hidden unit 출력). All output probabilities are near 0.5 because the model is untrained: the initial weights are small, so the output of `fc` is near 0, and $\sigma(0) = 0.5$. To use this model for real, it must be trained by deciding the dataset, loss function (binary cross-entropy), and optimizer as in Section 4 of Lecture 2 (Lecture 3). This LSTM layer has $4 \times 64 \times (4 + 64) + 4 \times 64 \times 2 = 17{,}920$ parameters, because each of the 4 gates has input weights ($64 \times 4$), hidden weights ($64 \times 64$), and two sets of biases (`b_ih` and `b_hh`, 64 each).
+The Korean labels mean "before the operations" (연산 전), "output of the final layer" (최종층 출력), and "output of the last hidden unit" (마지막 hidden unit 출력). All output probabilities are near 0.5 because the model is untrained: the initial weights are small, so the output of `fc` is near 0, and $\sigma(0) = 0.5$. To use this model for real, it must be trained by deciding the dataset, loss function (binary cross-entropy), and optimizer as in Section 4 of Lecture 2 (Lecture 3). This LSTM layer has $4 \times 64 \times (4 + 64) + 4 \times 64 \times 2 = 17{,}920$ parameters, because each of the 4 gates has input weights ($`64 \times 4`$), hidden weights ($`64 \times 64`$), and two sets of biases (`b_ih` and `b_hh`, 64 each).
 
 ---
 

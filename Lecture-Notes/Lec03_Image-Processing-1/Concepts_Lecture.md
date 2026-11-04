@@ -101,9 +101,9 @@ Before writing code, decide what goes into the model and what comes out. In imag
 
 Figure 4 is AlexNet, covered in Lecture 2. Because its input size is fixed, preprocessing must resize images to 227×227, and because its output is a score for each of 1000 classes, postprocessing must turn the position of the largest score into a class name. The output size of a convolution or pooling layer is computed from the input size $W$, kernel size $K$, padding $P$, and stride $S$.
 
-$$
+```math
 O = \left\lfloor \frac{W - K + 2P}{S} \right\rfloor + 1
-$$
+```
 
 | Layer | Setting | Output size computation | Output |
 |:-----|:-----|:-----|:-----|
@@ -127,7 +127,7 @@ The 2×2 in the table is padding 2 added on both sides. The 6×6×256 = 9216 val
 
 A **dataset** is an object that bundles pairs of inputs and answers so that they can be taken out one at a time by index, and a **data loader** is an object that takes a given number of samples from a dataset and groups them into mini-batches.
 
-**torchvision.** torchvision is the computer vision library used with PyTorch. It provides datasets (`torchvision.datasets`), model architectures and pretrained weights (`torchvision.models`), and image transformation functions (`torchvision.transforms`) for tasks such as image classification, object detection, and video analysis. It is a core component of the PyTorch ecosystem, designed so that researchers and developers can easily start, experiment with, and deploy vision projects.
+**torchvision.** torchvision is the computer vision library used with PyTorch. It provides datasets (`torchvision.datasets`), model architectures and pretrained weights (`torchvision.models`), and image transformation functions (`torchvision.transforms`) for tasks such as image classification, object detection, and video analysis. The datasets give easy access to major vision datasets such as CIFAR, MNIST, and ImageNet; the models include pretrained image classification models such as ResNet, AlexNet, VGG, and Inception and object detection models such as Faster R-CNN and Mask R-CNN; and the transforms provide common preprocessing and augmentation for images and video. It also provides utilities such as the data loader that simplify data processing and model training code. It is a core component of the PyTorch ecosystem, designed so that researchers and developers can easily start, experiment with, and deploy vision projects.
 
 **Tensors.** A **tensor** is a mathematical object meaning a multidimensional array, a generalization of scalars, vectors, and matrices. In deep learning, input data, model weights, and outputs are all represented as tensors, and training is a sequence of tensor operations. PyTorch's `Tensor` type supports GPU computation and **automatic differentiation** in addition to array computation similar to NumPy arrays. Automatic differentiation records the sequence of operations and computes the gradient of the loss automatically.
 
@@ -150,9 +150,9 @@ A **dataset** is an object that bundles pairs of inputs and answers so that they
 
 **Normalize.** `transforms.Normalize(mean, std)` subtracts the mean $m_c$ and divides by the standard deviation $s_c$ for each channel $c$. `mean` and `std` take a sequence with one value per channel. A color image has three channels, so there are three values, as in `(0.5, 0.5, 0.5)`.
 
-$$
+```math
 x' = \frac{x - m_c}{s_c}
-$$
+```
 
 With both the mean and the standard deviation set to 0.5, values in the range 0-1 move to the range −1 to 1. Following the pixel values 0, 128, and 255 gives the following.
 
@@ -276,17 +276,17 @@ PyTorch provides loss functions and layers in `torch.nn` and optimization method
 
 **Cross-entropy loss.** `nn.CrossEntropyLoss` applies softmax to the logits $z_1, \dots, z_K$ to turn them into probabilities and takes the negative logarithm of the probability of the correct class $y$.
 
-$$
+```math
 p_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}, \qquad L = -\log p_y = -z_y + \log \sum_{j=1}^{K} e^{z_j}
-$$
+```
 
 When the probability of the correct class is close to 1 the loss is close to 0, and the smaller the probability, the larger the loss. For example, if the probability of the correct class is 0.534, then $L = -\ln 0.534 \approx 0.627$. In a 10-class problem, a model that gives every class the same probability 0.1 has loss $-\ln 0.1 = \ln 10 \approx 2.303$, so the loss at the beginning of training starts near this value.
 
 **SGD with momentum.** `optim.SGD` is stochastic gradient descent, which corrects the parameters $\theta$ with the gradient $g_t$ computed on a mini-batch. `lr` is the **learning rate** $\eta$ and `momentum` is the momentum coefficient $\mu$. PyTorch's SGD with momentum accumulates the previous update direction $v$ as follows [2].
 
-$$
+```math
 v_t = \mu v_{t-1} + g_t, \qquad \theta_t = \theta_{t-1} - \eta v_t
-$$
+```
 
 With $\mu = 0.9$, the update keeps 90% of the previous direction and adds the new gradient, so it gains speed along axes where the gradient keeps the same direction, and the contributions cancel along axes where the direction alternates (the zigzag of Figure 6).
 
@@ -352,7 +352,7 @@ val_acc = corrects / len(testloader.dataset)
 print('val Loss: {:.4f} val Acc: {:.4f}'.format(val_loss, val_acc))
 ```
 
-`model.eval()` switches the model to evaluation mode. It is required whenever there are layers that behave differently in training and evaluation, such as dropout or batch normalization (Section 5.2). `torch.max(outputs, 1)` returns both the maximum values and their positions along dimension 1 (the class dimension). For example, if the rows of a 4×4 tensor `a` are [−1.2360, 0.2942, −0.1222, 0.8475], [1.1949, −1.1127, −2.2379, −0.6702], [1.5717, −0.9207, 0.1297, −1.8768], and [−0.6172, 1.0036, −0.6060, −0.2432], then `torch.max(a, 1)` returns the values [0.8475, 1.1949, 1.5717, 1.0036] and the positions [3, 0, 0, 1]. In classification the position is the predicted class, so the values are discarded into `_` and only the positions are kept in `preds`. The number of correct predictions divided by all 10,000 images is the accuracy, and the validation accuracy of this model trained for only one epoch is around 50% depending on the run.
+`model.eval()` switches the model to evaluation mode. It is required whenever there are layers that behave differently in training and evaluation, such as dropout or batch normalization (Section 5.2). `torch.max(outputs, 1)` returns both the maximum values and their positions along dimension 1 (the class dimension). For example, if the rows of a 4×4 tensor `a` are [−1.2360, −0.2942, −0.1222, 0.8475], [1.1949, −1.1127, −2.2379, −0.6702], [1.5717, −0.9207, 0.1297, −1.8768], and [−0.6172, 1.0036, −0.6060, −0.2432], then `torch.max(a, 1)` returns the values [0.8475, 1.1949, 1.5717, 1.0036] and the positions [3, 0, 0, 1]. In classification the position is the predicted class, so the values are discarded into `_` and only the positions are kept in `preds`. The number of correct predictions divided by all 10,000 images is the accuracy, and the validation accuracy of this model trained for only one epoch is around 50% depending on the run.
 
 > **Caution:** This code uses the test data for validation. Strictly, part of the training data should be held out as validation data, and the test data should be used only once at the end, after the model and hyperparameters have been chosen. Choosing a model while looking at the test data makes the measured test performance better than the real one. Also, putting the evaluation loop inside `with torch.no_grad():` skips the recording needed for gradient computation and saves memory and time.
 
@@ -395,7 +395,7 @@ plt.show()
 print('예측 class:', classes[preds[0]])
 ```
 
-A 426×640 photo of a golden retriever is shrunk to 32×32 like the training data, converted to a tensor, and normalized with the same `transform`. The model's output is the logits of 10 classes, and if the position of the largest logit is 5, the model predicted `classes[5]`, which is `'dog'`. To see the logits as probabilities, apply softmax as postprocessing. The output values and what each line does are covered in detail in the [lab note](Concepts_Lab.md).
+A photo of a golden retriever, 426 pixels high and 640 pixels wide, is shrunk to 32×32 like the training data, converted to a tensor, and normalized with the same `transform`. The model's output is the logits of 10 classes, and if the position of the largest logit is 5, the model predicted `classes[5]`, which is `'dog'`. To see the logits as probabilities, apply softmax as postprocessing. The output values and what each line does are covered in detail in the [lab note](Concepts_Lab.md).
 
 ---
 
@@ -464,7 +464,7 @@ The process in Figure 11 has three steps. First it finds the region containing t
 
 *Figure 12. A super-resolution architecture that upsamples a low-resolution image and then restores details with convolutional layers*
 
-The architecture in Figure 12 first enlarges a small butterfly image to the target size by interpolation (upsampling), and then several convolutional layers learn to sharpen the blurred edges and patterns. A representative early model of this approach is SRCNN [5].
+The architecture in Figure 12 first enlarges a small butterfly image to the target size by interpolation (upsampling), and then several convolutional layers learn to sharpen the blurred edges and patterns. A representative early model of this approach is SRCNN [5]. As another example of the same task, a blurred, mosaic-like low-resolution face photo (Original) can be turned into a sharp high-resolution face photo (Result). The details missing from the low-resolution image are filled in with plausible content that the model learned from its training data, so the restored face can differ from the actual person.
 
 **Image generation.** **Image generation** is the task of creating new images similar to the training data. The widely used **diffusion models** learn to reverse a process that gradually adds noise to the data.
 
@@ -474,15 +474,15 @@ The architecture in Figure 12 first enlarges a small butterfly image to the targ
 
 Figure 13 shows a score-based generative model that describes diffusion with stochastic differential equations (SDEs) [6]. The forward process keeps adding noise to the data $\mathbf{x}(0)$ at time 0 until it becomes pure noise $\mathbf{x}(T)$ at time $T$.
 
-$$
+```math
 d\mathbf{x} = \mathbf{f}(\mathbf{x}, t)\,dt + g(t)\,d\mathbf{w}
-$$
+```
 
 $\mathbf{f}$ is the average direction in which the values move (drift), $g(t)$ is the strength of the noise, and $\mathbf{w}$ is a Wiener process (Brownian motion) representing random movement. The reverse process starts from the noise $\mathbf{x}(T)$ and goes backward in time to create the data $\mathbf{x}(0)$.
 
-$$
+```math
 d\mathbf{x} = \left[\mathbf{f}(\mathbf{x}, t) - g(t)^2 \nabla_{\mathbf{x}} \log p_t(\mathbf{x})\right] dt + g(t)\,d\bar{\mathbf{w}}
-$$
+```
 
 $p_t$ is the probability distribution of the data at time $t$, and $\nabla_{\mathbf{x}} \log p_t(\mathbf{x})$ is the **score function**, which points in the direction in which the probability increases. Once a neural network learns this score function, it can start from noise and create images that look more and more like data. The puppy photo in the figure is buried in noise as the forward process proceeds and reappears along the reverse process.
 
@@ -506,9 +506,9 @@ Figure 15 shows a camera housing about 51 cm × 17.5 cm × 14.5 cm in size and t
 
 Figure 16 is an example of detecting pigs in infrared footage and tracking them with an ID per animal, as in `pig (id:1)` and `pig (id:2)`. The blue vertical line on the screen and the number at the lower left are used to count the animals that cross the reference line.
 
-![Figure 17. Segmenting roads, buildings, and fields in an aerial image, with the monitored land parcel outlined in red](../../images/Lec03_p26.png)
+![Figure 17. Segmenting the pixels of an aerial image into classes such as roads and buildings, with the monitored land parcel outlined in red](../../images/Lec03_p26.png)
 
-*Figure 17. Segmenting roads, buildings, and fields in an aerial image, with the monitored land parcel outlined in red*
+*Figure 17. Segmenting the pixels of an aerial image into classes such as roads and buildings, with the monitored land parcel outlined in red*
 
 Figure 17 is an example of semantic segmentation. Each pixel of the aerial image receives a class such as road (blue) or building (orange), and the use of the land within the monitored parcel inside the red line is checked.
 
@@ -609,11 +609,11 @@ The derivative of the sigmoid function $\sigma(z) = 1/(1+e^{-z})$ is $\sigma'(z)
 
 *Figure 23. A deep neural network whose learning signal fades with distance from the output layer*
 
-In Figure 23 the layers near the output layer are drawn dark and the layers near the input layer faint. This means that the gradient shrinks with distance from the output layer, so the weights of the early layers hardly change. Even after backpropagation became widely known in 1986, this problem kept deep networks from training well, and neural network research stagnated from the mid-1990s until around 2006, when methods for training deep neural networks drew attention again; this period is sometimes called the second winter of neural networks. Vanishing gradients are covered in detail in Section 5, and they are largely mitigated by normalized weight initialization and techniques such as the batch normalization of Section 5.2.
+In Figure 23 the layers near the output layer are drawn dark and the layers near the input layer faint. This means that the gradient shrinks with distance from the output layer, so the weights of the early layers hardly change. Even after backpropagation became widely known in 1986, this problem kept deep networks from training well. The period from 1986 until 2006, when methods for training deep neural networks drew attention again, is therefore sometimes called the second winter of neural networks (NN winter 2), and neural network research stagnated especially from the mid-1990s onward. Vanishing gradients are covered in detail in Section 5, and they are largely mitigated by normalized weight initialization and techniques such as the batch normalization of Section 5.2.
 
 ### 4.3 The Residual Block
 
-**ResNet** solved the degradation problem of Section 4.1 through **residual learning** with skip connections, trained networks of up to 152 layers, and won the classification track of ILSVRC 2015 [9].
+**ResNet** solved the degradation problem of Section 4.1 through **residual learning** with skip connections, trained networks of up to 152 layers on ImageNet, and won the classification track of ILSVRC 2015 [9].
 
 ![Figure 24. A plain CNN block with two stacked layers (left) and a residual block that adds the input x to the output (right)](../../images/Lec03_p33.png)
 
@@ -621,17 +621,17 @@ In Figure 23 the layers near the output layer are drawn dark and the layers near
 
 In the plain block on the left of Figure 24, two layers (weight layer and ReLU) learn the desired output $H(x)$ directly. In the **residual block** on the right, the two layers compute $F(x)$, and the input $x$ skips the layers and is added unchanged. This skipping connection is called a **skip connection** or shortcut connection, and it adds the original $x$ back after the layers so that the original is not forgotten.
 
-$$
+```math
 H(x) = F(x) + x \quad \Longleftrightarrow \quad F(x) = H(x) - x
-$$
+```
 
 The two layers need to learn only the difference between the output and the input, the **residual** $F(x)$, rather than the whole desired output. If the identity function is the best choice, as in the situation of Section 4.1, a plain block must fit $H(x) = x$ with nonlinear layers, whereas a residual block only has to drive its weights toward 0 to make $F(x) = 0$. The latter is much easier.
 
 The skip connection also creates a shortcut for backpropagation. Differentiating the block output with respect to its input gives
 
-$$
+```math
 \frac{\partial H}{\partial x} = \frac{\partial F}{\partial x} + 1
-$$
+```
 
 so even if $\partial F/\partial x$ is small, 1 is added and the gradient reaches the previous block without vanishing. As a simplification, assume that the derivative of each block is the scalar 0.1. The gradient after 10 plain blocks becomes $0.1^{10} = 10^{-10}$ times the original, whereas after 10 residual blocks it becomes $(1 + 0.1)^{10} \approx 2.59$ times and does not vanish. A skip connection adds no parameters, so the computation hardly increases either.
 
@@ -659,9 +659,9 @@ Backpropagation propagates the error from the output layer toward the input laye
 
 Let $z^{(l)}$ be the weighted sum of layer $l$, $\sigma$ the activation function, and $L$ the loss. In backpropagation, the error signal of layer $l$, $\delta^{(l)} = \partial L / \partial z^{(l)}$, is computed from the error signal of the next layer as follows.
 
-$$
+```math
 \delta^{(l)} = \left( W^{(l+1)} \right)^{\top} \delta^{(l+1)} \odot \sigma'\!\left( z^{(l)} \right)
-$$
+```
 
 $\odot$ is element-wise multiplication. The gradient of a layer near the input is the result of applying this equation many times, so roughly the product of the weight magnitude and the activation derivative of each layer is multiplied repeatedly. If this product is smaller than 1 the gradient shrinks exponentially (vanishing), and if it is larger than 1 the gradient grows exponentially (exploding). If every layer multiplies by 0.25, the factor after 10 layers is $0.25^{10} \approx 9.5 \times 10^{-7}$, and if every layer multiplies by 2, it is $2^{10} = 1024$.
 
@@ -682,11 +682,11 @@ The derivative of sigmoid is at most 0.25 and the derivative of tanh, $1 - \tanh
 
 *Figure 26. A batch normalization layer placed between a hidden layer and the activation function, normalizing the skewed distribution of each mini-batch*
 
-As in Figure 26, a BN layer is usually placed between a fully connected (or convolutional) layer and the activation function. For a mini-batch $B = \{x_1, \dots, x_m\}$, the following is computed for each feature (channel).
+As in Figure 26, a BN layer is usually placed between a fully connected (or convolutional) layer and the activation function. For a mini-batch $B = \lbrace x_1, \dots, x_m\rbrace$, the following is computed for each feature (channel).
 
-$$
+```math
 \mu_B = \frac{1}{m}\sum_{i=1}^{m} x_i, \qquad \sigma_B^2 = \frac{1}{m}\sum_{i=1}^{m} (x_i - \mu_B)^2, \qquad \hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \qquad y_i = \gamma \hat{x}_i + \beta
-$$
+```
 
 $\epsilon$ is a small number that prevents division by zero. The values normalized to mean 0 and variance 1 are rescaled by the trainable parameters $\gamma$ (scale) and $\beta$ (shift), so the network can recover the original distribution if needed. On the right of Figure 26, the distributions of Batch 1 and Batch 2 are skewed in different directions, but after BN both become similar bell-shaped distributions. Because values are not pushed into the saturated regions of sigmoid or tanh, vanishing gradients are reduced, and training stays stable even with a large learning rate. At evaluation time, the mean and variance accumulated during training are used instead of mini-batch statistics, which is why the `model.eval()` seen in Section 1.6 is needed.
 
@@ -714,21 +714,21 @@ In Figure 27, the ReLU family (ReLU, Leaky ReLU, ELU) and Softplus keep increasi
 
 **Gradient clipping** keeps the direction of the gradient and reduces only its magnitude to a threshold $\tau$ when the magnitude exceeds $\tau$ [12].
 
-$$
+```math
 \mathbf{g}_{\text{clipped}} =
 \begin{cases}
 \mathbf{g} & \text{if } \lVert \mathbf{g} \rVert_2 \le \tau \\
 \tau \cdot \dfrac{\mathbf{g}}{\lVert \mathbf{g} \rVert_2} & \text{if } \lVert \mathbf{g} \rVert_2 > \tau
 \end{cases}
-$$
+```
 
-$\lVert \mathbf{g} \rVert_2$ is the L2 norm (length) of the gradient vector. For example, if $\mathbf{g} = (3, 4)$ and $\tau = 1$, then $\lVert \mathbf{g} \rVert_2 = \sqrt{3^2 + 4^2} = 5 > 1$, so $\mathbf{g}_{\text{clipped}} = 1 \cdot (3, 4)/5 = (0.6, 0.8)$. The direction is the same and only the length has been reduced to 1.
+$\lVert \mathbf{g} \rVert_2$ is the L2 norm (length) of the gradient vector. For example, if $\mathbf{g} = (3, 4)$ and $\tau = 1$, then $\lVert \mathbf{g} \rVert_2 = \sqrt{3^2 + 4^2} = 5 > 1$, so $`\mathbf{g}_{\text{clipped}} = 1 \cdot (3, 4)/5 = (0.6, 0.8)`$. The direction is the same and only the length has been reduced to 1.
 
 ![Figure 28. Optimization paths without gradient clipping (left) and with gradient clipping (right)](../../images/Lec03_p38.png)
 
 *Figure 28. Optimization paths without gradient clipping (left) and with gradient clipping (right)*
 
-On the left of Figure 28, where the gradient is large, a single step moves too far and overshoots the minimum (the red point) by a wide margin. With clipping, as on the right, the step size is limited and the path approaches the neighborhood of the minimum step by step. Clipping prevents explosion and has no effect on vanishing. In PyTorch, call `torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)` between `loss.backward()` and `optimizer.step()`.
+On the left of Figure 28, where the gradient is large, a single step moves too far and overshoots the minimum (the red + mark) by a wide margin. With clipping, as on the right, the step size is limited and the path approaches the neighborhood of the minimum step by step. Clipping prevents explosion and has no effect on vanishing. In PyTorch, call `torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)` between `loss.backward()` and `optimizer.step()`.
 
 ---
 
@@ -853,7 +853,7 @@ On the left of Figure 28, where the gradient is large, a single step moves too f
     <details>
     <summary>Answer</summary>
 
-    $\lVert \mathbf{g} \rVert_2 = \sqrt{36 + 64} = 10 > 5$, so $\mathbf{g}_{\text{clipped}} = 5 \cdot (6, 8)/10 = (3, 4)$. Clipping only reduces the magnitude of gradients larger than the threshold and leaves small gradients unchanged, so it has no effect on vanishing, where gradients become too small.
+    $\lVert \mathbf{g} \rVert_2 = \sqrt{36 + 64} = 10 > 5$, so $`\mathbf{g}_{\text{clipped}} = 5 \cdot (6, 8)/10 = (3, 4)`$. Clipping only reduces the magnitude of gradients larger than the threshold and leaves small gradients unchanged, so it has no effect on vanishing, where gradients become too small.
 
     </details>
 

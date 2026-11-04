@@ -100,6 +100,8 @@ Match the equations to the paper's equation numbers (1)-(5), and define each sym
 
 > **Definition:** **Semi-supervised learning** trains with a small amount of labeled data together with a large amount of unlabeled data. **Unsupervised pre-training** is a special case whose goal is to find good initial parameters from unlabeled data instead of modifying the supervised learning objective.
 
+Unsupervised pre-training was first used in image classification and regression tasks, and research also showed that pre-training acts as a regularization scheme that helps deep neural networks generalize. It was later used to help train models for tasks such as speech recognition, entity disambiguation, and machine translation [1].
+
 ### 2.2 Difficulty of Transfer Beyond the Word Level
 
 The most successful way of using unlabeled text had been **pre-trained word embeddings** such as Word2Vec (Lecture 7). However, word embeddings mainly carry word-level information. Learning and transferring information beyond the word level faced two difficulties [1].
@@ -114,7 +116,7 @@ The most successful way of using unlabeled text had been **pre-trained word embe
 | Word and sentence embeddings | Learn vector representations of words, phrases, and sentences from an unlabeled corpus and use them as features for tasks | GPT transfers higher-level semantics beyond the word level through the whole model |
 | Fine-tuning after LSTM language model pre-training | Dai and Le [2] and ULMFiT [3] fine-tune an LSTM pre-trained as a language model for text classification | LSTMs restrict prediction ability to a short range, whereas GPT's Transformer captures longer-range linguistic structure |
 | Hidden representations of pre-trained models as auxiliary features | ELMo [4] and others add the hidden representations of a pre-trained language or translation model as features of the task model | Many new parameters are needed for each task, whereas GPT barely changes its architecture during transfer |
-| Auxiliary training objectives | Add an unsupervised objective such as language modeling to the task objective | GPT also uses an auxiliary objective, but pre-training alone already learns much of the linguistic knowledge the tasks need |
+| Auxiliary training objectives | Add an unsupervised objective such as language modeling to the task objective | GPT also uses an auxiliary objective, but pre-training alone already learns several linguistic aspects relevant to the target tasks |
 
 *Table 2. Comparison of GPT with related work*
 
@@ -139,9 +141,11 @@ flowchart LR
 
 ### 3.1 Unsupervised Pre-Training: Language Modeling
 
-Given an unlabeled corpus of tokens $\mathcal{U} = \{u_1, \ldots, u_n\}$, the likelihood of the standard **language modeling** objective is maximized.
+Given an unlabeled corpus of tokens $\mathcal{U} = \lbrace u_1, \ldots, u_n\rbrace$, the likelihood of the standard **language modeling** objective is maximized.
 
-$$L_1(\mathcal{U}) = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1}; \Theta) \qquad (1)$$
+```math
+L_1(\mathcal{U}) = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1}; \Theta) \qquad (1)
+```
 
 - $k$: the size of the **context window**, that is, the number of previous tokens that can be seen when predicting the next token.
 - $P$: the conditional probability computed by a neural network with parameters $\Theta$. The parameters are trained with stochastic gradient descent.
@@ -150,15 +154,19 @@ In other words, the model is trained to predict the next token from the previous
 
 A numerical example illustrates this. Suppose that for the three tokens "the cat sat" the model assigns the conditional probabilities $P(\text{the}) = 0.2$, $P(\text{cat} \mid \text{the}) = 0.5$, and $P(\text{sat} \mid \text{the cat}) = 0.4$. The log-likelihood is as follows.
 
-$$\ln 0.2 + \ln 0.5 + \ln 0.4 = -1.609 - 0.693 - 0.916 = -3.219$$
+```math
+\ln 0.2 + \ln 0.5 + \ln 0.4 = -1.609 - 0.693 - 0.916 = -3.219
+```
 
-Training pushes this value toward 0 (the probabilities toward 1). The performance of a language model is often expressed as **perplexity**, $\exp\!\left(-\frac{1}{N}\sum_i \log P(u_i \mid \cdot)\right)$, which is $\exp(3.219 / 3) \approx 2.92$ in this example. Perplexity can be read as the average number of candidates among which the model hesitates at each step, and lower is better. The paper's language model achieved a token-level perplexity of 18.4 on BooksCorpus [1].
+Training pushes this value toward 0 (the probabilities toward 1). The performance of a language model is often expressed as **perplexity**, $`\exp\!\left(-\frac{1}{N}\sum_i \log P(u_i \mid \cdot)\right)`$, which is $\exp(3.219 / 3) \approx 2.92$ in this example. Perplexity can be read as the average number of candidates among which the model hesitates at each step, and lower is better. The paper's language model achieved a token-level perplexity of 18.4 on BooksCorpus [1].
 
 ### 3.2 Transformer Decoder
 
 The language model is a **multi-layer Transformer decoder**, a variant of the Transformer [5]. It applies multi-head self-attention over the input context tokens followed by position-wise feedforward layers to produce an output distribution over target tokens.
 
-$$h_0 = U W_e + W_p, \qquad h_l = \texttt{transformer\_block}(h_{l-1}) \;\; \forall l \in [1, n], \qquad P(u) = \mathrm{softmax}(h_n W_e^{T}) \qquad (2)$$
+```math
+h_0 = U W_e + W_p, \qquad h_l = \texttt{transformer\_block}(h_{l-1}) \;\; \forall l \in [1, n], \qquad P(u) = \mathrm{softmax}(h_n W_e^{T}) \qquad (2)
+```
 
 - $U = (u_{-k}, \ldots, u_{-1})$: the (one-hot) vectors of the context tokens.
 - $W_e$: the token embedding matrix, $W_p$: the position embedding matrix, $n$: the number of layers (blocks).
@@ -193,9 +201,13 @@ Since $e^{-\infty} = 0$, the masked cells get a weight of 0. The second row is c
 
 After pre-training, the parameters are adapted to the target task. Each instance of the labeled dataset $\mathcal{C}$ consists of a sequence of input tokens $x^1, \ldots, x^m$ and a label $y$. The input is passed through the pre-trained model to obtain **the activation of the final Transformer block at the last token position** $h_l^m$, and a newly added linear output layer $W_y$ predicts $y$.
 
-$$P(y \mid x^1, \ldots, x^m) = \mathrm{softmax}(h_l^m W_y) \qquad (3)$$
+```math
+P(y \mid x^1, \ldots, x^m) = \mathrm{softmax}(h_l^m W_y) \qquad (3)
+```
 
-$$L_2(\mathcal{C}) = \sum_{(x, y)} \log P(y \mid x^1, \ldots, x^m) \qquad (4)$$
+```math
+L_2(\mathcal{C}) = \sum_{(x, y)} \log P(y \mid x^1, \ldots, x^m) \qquad (4)
+```
 
 As a numerical example, if $h_l^m W_y$ for the three classes of an entailment judgment (entailment, neutral, contradiction) is $(2.0, 0.5, -1.0)$, the softmax result is $(0.786, 0.175, 0.039)$. If the correct answer is entailment, this instance adds $\ln 0.786 \approx -0.241$ to $L_2$, and training pushes this probability toward 1.
 
@@ -205,7 +217,9 @@ The representation at the last token position is used because of masked self-att
 
 Optimizing language modeling together as an **auxiliary objective** during fine-tuning (a) improves the generalization of the supervised model and (b) accelerates convergence. The following objective is maximized with a weight $\lambda$.
 
-$$L_3(\mathcal{C}) = L_2(\mathcal{C}) + \lambda \cdot L_1(\mathcal{C}) \qquad (5)$$
+```math
+L_3(\mathcal{C}) = L_2(\mathcal{C}) + \lambda \cdot L_1(\mathcal{C}) \qquad (5)
+```
 
 Here $L_1(\mathcal{C})$ is the language modeling objective on the input text of the labeled data. The experiments used $\lambda = 0.5$. Implementations often write it as cross-entropy losses to be minimized instead of log-likelihoods to be maximized. For example, if the classification loss of a mini-batch is 0.35 and the language modeling loss is 2.80, the total loss is $0.35 + 0.5 \times 2.80 = 1.75$.
 
@@ -225,11 +239,11 @@ Multiple choice ⟨s⟩ context $ answer 1 ⟨e⟩ → Transformer → linear �
                 ⟨s⟩ context $ answer 3 ⟨e⟩ → Transformer → linear ─┘
 ```
 
-*Figure 3. Task-specific input transformations ($ is the delimiter token, and the context of multiple choice is the document and the question)*
+*Figure 3. Task-specific input transformations (`$` is the delimiter token, and the context of multiple choice is the document and the question)*
 
-- **Textual entailment:** The token sequences of the premise $p$ and the hypothesis $h$ are concatenated with a delimiter token ($) in between.
+- **Textual entailment:** The token sequences of the premise $p$ and the hypothesis $h$ are concatenated with a delimiter token (`$`) in between.
 - **Similarity:** There is no inherent ordering of the two sentences being compared, so both orderings are built and processed independently, and the two resulting representations $h_l^m$ are added element-wise before being fed into the linear output layer.
-- **Question answering and commonsense reasoning:** Given a context document $z$, a question $q$, and a set of possible answers $\{a_k\}$, $[z; q; \$; a_k]$ is built for each answer. The scores obtained by processing each sequence independently are normalized with softmax to produce a probability distribution over the answers.
+- **Question answering and commonsense reasoning:** Given a context document $z$, a question $q$, and a set of possible answers $\lbrace a_k\rbrace$, `[z; q; $; a_k]` is built for each answer. The scores obtained by processing each sequence independently are normalized with softmax to produce a probability distribution over the answers.
 
 These transformations let a single pre-trained model be fine-tuned on a variety of tasks without large changes to the architecture for each task.
 
@@ -312,7 +326,7 @@ Several of these tasks are part of the multi-task benchmark **GLUE** [12]. The d
 
 ### 5.2 Natural Language Inference
 
-**Natural language inference (NLI)** is the task of reading a pair of sentences and judging their relationship as one of entailment, contradiction, or neutral.
+**Natural language inference (NLI)** is the task of reading a pair of sentences and judging their relationship as one of entailment, contradiction, or neutral. It is challenging because it involves a wide variety of phenomena such as lexical entailment, coreference, and lexical and syntactic ambiguity. The five evaluation datasets come from diverse sources: image captions (SNLI), transcribed speech, popular fiction, and government reports (MNLI), Wikipedia articles (QNLI), science exams (SciTail), and news articles (RTE).
 
 | Dataset | Previous best | GPT | Difference |
 |:-----|-----:|-----:|-----:|
@@ -344,6 +358,8 @@ The gains are especially large on tasks that require handling long contexts, whi
 
 ### 5.4 Semantic Similarity and Classification
 
+**Semantic similarity** (or paraphrase detection) tasks predict whether two sentences are semantically equivalent, which requires recognizing the rephrasing of concepts, understanding negation, and handling syntactic ambiguity. The evaluation used MRPC (sentence pairs collected from news sources), QQP, and STS-B. For classification, it used CoLA, which contains expert judgments on whether a sentence is grammatical, and SST-2, a standard binary sentiment classification task.
+
 | Dataset (metric) | Previous best | GPT | Difference |
 |:-----|-----:|-----:|-----:|
 | CoLA (Matthews correlation) | 35.0 | 45.4 | +10.4 |
@@ -355,7 +371,7 @@ The gains are especially large on tasks that require handling long contexts, whi
 
 *Table 10. Semantic similarity and classification results*
 
-CoLA is the task of judging whether a sentence is grammatical, and the large gain shows that the model learned an innate linguistic bias (grammaticality). On SST-2 and MRPC it was below the previous best. Overall, it set new state-of-the-art results on 9 of the 12 datasets, outperforming ensembles in many cases.
+The large gain on CoLA shows that the model learned an innate linguistic bias (grammaticality). On SST-2 and MRPC it was below the previous best. Overall, it set new state-of-the-art results on 9 of the 12 datasets, outperforming ensembles in many cases.
 
 > **Note:** The introduction of the paper states an absolute improvement of 5.5% on GLUE, but the numbers in Table 4 of the paper are 72.8 and a previous best of 68.9, a difference of 3.9. When reporting the GLUE improvement, state the numbers in the table together with the baseline.
 
@@ -371,7 +387,7 @@ The number of pre-trained layers transferred to the target task was varied from 
 
 ### 6.2 Zero-Shot Behaviors
 
-To understand why language model pre-training is effective, the paper designed heuristics that perform tasks with the generative model alone, without fine-tuning, and observed how their performance changed as pre-training progressed. This is called **zero-shot** evaluation.
+To understand why language model pre-training is effective, the paper designed heuristics that perform tasks with the generative model alone, without fine-tuning, and observed how their performance changed as pre-training progressed. This is called **zero-shot** evaluation. The paper's hypothesis is that the underlying generative model learns to perform many of the evaluated tasks in order to improve its language modeling capability, and that the more structured attentional memory of the Transformer assists transfer compared to LSTMs.
 
 | Task | Heuristic |
 |:-----|:-----|
@@ -382,11 +398,11 @@ To understand why language model pre-training is effective, the paper designed h
 
 *Table 11. Heuristics of the zero-shot evaluation*
 
-The performance of the heuristics increased stably and steadily during pre-training. This is evidence that generative pre-training learns a wide variety of task-relevant functionality. In the same experiment the LSTM showed higher variance in its zero-shot performance, which the paper interprets as the inductive bias of the Transformer architecture assisting transfer.
+The performance of the heuristics, normalized between a random-guess baseline and the state of the art with a single model, increased stably and steadily during pre-training. This is evidence that generative pre-training learns a wide variety of task-relevant functionality. In the same experiment the LSTM showed higher variance in its zero-shot performance, which the paper interprets as the inductive bias of the Transformer architecture assisting transfer.
 
 ### 6.3 Ablation Studies
 
-An **ablation study** is an experiment that removes or replaces the components of a model one at a time to confirm the contribution of each component.
+An **ablation study** is an experiment that removes or replaces the components of a model one at a time to confirm the contribution of each component. The paper performed three ablation studies on eight GLUE tasks.
 
 | Method | Avg. | CoLA | SST2 | MRPC | STSB | QQP | MNLI | QNLI | RTE |
 |:-----|-----:|-----:|-----:|-----:|-----:|-----:|-----:|-----:|-----:|
@@ -425,7 +441,7 @@ An **ablation study** is an experiment that removes or replaces the components o
 
 *Table 13. GPT and the pre-trained language models that followed*
 
-BERT pointed out the limitation that GPT's unidirectional language modeling sees only one side of the context, and pre-trained an encoder with an objective that masks some input tokens and predicts them from the context on both sides. The GPT family kept the decoder architecture and the language modeling objective and scaled up the model and the data, evolving toward performing tasks without fine-tuning. The zero-shot experiments of GPT-1 (Section 6.2) are the starting point of this direction. The comparison of BERT and GPT is also covered in Lecture 8.
+BERT pointed out the limitation that GPT's unidirectional language modeling sees only one side of the context, and pre-trained an encoder with an objective that masks some input tokens and predicts them from the context on both sides. The GPT family kept the decoder architecture and the language modeling objective and scaled up the model and the data, evolving toward performing tasks without fine-tuning. The zero-shot experiments of GPT (Section 6.2) can be seen as an early sign of this direction. The comparison of BERT and GPT is also covered in Lecture 8.
 
 ---
 
@@ -440,12 +456,12 @@ BERT pointed out the limitation that GPT's unidirectional language modeling sees
 | Two-stage training | A language model is pre-trained on an unlabeled corpus and then fine-tuned on discriminative tasks with labeled data. |
 | Language modeling objective | $L_1 = \sum_i \log P(u_i \mid u_{i-k}, \ldots, u_{i-1})$, which predicts the next token from the previous $k$ tokens. |
 | Transformer decoder | Masked self-attention blocks with 12 layers, 768 dimensions, and 12 heads, whose output layer shares the token embedding matrix. |
-| Fine-tuning | A linear layer $W_y$ and softmax are added on the representation $h_l^m$ at the last token position, and $L_3 = L_2 + \lambda L_1$ ($\lambda = 0.5$) is maximized. |
+| Fine-tuning | A linear layer $W_y$ and softmax are added on the representation $h_l^m$ at the last token position, and $L_3 = L_2 + \lambda L_1$ ($`\lambda = 0.5`$) is maximized. |
 | Input transformations | Entailment joins the premise and hypothesis with a delimiter, similarity adds the representations of both orderings, and multiple choice builds a sequence per answer and normalizes with softmax. |
 | Settings | Pre-training uses BooksCorpus, 512 tokens, a batch of 64, 100 epochs, and a learning rate of $2.5 \times 10^{-4}$; fine-tuning uses a learning rate of $6.25 \times 10^{-5}$, a batch of 32, and 3 epochs. |
 | Results | State-of-the-art on 9 of 12 datasets, with Story Cloze +8.9, RACE +5.7, MNLI +1.5, and GLUE 72.8 (previously 68.9). |
 | Analysis | More transferred layers improve performance, zero-shot performance rises with pre-training, and removing pre-training costs 14.8 on average while switching to an LSTM costs 5.6. |
-| Follow-up work | BERT evolved into a bidirectional encoder, and GPT-2 and GPT-3 into larger decoders. |
+| Follow-up work | The follow-up models include BERT, a bidirectional encoder, and GPT-2 and GPT-3, scaled-up decoders. |
 
 ---
 
@@ -512,7 +528,7 @@ BERT pointed out the limitation that GPT's unidirectional language modeling sees
    <details>
    <summary>Answer</summary>
 
-   One sequence of the form $[z; q; \$; a_k]$ is built for each answer, four in total. Each sequence is processed independently by the model to obtain one score from the linear layer, and the four scores are normalized with softmax into a probability distribution over the candidate answers. The answer with the highest probability is chosen.
+   One sequence of the form `[z; q; $; a_k]` is built for each answer, four in total. Each sequence is processed independently by the model to obtain one score from the linear layer, and the four scores are normalized with softmax into a probability distribution over the candidate answers. The answer with the highest probability is chosen.
 
    </details>
 
@@ -530,7 +546,7 @@ BERT pointed out the limitation that GPT's unidirectional language modeling sees
    <details>
    <summary>Answer</summary>
 
-   The average was raised by the higher scores without the auxiliary objective on CoLA, SST-2, MRPC, and STS-B. On the large datasets MNLI (81.8 vs. 81.1), QNLI (88.1 vs. 86.9), and QQP (70.3 vs. 69.8), the auxiliary objective improved performance, so the paper concludes that the auxiliary objective helps when datasets are large.
+   The average was raised by the higher scores without the auxiliary objective on CoLA, SST-2, MRPC, and STS-B. On the large datasets MNLI (81.8 vs. 81.1), QNLI (88.1 vs. 86.9), and QQP (70.3 vs. 69.8), the auxiliary objective improved performance, so the paper concludes that the auxiliary objective helps when datasets are large. The paper also states that the auxiliary objective improves the generalization of the supervised model and accelerates convergence (Section 3.4).
 
    </details>
 

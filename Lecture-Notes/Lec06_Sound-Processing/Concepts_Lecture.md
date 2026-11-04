@@ -75,7 +75,7 @@ Deep learning is widely used not only for images (Lectures 3-5) and text (Lectur
 
 *Table 1. Representative tasks performed with sound data*
 
-There are many other tasks, such as speaker recognition, music genre classification, and anomalous sound detection that finds faults from machine sounds. This lecture focuses on audio classification and sound event detection, together with sound preprocessing, which is their common basis.
+There are many other tasks, such as speaker recognition, music genre classification, and anomalous sound detection that finds faults from machine sounds. The sections below focus on audio classification and sound event detection, together with sound preprocessing, which is their common basis.
 
 ### 1.2 Audio Classification
 
@@ -98,7 +98,7 @@ The top left is the **waveform**, which plots the amplitude of the sound over ti
 A deep-learning speech recognition system consists of the following steps, as in the figure above [1].
 
 1. **Feature extraction:** The audio signal is preprocessed with techniques such as normalization and the spectrogram or MFCC.
-2. **Acoustic model:** A neural network that predicts, at each time step $t$, the probability distribution $P_t(c)$ over vocabulary characters $c$. Jasper [2] and QuartzNet [3] in the figure are examples of such acoustic models. The vocabulary is the set of output characters such as the letters and the space.
+2. **Acoustic model:** A neural network that predicts, at each time step $t$, the probability distribution $P_t(c)$ over vocabulary characters $c$. Jasper [2] and QuartzNet [3] in the figure are examples of such acoustic models. The vocabulary is the set of characters the model can output, such as the letters and the space, and $c$ is an element of it.
 3. **Decoding:** The probability distribution at each time step is turned into a character string.
    - **Greedy decoding (argmax):** The simplest strategy. At each time step it emits the character with the highest probability, without regard to the meaning of the content.
    - **Using a language model:** A language model adds context, so it can correct the errors of the acoustic model. For example, even if the acoustic model mispredicts "apple" as "apble", the language model knows that the word "apble" is almost never used and that "apple" fits the context, so it corrects the error.
@@ -135,9 +135,9 @@ The input is a long audio waveform, and the output is, for each event, a class l
 The figure above is the structure of SELDnet [5].
 
 - **Feature extractor:** From the multichannel input audio, it computes the magnitude and phase of the spectrogram for each channel to form an input of size $T \times M/2 \times 2C$. $T$ is the number of frames, $M/2$ the number of frequency bins, and $C$ the number of channels (microphones); it is $2C$ because there are two quantities, magnitude and phase.
-- **Three convolutional blocks:** They convolve with $P$ filters of size 3×3 and max-pool only along the frequency axis ($1 \times MP_i$), reducing the size to $T \times 2 \times P$ while keeping the time resolution.
+- **Three convolutional blocks:** They convolve with $P$ filters of size 3×3 and max-pool only along the frequency axis ($`1 \times MP_i`$), reducing the size to $T \times 2 \times P$ while keeping the time resolution.
 - **Two bidirectional GRU layers:** They learn context along the time axis and output $T \times Q$.
-- **Two output branches:** One branch is sound event detection (SED, $T \times N$), which outputs with sigmoids whether each of $N$ classes is active in each frame, and the other is **direction-of-arrival (DOA) estimation** ($T \times 3N$), which outputs for each class the direction the sound came from as a three-dimensional coordinate $(x, y, z)$. The lower figures are example ground truths for the classification task (class activity over time) and the regression task (direction coordinates over time), respectively.
+- **Two output branches:** Each branch passes through a linear fully connected layer of $R$ units before its output layer. One branch is sound event detection (SED, $`T \times N`$), which outputs with sigmoids whether each of $N$ classes is active in each frame, and the other is **direction-of-arrival (DOA) estimation** ($`T \times 3N`$), which outputs for each class the direction the sound came from as a three-dimensional coordinate $(x, y, z)$. The lower figures are example ground truths for the classification task (class activity over time) and the regression task (direction coordinates over time), respectively.
 
 > **Caution:** Estimating the direction of a sound requires multichannel audio recorded with several microphones, because the differences in arrival time (phase) and level of the same sound at each microphone are the cues to the direction. Single-channel audio recorded with one microphone has no such spatial information, so sound event detection is possible but localization is not.
 
@@ -175,14 +175,14 @@ Sound received by a microphone is air pressure that changes continuously over ti
 
 *Figure 7. The lower the sample rate, the more coarsely the original waveform is represented*
 
-The three pictures on the left show the original wave sampled at 192 kHz and 96 kHz with the points joined by straight lines; the lower the sample rate, the more coarsely it follows the original curve. The four pictures on the right show one period of the same sine wave sampled at 2, 6, and 10 points, illustrating the relationship between sample rate and resolution: the more samples, the closer to the original shape.
+The three pictures on the left show the original wave sampled at 192 kHz and 96 kHz with the points joined by straight lines; the lower the sample rate, the more coarsely it follows the original curve. The four pictures on the right show the original waveform of one period of a sine wave and the same wave sampled at 2, 6, and 10 points, illustrating the relationship between sample rate and resolution: the more samples, the closer to the original shape.
 
 Recording for $T$ seconds at sample rate $f_s$ gives $f_s \times T$ samples. For example, recording 3 seconds at 16,000 Hz gives $16000 \times 3 = 48000$ samples. The value of each sample is also stored with finite precision; stored as a 16-bit integer, it is represented in $2^{16} = 65536$ levels. Libraries such as librosa read it after converting it to a real number between $-1$ and 1.
 
 | Sample rate | Nyquist frequency | Main use |
 |:-----|:-----|:-----|
 | 8,000 Hz | 4,000 Hz | Landline telephone speech |
-| 16,000 Hz | 8,000 Hz | Speech recognition, the examples of this lecture |
+| 16,000 Hz | 8,000 Hz | Speech recognition, the example of Section 4.4 |
 | 44,100 Hz | 22,050 Hz | Music CDs |
 | 48,000 Hz | 24,000 Hz | Video production and digital audio equipment |
 | 96,000 Hz, 192,000 Hz | 48,000 Hz, 96,000 Hz | High-resolution recording |
@@ -224,15 +224,15 @@ Sound (a waveform) reveals more information in the frequency domain. Information
 
 In the three-dimensional coordinates of the figure, the left face (Time Domain) draws a complicated, undulating signal on the time axis. This signal is actually the sum of three sine waves of different frequencies (red, blue, and green), and the right face (Frequency Domain) raises a bar, as tall as each sine wave is strong, at the frequency of that sine wave. According to Fourier analysis, a signal can be expressed as a sum of sinusoids (sine and cosine waves). The red waveform on the right is an example: adding only a few sine waves whose frequencies are odd multiples of the fundamental already approaches a square wave. A square wave is the sum of infinitely many sine waves, as follows.
 
-$$
+```math
 x(t) = \frac{4}{\pi} \left( \sin \omega t + \frac{1}{3} \sin 3\omega t + \frac{1}{5} \sin 5\omega t + \cdots \right)
-$$
+```
 
 The Fourier transform of a continuous-time signal $x(t)$ is as follows.
 
-$$
+```math
 X(f) = \int_{-\infty}^{\infty} x(t) \, e^{-j 2\pi f t} \, dt
-$$
+```
 
 > **Note:** By Euler's formula $e^{-j\theta} = \cos\theta - j\sin\theta$, $e^{-j 2\pi f t}$ is a pair of cosine and sine rotating at frequency $f$. The Fourier transform multiplies the signal by this rotation and integrates, computing how much the signal resembles the component at frequency $f$. $\lvert X(f) \rvert$ is the magnitude of that frequency component, and the angle of the complex number $X(f)$ is its phase. The video by 3Blue1Brown [9] is a widely known resource that explains this process visually.
 
@@ -240,9 +240,9 @@ $$
 
 Sound in a computer is a finite sequence of samples, so the **DFT (Discrete Fourier Transform)**, which uses a sum instead of an integral, is used [8]. The DFT of a signal $x[0], \dots, x[N-1]$ of length $N$ is as follows.
 
-$$
+```math
 X[k] = \sum_{n=0}^{N-1} x[n] \, e^{-j 2\pi k n / N}, \qquad k = 0, 1, \dots, N-1
-$$
+```
 
 - $X[k]$ is the component of the $k$-th **frequency bin**, and the frequency of this bin is $f_k = k f_s / N$. Therefore the spacing between bins, the **frequency resolution**, is $f_s / N$.
 - For a real signal, $X[N-k]$ is the complex conjugate of $X[k]$, so only the $N/2 + 1$ bins from $k = 0$ to $N/2$ carry distinct information.
@@ -282,9 +282,9 @@ The **STFT (Short-Time Fourier Transform)** divides a signal into short interval
 
 Written as an equation, with hop length $H$, window function $w[n]$, and FFT size $N$, the $k$-th frequency component of the $m$-th frame is as follows.
 
-$$
+```math
 X[m, k] = \sum_{n=0}^{N-1} x[n + mH] \, w[n] \, e^{-j 2\pi k n / N}
-$$
+```
 
 **The trade-off between time resolution and frequency resolution.** The longer the window, the better the frequency resolution $f_s / N$, but the longer the time $N / f_s$ covered by one window, which blurs when the sound changed. A short window does the opposite. The window length is therefore chosen to suit the sound to be analyzed.
 
@@ -303,11 +303,11 @@ The frame-count formula is for the case where, as in librosa, the signal is padd
 
 ### 3.5 Spectrogram
 
-A **spectrogram** is a way to visualize the change of a signal over time in the frequency domain. The magnitude $\lvert X[m, k] \rvert$ of the STFT result $X[m, k]$ (or its square, the power) is arranged as a two-dimensional array with time (frame $m$) on the horizontal axis and frequency (bin $k$) on the vertical axis, and the size of each value is shown as a color. The human ear perceives loudness roughly on a logarithmic scale, and the values span a very wide range, so they are usually expressed in decibels (dB).
+A **spectrogram** is a way to visualize the change of a signal over time in the frequency domain. The magnitude $\lvert X[m, k] \rvert$ of the STFT result $X[m, k]$ (or its square, the power) is arranged as a two-dimensional array with time (frame $`m`$) on the horizontal axis and frequency (bin $`k`$) on the vertical axis, and the size of each value is shown as a color. The human ear perceives loudness roughly on a logarithmic scale, and the values span a very wide range, so they are usually expressed in decibels (dB).
 
-$$
+```math
 \text{dB} = 20 \log_{10} \frac{\lvert X \rvert}{\text{ref}} \quad \text{(magnitude)}, \qquad \text{dB} = 10 \log_{10} \frac{\lvert X \rvert^2}{\text{ref}} \quad \text{(power)}
-$$
+```
 
 ![Figure 12. Waveform, linear-frequency spectrogram, and mel spectrogram of a synthetic signal](../../images/Lec06_Spectrogram.png)
 
@@ -315,7 +315,7 @@ $$
 
 The figure above is a synthetic signal 6 seconds long made at 16 kHz. From 0 to 1.5 s it contains a tone mixing 440 Hz with its 2nd and 3rd harmonics (880 Hz, 1320 Hz), from 1.5 to 3.5 s a sound whose frequency rises steadily from 200 Hz to 5000 Hz, and from 3.6 to 6 s a 3000 Hz tone and three bursts of noise 0.25 s long.
 
-- **Waveform (top):** It shows when the loudness of the sound changes, but not which frequencies the sound has. In particular, 0-1.5 s and 1.5-3.5 s look almost the same.
+- **Waveform (top):** It shows when the loudness of the sound changes, but not which frequencies the sound has. In particular, 0-1.5 s and 1.5-3.5 s appear as solid bands that differ only slightly in height, so it is impossible to tell what sound each one is.
 - **Spectrogram (middle):** The 440, 880, and 1320 Hz tones appear as three horizontal lines, the rising sound as a slanted straight line, the 3000 Hz tone as one horizontal line, and the noise as vertical bands across all frequencies, so the composition of the sound is visible at a glance.
 - **Mel spectrogram (bottom):** Explained in Section 4.2, it changes the vertical axis to match human hearing.
 
@@ -333,9 +333,9 @@ A spectrogram is a two-dimensional array, that is, an image, so image-processing
 
 The mel scale originated from listening experiments in which people adjusted tones so that they sounded equally spaced in pitch [11]. People distinguish even small differences well at low frequencies, but at high frequencies the difference must be large to be distinguished. That is, the mel scale has high sensitivity at low frequencies and low sensitivity at high frequencies. A widely used conversion formula is as follows [12].
 
-$$
+```math
 m = 2595 \log_{10} \left( 1 + \frac{f}{700} \right), \qquad f = 700 \left( 10^{m / 2595} - 1 \right)
-$$
+```
 
 ![Figure 13. Relationship between frequency (Hz) and mel value](../../images/Lec06_Mel-Scale.png)
 
@@ -357,11 +357,11 @@ The left is the spectrogram of a piece of music, the small graph in the middle i
 
 The mel scale is applied with a **mel filter bank**. $B$ triangular filters placed at equal intervals on the mel axis are made, and the values of the frequency bins covered by each filter are summed with weights to give the value of that filter. With $H_b[k]$ the weights of the $b$-th filter, the mel spectrogram is as follows.
 
-$$
+```math
 M[m, b] = \sum_{k} H_b[k] \, \lvert X[m, k] \rvert^{p}, \qquad b = 0, 1, \dots, B - 1
-$$
+```
 
-With $p = 2$ it is a power mel spectrogram, and with $p = 1$ a magnitude mel spectrogram. For example, making 10 filters ($B = 10$) over 0-8000 Hz needs 12 points that divide the mel axis into 11 equal parts. Computed with the formula above, these points are 0, 180, 407, 692, 1050, 1501, 2067, 2780, 3676, 4802, 6219, and 8000 Hz, and the $b$-th filter is a triangle that starts at the $b$-th point, reaches its maximum at the $(b+1)$-th point, and ends at the $(b+2)$-th point (counting from 0). The first filter spans 0-407 Hz, about 400 Hz wide, but the last spans 4802-8000 Hz, about 3200 Hz wide, so the higher the frequency, the wider the band a single filter lumps together. As a result, the 1025 frequency bins shrink to 10 mel bands, and the data also becomes smaller.
+With $p = 2$ it is a power mel spectrogram, and with $p = 1$ a magnitude mel spectrogram. For example, making 10 filters ($`B = 10`$) over 0-8000 Hz needs 12 points that divide the mel axis into 11 equal parts. Computed with the formula above, these points are 0, 180, 407, 692, 1050, 1501, 2067, 2780, 3676, 4802, 6219, and 8000 Hz, and the $b$-th filter is a triangle that starts at the $b$-th point, reaches its maximum at the $(b+1)$-th point, and ends at the $(b+2)$-th point (counting from 0). The first filter spans 0-407 Hz, about 400 Hz wide, but the last spans 4802-8000 Hz, about 3200 Hz wide, so the higher the frequency, the wider the band a single filter lumps together. As a result, the 1025 frequency bins shrink to 10 mel bands, and the data also becomes smaller.
 
 > **Note:** The mel spectrogram is sometimes described as the result of converting frequency to the mel scale and then applying the STFT, but the actual order of computation is to obtain the spectrogram with the STFT first and then apply the mel filter bank to its frequency axis. A waveform has no frequency axis yet, so the mel scale cannot be applied before the STFT.
 
@@ -385,9 +385,9 @@ graph LR
 
 Applying the DCT to the log values $\log M_b$ of $B$ mel bands, the $q$-th coefficient is as follows.
 
-$$
+```math
 c_q = \sum_{b=0}^{B-1} \log(M_b) \cos\left[ \frac{\pi q}{B} \left( b + \frac{1}{2} \right) \right], \qquad q = 0, 1, \dots, Q - 1
-$$
+```
 
 - **Why take the logarithm:** People perceive loudness on a logarithmic scale, and the logarithm compresses a very wide range of values.
 - **Why apply the DCT:** The values of neighboring mel bands are strongly correlated with each other. The DCT turns them into coefficients with little correlation and gathers the overall shape (envelope) of the spectrum into the first few coefficients. Usually only about the first 13 coefficients are kept, summarizing one frame as a short vector.
@@ -474,10 +474,11 @@ Although spectrogram features come from old, traditional sound-processing techni
 | 4 | Jiang_THUEE_task2_1 | Pre-trained models, CNN, ensemble | 360M | Spectrogram, raw waveform | specaug | median |
 | 5 | Lv_AITHU_task2_2 | Pre-trained models, ensemble | 360M | Spectrogram | specaug | median |
 | 6 | Jiang_THUEE_task2_2 | Pre-trained models, flow model, ensemble | 360M | Spectrogram | specaug | median |
+| 7 | Jiang_THUEE_task2_3 | Pre-trained models, CNN, flow model, ensemble | 360M | Spectrogram | specaug | median |
 
 *Table 5. Composition of the top systems of DCASE 2024 Task 2*
 
-All of the top systems use the spectrogram as the acoustic feature, and the raw waveform was used only in one system, as an auxiliary input alongside the spectrogram. System complexity is the number of parameters (700M is 700 million), and most are ensembles combining several models pre-trained on large data. In data augmentation, specaug is SpecAugment, a technique that increases training data by masking some time intervals and frequency bands of the spectrogram [16].
+All of the top systems use the spectrogram as the acoustic feature, and the raw waveform was used only in one system, as an auxiliary input alongside the spectrogram. System complexity is the number of parameters (700M is 700 million), and all of them are ensembles combining several models pre-trained on large data. In data augmentation, specaug is SpecAugment, a technique that increases training data by masking some time intervals and frequency bands of the spectrogram [16].
 
 ---
 
@@ -495,7 +496,7 @@ Why bother converting sound into a spectrogram? The image-processing field alrea
 
 ### 5.2 VGGish and Transfer Learning
 
-**VGGish** is a study that applied the VGG model used for images to audio [17]. The suffix "-ish" in the name means that the model is similar to VGG. Google trained several CNN architectures on the sounds of a large number of YouTube videos and showed that image CNNs work well for audio classification, and released the VGG-like model among them as VGGish. The released VGGish takes a log mel spectrogram 0.96 seconds long (96 frames × 64 mel bands) as input and outputs a 128-dimensional feature vector (embedding) [18]. The VGG architecture was covered in Lecture 3.
+**VGGish** is a study that applied the VGG model used for images to audio [17]. The suffix "-ish" in the name means that the model is similar to VGG. Google trained several CNN architectures on the sounds of about 70 million YouTube training videos and showed that image CNNs work well for audio classification, and released the VGG-like model among them as VGGish. The released VGGish takes a log mel spectrogram 0.96 seconds long (96 frames × 64 mel bands) as input and outputs a 128-dimensional feature vector (embedding) [18]. The VGG architecture was covered in Lecture 3.
 
 VGGish is mainly used to extract features of sound data, that is, for **transfer learning**. The front part, already trained on large sound data, is taken as it is and used as a feature extractor, and only the back part suited to the target task is newly trained.
 
@@ -503,7 +504,7 @@ VGGish is mainly used to extract features of sound data, that is, for **transfer
 
 *Figure 17. A lung-sound recognition model that transfers the parameters of VGGish and newly trains a Bi-GRU*
 
-The figure above is an example of applying VGGish to lung-sound recognition [19]. The right is the VGGish network trained on a large audio dataset (AudioSet), which repeats convolution (Conv) and max pooling (Maxpool) and ends with three fully connected layers (FC×3) and a classification layer (FC, Softmax). The lung-sound recognition model on the left transfers the parameters of VGGish from the convolutional layers through FC×3 as they are in the transfer section (Transfer the parameters of VGGish network), and in the retraining section it attaches a bidirectional GRU (Bi-GRU) and a softmax in place of the original classification layer and trains them anew on lung-sound data. Even in fields with little data, such as medical recordings, good performance can be achieved by reusing general sound features learned from large data.
+The figure above is an example of applying VGGish to lung-sound recognition [19]. The right is the VGGish network pre-trained on the sounds of a large number of YouTube videos (the AudioSet at the top of the figure is a YouTube-based audio dataset released together with features extracted by the same model as VGGish), which repeats convolution (Conv) and max pooling (Maxpool) and ends with three fully connected layers (FC×3) and a classification layer (FC, Softmax). The lung-sound recognition model on the left transfers the parameters of VGGish from the convolutional layers through FC×3 as they are in the transfer section (Transfer the parameters of VGGish network), and in the retraining section it attaches a bidirectional GRU (Bi-GRU) and a softmax in place of the original classification layer and trains them anew on lung-sound data. Even in fields with little data, such as medical recordings, good performance can be achieved by reusing general sound features learned from large data.
 
 ---
 
@@ -606,7 +607,7 @@ The accuracy of SED is evaluated in two ways, **segment-based** and **event-base
 1. The event bars of the reference and the system output are divided into 4 segments, and every segment that an event touches even partially is marked active (1) (Segment-based event activity).
 2. For each cell of class and segment, the reference and the output are compared (Segment by segment comparison): TP if both are 1, FP if only the output is 1, FN if only the reference is 1, and TN if both are 0.
 
-Transcribing the five classes (rows) and four segments (columns) of the figure into a table gives the following.
+Writing the five classes (rows) and four segments (columns) of the figure as a table gives the following.
 
 | Class | Reference activity | System output activity | Judgment (segments 1-4) |
 |:-----|:-----|:-----|:-----|
@@ -620,19 +621,19 @@ Transcribing the five classes (rows) and four segments (columns) of the figure i
 
 Counting everything gives TP 9, FP 4, FN 4, and TN 3. Precision, recall, and the F1 score are as follows.
 
-$$
+```math
 P = \frac{TP}{TP + FP} = \frac{9}{13} \approx 0.692, \quad R = \frac{TP}{TP + FN} = \frac{9}{13} \approx 0.692, \quad F_1 = \frac{2PR}{P + R} = \frac{2\,TP}{2\,TP + FP + FN} = \frac{18}{26} \approx 0.692
-$$
+```
 
 SED also uses the **error rate (ER)**. In each segment $k$, when FN and FP occur together they are regarded as replacing one class with another and counted as **substitutions (S)**, the remaining FNs as **deletions (D)**, and the remaining FPs as **insertions (I)** [22].
 
-$$
+```math
 S(k) = \min(FN(k), FP(k)), \quad D(k) = \max(0, FN(k) - FP(k)), \quad I(k) = \max(0, FP(k) - FN(k))
-$$
+```
 
-$$
+```math
 \text{ER} = \frac{\sum_k S(k) + \sum_k D(k) + \sum_k I(k)}{\sum_k N(k)}
-$$
+```
 
 $N(k)$ is the number of classes active in the reference in segment $k$. Applying this to the example above gives the following.
 
@@ -685,7 +686,7 @@ As an example of accuracy, consider the results of DCASE 2017 Task 3 (sound even
 
 *Table 8. Segment-based error rates and F1 scores of the top systems of DCASE 2017 Task 3*
 
-Even the first-ranked system has an ER of about 0.79 and an F1 of about 42%. This shows that finding acoustic events accurately in real-life recordings, where many sounds overlap and background noise is heavy, is still harder than speech recognition. Also, because the ranking is by ER, the second-ranked system with a higher F1 (42.9%) is below the first-ranked system with a lower ER (0.7914).
+Even the first-ranked system has an ER of about 0.79 and an F1 of about 42%. This shows that finding acoustic events accurately in real-life recordings, where many sounds overlap and background noise is heavy, is difficult. Also, because the ranking is by ER, the second-ranked system with a higher F1 (42.9%) is below the first-ranked system with a lower ER (0.7914).
 
 ![Figure 27. The FarmSonic screen, which detects coughs in a barn and counts them by type](../../images/Lec06_p34.png)
 
@@ -815,7 +816,7 @@ As an application of SED, FarmSonic analyzes the sounds of a barn to detect live
    <details>
    <summary>Answer</summary>
 
-   In segment 1, A is TP and B is FP ($N = 1$, S = 0, D = 0, I = 1). In segment 2, A is FN and B is TP ($N = 2$, S = 0, D = 1, I = 0). In segment 3, B is TP ($N = 1$). The totals are TP 3, FP 1, FN 1, so $F_1 = 6 / (6 + 1 + 1) = 0.75$. $\text{ER} = (0 + 1 + 1) / 4 = 0.5$.
+   In segment 1, A is TP and B is FP ($N = 1$, S = 0, D = 0, I = 1). In segment 2, A is FN and B is TP ($N = 2$, S = 0, D = 1, I = 0). In segment 3, B is TP ($`N = 1`$). The totals are TP 3, FP 1, FN 1, so $F_1 = 6 / (6 + 1 + 1) = 0.75$. $\text{ER} = (0 + 1 + 1) / 4 = 0.5$.
 
    </details>
 
@@ -834,7 +835,7 @@ As an application of SED, FarmSonic analyzes the sounds of a barn to detect live
 
 ## References
 
-1. NVIDIA, "How to build domain specific automatic speech recognition models on GPUs," *NVIDIA Technical Blog*, 2020. https://developer.nvidia.com/blog/how-to-build-domain-specific-automatic-speech-recognition-models-on-gpus/
+1. A. Flores Miranda, P. Chitale, and J. Cohen, "How to build domain specific automatic speech recognition models on GPUs," *NVIDIA Technical Blog*, 2019. https://developer.nvidia.com/blog/how-to-build-domain-specific-automatic-speech-recognition-models-on-gpus/
 2. J. Li, V. Lavrukhin, B. Ginsburg, R. Leary, O. Kuchaiev, J. M. Cohen, H. Nguyen, and R. T. Gadde, "Jasper: An end-to-end convolutional neural acoustic model," in *Proc. Interspeech*, 2019, pp. 71-75.
 3. S. Kriman, S. Beliaev, B. Ginsburg, J. Huang, O. Kuchaiev, V. Lavrukhin, R. Leary, J. Li, and Y. Zhang, "QuartzNet: Deep automatic speech recognition with 1D time-channel separable convolutions," in *Proc. IEEE Int. Conf. Acoustics, Speech and Signal Processing (ICASSP)*, 2020, pp. 6124-6128.
 4. A. Graves, S. Fernández, F. Gomez, and J. Schmidhuber, "Connectionist temporal classification: Labelling unsegmented sequence data with recurrent neural networks," in *Proc. Int. Conf. Machine Learning (ICML)*, 2006, pp. 369-376.

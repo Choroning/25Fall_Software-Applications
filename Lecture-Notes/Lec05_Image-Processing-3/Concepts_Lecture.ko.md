@@ -120,9 +120,9 @@
 
 두 형식은 다음 식으로 서로 바꿀 수 있다.
 
-$$
+```math
 x = \frac{x_1 + x_2}{2}, \quad y = \frac{y_1 + y_2}{2}, \quad w = x_2 - x_1, \quad h = y_2 - y_1
-$$
+```
 
 예를 들어 1.2절의 고양이 상자 `[10, 50, 100, 200]`을 모서리 형식으로 읽으면 너비는 $100 - 10 = 90$, 높이는 $200 - 50 = 150$, 중심은 $(55, 125)$이므로 중심 형식으로는 $(55, 125, 90, 150)$이다. 초기의 탐지 연구는 모서리 형식을 많이 썼고, 최근의 모델은 중심 형식을 많이 쓴다. 같은 네 숫자라도 형식에 따라 전혀 다른 상자가 되므로, 데이터셋과 라이브러리를 쓰기 전에 어떤 형식인지, 좌표를 이미지 크기로 나누어 0~1 범위로 정규화했는지 확인해야 한다.
 
@@ -144,7 +144,7 @@ $$
 4. 각 상자의 넓이는 $100 \times 100 = 10000$이므로 합집합의 넓이는 $10000 + 10000 - 7200 = 12800$이다. 교집합을 한 번 빼는 것은 두 넓이를 더할 때 겹친 부분이 두 번 세어지기 때문이다.
 5. $\text{IoU} = 7200 / 12800 = 0.5625$이다.
 
-IoU는 이 강의의 여러 곳에 쓰인다. YOLO는 예측 상자의 신뢰도를 IoU로 정의하고(3.4절), NMS는 IoU로 중복 상자를 찾으며(3.7절), 평가에서는 IoU로 예측이 맞았는지를 판정한다(4.1절).
+IoU는 객체 탐지의 여러 단계에 쓰인다. YOLO는 예측 상자의 신뢰도를 IoU로 정의하고(3.4절), NMS는 IoU로 중복 상자를 찾으며(3.7절), 평가에서는 IoU로 예측이 맞았는지를 판정한다(4.1절).
 
 ### 1.4 객체 탐지의 발전과 두 계열
 
@@ -247,9 +247,9 @@ R-CNN은 다음 네 단계로 동작한다.
 
 **바운딩 박스 회귀.** 선택적 탐색이 낸 상자는 객체를 대략적으로만 감싸므로, 같은 특징으로 상자를 얼마나 옮기고 늘일지를 회귀로 예측한다. 제안 상자를 중심 형식 $P = (P_x, P_y, P_w, P_h)$, 정답 상자를 $G = (G_x, G_y, G_w, G_h)$라 하면 모델이 학습하는 목표값은 다음과 같다 [5].
 
-$$
+```math
 t_x = \frac{G_x - P_x}{P_w}, \quad t_y = \frac{G_y - P_y}{P_h}, \quad t_w = \log\frac{G_w}{P_w}, \quad t_h = \log\frac{G_h}{P_h}
-$$
+```
 
 중심의 이동량을 제안 상자의 너비와 높이로 나누면 상자의 크기와 무관한 상대적인 이동량이 되고, 크기 변화에 로그를 취하면 항상 양수인 배율을 제약 없는 실수로 다룰 수 있다. 예를 들어 $P = (100, 100, 50, 80)$, $G = (110, 96, 60, 80)$이면 $t_x = 10/50 = 0.2$, $t_y = -4/80 = -0.05$, $t_w = \ln(60/50) = \ln 1.2 \approx 0.182$, $t_h = \ln(80/80) = 0$이다. 즉 중심을 너비의 20%만큼 오른쪽으로, 높이의 5%만큼 위로 옮기고, 너비를 1.2배로 늘이라는 뜻이다.
 
@@ -338,7 +338,7 @@ YOLO v1은 입력 이미지를 $S \times S = 7 \times 7$개의 그리드 셀로 
   - $x$, $y$: 상자 중심의 좌표를 셀의 왼쪽 위 모서리를 기준으로, 셀 크기로 나눈 값(0~1)이다.
   - $w$, $h$: 상자의 너비와 높이를 이미지 전체의 너비와 높이로 나눈 값(0~1)이다.
   - $c$: 상자의 신뢰도(confidence)이다(3.4절).
-- **클래스 확률 $C = 20$개:** 셀에 객체가 있다고 할 때 그 객체가 각 클래스일 조건부 확률 $\Pr(\text{Class}_i \mid \text{Object})$이다. YOLO v1이 학습한 PASCAL VOC 데이터셋의 클래스가 20개이기 때문이다. 상자의 수와 관계없이 셀마다 한 세트만 예측한다(그림의 아래쪽, 셀마다 하나의 색).
+- **클래스 확률 $C = 20$개:** 셀에 객체가 있다고 할 때 그 객체가 각 클래스일 조건부 확률 $`\Pr(\text{Class}_i \mid \text{Object})`$이다. YOLO v1이 학습한 PASCAL VOC 데이터셋의 클래스가 20개이기 때문이다. 상자의 수와 관계없이 셀마다 한 세트만 예측한다(그림의 아래쪽, 셀마다 하나의 색).
 
 따라서 셀 하나의 출력은 $B \times 5 + C = 2 \times 5 + 20 = 30$개의 값이고, 전체 출력은 $7 \times 7 \times 30$ 텐서, 즉 1,470개의 숫자이다. 셀 하나의 출력 벡터는 다음과 같이 배치된다.
 
@@ -362,12 +362,12 @@ YOLO v1은 입력 이미지를 $S \times S = 7 \times 7$개의 그리드 셀로 
 
 YOLO v1에서 상자의 **신뢰도(confidence)** 는 다음과 같이 정의한다 [2].
 
-$$
+```math
 \text{confidence} = \Pr(\text{Object}) \times \text{IoU}_{\text{pred}}^{\text{truth}}
-$$
+```
 
 - $\Pr(\text{Object})$는 그 상자 안에 객체가 있을 확률이다.
-- $\text{IoU}_{\text{pred}}^{\text{truth}}$는 예측 상자와 정답 상자의 IoU이다(1.3절).
+- $`\text{IoU}_{\text{pred}}^{\text{truth}}`$는 예측 상자와 정답 상자의 IoU이다(1.3절).
 
 신뢰도는 객체가 있는지와, 있다면 상자가 얼마나 정확한지를 하나의 수로 합친 것이다. 셀에 객체가 없으면 신뢰도는 0이어야 하고, 객체가 있으면 예측 상자와 정답 상자의 IoU와 같아야 한다. 학습할 때 신뢰도의 목표값도 이 정의를 따른다.
 
@@ -377,21 +377,21 @@ $$
 
 YOLO v1은 모든 출력값의 오차를 제곱 오차의 합으로 계산하며, 손실 함수는 상자 위치의 오차, 신뢰도의 오차, 클래스 확률의 오차의 세 부분으로 이루어진다 [2].
 
-$$
+```math
 \begin{aligned}
 \mathcal{L} = {} & \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{obj}} \left[ (x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2 \right] \\
 & + \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{obj}} \left[ \left( \sqrt{w_i} - \sqrt{\hat{w}_i} \right)^2 + \left( \sqrt{h_i} - \sqrt{\hat{h}_i} \right)^2 \right] \\
 & + \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{obj}} \left( C_i - \hat{C}_i \right)^2 + \lambda_{\text{noobj}} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{noobj}} \left( C_i - \hat{C}_i \right)^2 \\
 & + \sum_{i=0}^{S^2} \mathbf{1}_{i}^{\text{obj}} \sum_{c \in \text{classes}} \left( p_i(c) - \hat{p}_i(c) \right)^2
 \end{aligned}
-$$
+```
 
 기호의 뜻은 다음과 같다.
 
 - $i$는 그리드 셀의 번호, $j$는 셀 안의 상자 번호이다. 모자(^)를 쓴 값과 쓰지 않은 값 중 하나는 예측값, 다른 하나는 정답값이다. 제곱 오차이므로 어느 쪽을 예측값으로 쓰든 값은 같다.
-- $\mathbf{1}_{ij}^{\text{obj}}$는 $i$번째 셀에 객체가 있고, 그 셀의 $j$번째 상자가 그 객체를 **책임지는** 상자일 때 1, 아니면 0이다. 셀의 두 상자 중 정답 상자와의 IoU가 더 큰 쪽이 책임을 진다.
-- $\mathbf{1}_{ij}^{\text{noobj}}$는 책임지는 객체가 없는 상자일 때 1이다.
-- $\mathbf{1}_{i}^{\text{obj}}$는 $i$번째 셀에 객체(의 중심)가 있을 때 1이다.
+- $`\mathbf{1}_{ij}^{\text{obj}}`$는 $i$번째 셀에 객체가 있고, 그 셀의 $j$번째 상자가 그 객체를 **책임지는** 상자일 때 1, 아니면 0이다. 셀의 두 상자 중 정답 상자와의 IoU가 더 큰 쪽이 책임을 진다.
+- $`\mathbf{1}_{ij}^{\text{noobj}}`$는 책임지는 객체가 없는 상자일 때 1이다.
+- $`\mathbf{1}_{i}^{\text{obj}}`$는 $i$번째 셀에 객체(의 중심)가 있을 때 1이다.
 
 > **참고:** 논문의 표기는 합의 범위를 $i = 0$부터 $S^2$까지, $j = 0$부터 $B$까지로 쓰지만, 실제 의미는 $S^2$개의 셀 전체와 셀마다 $B$개의 상자 전체에 대한 합이다. 0부터 세면 마지막 번호는 $S^2 - 1$과 $B - 1$이다.
 
@@ -420,9 +420,9 @@ $$
 
 왼쪽처럼 98개의 상자를 모두 그리면 이미지가 상자로 뒤덮인다. 실제로 탐지해야 할 상자만 남기기 위해, 상자마다 신뢰도와 셀의 클래스별 확률을 곱해 **클래스별 신뢰도 점수(class-specific confidence score)** 를 만든다 [2].
 
-$$
+```math
 \Pr(\text{Class}_i \mid \text{Object}) \times \Pr(\text{Object}) \times \text{IoU}_{\text{pred}}^{\text{truth}} = \Pr(\text{Class}_i) \times \text{IoU}_{\text{pred}}^{\text{truth}}
-$$
+```
 
 ![그림 17. 상자의 신뢰도와 셀의 클래스 확률 20개를 곱해 상자마다 20차원 점수 벡터를 만드는 과정](../../images/Lec05_p22.png)
 
@@ -585,9 +585,11 @@ YOLO는 v1 이후 여러 연구 그룹과 기업이 이름을 이어 받아 계�
 
 *표 8. YOLOv1부터 YOLOv26까지의 핵심 혁신, 태스크, 프레임워크*
 
-표에서 몇 가지 흐름을 읽을 수 있다. 첫째, YOLOv2의 앵커 박스 도입 이후 YOLOv6와 YOLOv8에서 앵커 없는 설계로 옮겨 갔다. 둘째, YOLOv10과 YOLOv26은 3.7절의 NMS 후처리 없이 끝까지 하나의 모델로 탐지한다. 셋째, YOLOv12는 8강에서 다룰 어텐션 기법을, YOLOv13은 9강에서 다룰 깊이별 분리 합성곱 같은 경량화 기법을 받아들였다. 넷째, 태스크가 객체 탐지에서 분할, 자세 추정, 추적으로 넓어졌다. 다만 표에 적힌 YOLOv5의 앵커 없는 헤드, YOLOv6의 셀프 어텐션, YOLOv7의 트랜스포머 모듈, YOLOv8의 GAN 기반 증강은 조사 연구의 서술이며, 각 모델의 원 논문이나 공식 문서에서는 확인되지 않는다.
+표에서 몇 가지 흐름을 읽을 수 있다. 첫째, YOLOv2의 앵커 박스 도입 이후 YOLOv6와 YOLOv8에서 앵커 없는 설계로 옮겨 갔다. 둘째, YOLOv10과 YOLOv26은 3.7절의 NMS 후처리 없이 끝까지 하나의 모델로 탐지한다. 셋째, YOLOv12는 8강에서 다룰 어텐션 기법을, YOLOv13은 9강에서 다룰 깊이별 분리 합성곱 같은 경량화 기법을 받아들였다. 넷째, 태스크가 객체 탐지에서 분할, 자세 추정, 추적으로 넓어졌다.
 
-YOLO는 실제 현장에서도 널리 쓰인다. 한 응용 예는 농장 출입구의 CCTV 영상(1920×1080, 초당 6프레임)에서 들어오는 트럭을 탐지하는 시스템이다. 이 시스템은 영상 수신, 차량 번호판 인식, 차에서 사람이 내리는지 판단, 객체 추적, 결과 시각화와 서버 업로드를 각각의 스레드로 나누어 동시에 실행하고, 장비가 켜지는 것과 같은 사건을 시각과 함께 서버로 보낸다. 다른 예는 축사 내부 카메라에서 돼지를 탐지하고 개체마다 번호를 붙여 추적하는 시스템이다.
+> **참고:** 표 8의 일부 서술은 각 모델의 원 논문이나 공식 문서와 다르다. 원래의 YOLOv5는 앵커 기반 탐지 헤드를 쓰며, 앵커 없는 헤드는 이후 Ultralytics가 YOLOv8의 헤드를 가져와 만든 YOLOv5u에서 도입되었다. YOLOv6의 EfficientRep 백본은 셀프 어텐션이 아니라 재파라미터화가 가능한 합성곱 블록(RepVGG 방식)으로 이루어진다. YOLOv7 논문에는 트랜스포머 기반 모듈이 없고, YOLOv8의 데이터 증강(Mosaic, Mixup 등)에도 GAN 기반 증강은 없다.
+
+YOLO는 실제 현장에서도 널리 쓰인다. 한 응용 예는 CCTV 영상(1920×1080, 초당 6프레임)에서 화물차를 탐지하는 시스템이다. 이 시스템은 영상 수신, 차량 번호판 인식, 차에서 사람이 내리는지 판단, 객체 추적, 결과 시각화와 서버 업로드를 각각의 스레드로 나누어 동시에 실행하고, 장비가 켜지는 것과 같은 사건을 시각과 함께 서버로 보낸다. 다른 예는 축사 내부 카메라에서 돼지를 탐지하고 개체마다 번호를 붙여 추적하는 시스템이다.
 
 ![그림 23. 축사 영상에서 돼지를 탐지하고 개체 번호를 붙여 추적한 결과](../../images/Lec05_p32.png)
 
@@ -653,9 +655,9 @@ YOLO는 실제 현장에서도 널리 쓰인다. 한 응용 예는 농장 출입
 
 TP는 5개, FP는 2개이다. 정답 상자 6개 중 P6의 자동차만 맞힌 예측이 없으므로 FN은 1개이다. 4강에서 정의한 정밀도와 재현율을 다시 쓰면 다음과 같다.
 
-$$
+```math
 \text{Precision} = \frac{TP}{TP + FP}, \qquad \text{Recall} = \frac{TP}{TP + FN}
-$$
+```
 
 **정밀도(precision)** 는 모델이 예측한 것 중 맞은 비율이고, **재현율(recall)** 은 실제 정답 중 모델이 찾아낸 비율이다. 이 예에서 정밀도는 $5 / (5 + 2) = 5/7 \approx 0.714$, 재현율은 $5 / (5 + 1) = 5/6 \approx 0.833$이다. 재현율의 분모 $TP + FN$은 정답 상자의 총수와 같다.
 
@@ -733,9 +735,9 @@ IoU 임계값과 별개로, 모델이 낸 상자 중 어느 신뢰도 이상을 
 
 **AP(Average Precision, 평균 정밀도)** 는 PR 곡선 아래의 넓이로, 재현율 0부터 1까지에 걸친 정밀도의 평균이라는 뜻이다. 톱니 모양을 그대로 적분하면 작은 흔들림에 민감하므로, 보통 다음과 같이 **보간한 정밀도(interpolated precision)** 를 쓴다.
 
-$$
+```math
 p_{\text{interp}}(r) = \max_{\tilde{r} \ge r} p(\tilde{r})
-$$
+```
 
 즉 재현율 $r$에서의 정밀도를, $r$ 이상의 재현율에서 얻을 수 있는 정밀도 중 최댓값으로 바꾼다. 재현율을 $r$ 이상으로 요구할 때 기대할 수 있는 최선의 정밀도를 뜻하며, 그 결과 곡선은 오른쪽으로 갈수록 내려가기만 하는 계단 모양(주황색 점선)이 된다. 예제에서 보간한 정밀도는 다음과 같다.
 
@@ -755,11 +757,11 @@ $$
 
 AP는 클래스 하나에 대해 계산한다. **mAP(mean Average Precision)** 는 클래스마다 AP를 구해 평균한 값이다.
 
-$$
+```math
 \text{mAP} = \frac{1}{n} \sum_{k=1}^{n} \text{AP}_k
-$$
+```
 
-여기서 $\text{AP}_k$는 클래스 $k$의 AP, $n$은 클래스의 수이다. 예를 들어 클래스가 3개이고 각 AP가 0.845, 0.70, 0.60이면 $\text{mAP} = (0.845 + 0.70 + 0.60) / 3 = 0.715$이다.
+여기서 $`\text{AP}_k`$는 클래스 $k$의 AP, $n$은 클래스의 수이다. 예를 들어 클래스가 3개이고 각 AP가 0.845, 0.70, 0.60이면 $\text{mAP} = (0.845 + 0.70 + 0.60) / 3 = 0.715$이다.
 
 COCO 데이터셋 [12]은 IoU 임계값과 객체 크기를 바꾸어 가며 여러 AP를 보고한다 [13]. COCO에서는 클래스 평균까지 포함한 값도 AP라고 부른다.
 
@@ -947,17 +949,17 @@ IoU 임계값을 0.5 하나로 정하면 상자가 대충만 맞아도 TP가 되
 
 ## 참고 문헌
 
-1. S. Ren, K. He, R. Girshick, and J. Sun, "Faster R-CNN: Towards real-time object detection with region proposal networks," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 28, 2015, pp. 91-99.
-2. J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You only look once: Unified, real-time object detection," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, 2016, pp. 779-788.
-3. W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, "SSD: Single shot multibox detector," in *Proc. European Conf. Computer Vision (ECCV)*, 2016, pp. 21-37.
-4. Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, "Object detection in 20 years: A survey," *Proceedings of the IEEE*, vol. 111, no. 3, pp. 257-276, 2023.
-5. R. Girshick, J. Donahue, T. Darrell, and J. Malik, "Rich feature hierarchies for accurate object detection and semantic segmentation," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, 2014, pp. 580-587.
-6. J. R. R. Uijlings, K. E. A. van de Sande, T. Gevers, and A. W. M. Smeulders, "Selective search for object recognition," *International Journal of Computer Vision*, vol. 104, no. 2, pp. 154-171, 2013.
-7. R. Girshick, "Fast R-CNN," in *Proc. IEEE Int. Conf. Computer Vision (ICCV)*, 2015, pp. 1440-1448.
-8. Ultralytics, "Ultralytics YOLO," GitHub repository. https://github.com/ultralytics/ultralytics
-9. R. Sapkota *et al.*, "YOLO26: Key architectural enhancements and performance benchmarking for real-time object detection," arXiv:2509.25164, 2025.
-10. R. Padilla, S. L. Netto, and E. A. B. da Silva, "A survey on performance metrics for object-detection algorithms," in *Proc. Int. Conf. Systems, Signals and Image Processing (IWSSIP)*, 2020, pp. 237-242.
-11. M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman, "The PASCAL visual object classes (VOC) challenge," *International Journal of Computer Vision*, vol. 88, no. 2, pp. 303-338, 2010.
-12. T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, "Microsoft COCO: Common objects in context," in *Proc. European Conf. Computer Vision (ECCV)*, 2014, pp. 740-755.
-13. COCO Consortium, "Detection evaluation," COCO Dataset. https://cocodataset.org/#detection-eval
-14. C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, 2023, pp. 7464-7475.
+1. S. Ren, K. He, R. Girshick, and J. Sun, "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 28, pp. 91-99, 2015.
+2. J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 779-788, 2016.
+3. W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, "SSD: Single Shot MultiBox Detector," in *Proc. European Conf. Computer Vision (ECCV)*, pp. 21-37, 2016.
+4. Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, "Object Detection in 20 Years: A Survey," *Proceedings of the IEEE*, vol. 111, no. 3, pp. 257-276, 2023.
+5. R. Girshick, J. Donahue, T. Darrell, and J. Malik, "Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 580-587, 2014.
+6. J. R. R. Uijlings, K. E. A. van de Sande, T. Gevers, and A. W. M. Smeulders, "Selective Search for Object Recognition," *Int. J. Computer Vision*, vol. 104, no. 2, pp. 154-171, 2013.
+7. R. Girshick, "Fast R-CNN," in *Proc. IEEE Int. Conf. Computer Vision (ICCV)*, pp. 1440-1448, 2015.
+8. Ultralytics, "Ultralytics YOLO," *GitHub*, accessed Nov. 4, 2026. https://github.com/ultralytics/ultralytics
+9. R. Sapkota, R. H. Cheppally, A. Sharda, and M. Karkee, "YOLO26: Key Architectural Enhancements and Performance Benchmarking for Real-Time Object Detection," arXiv:2509.25164, 2025.
+10. R. Padilla, S. L. Netto, and E. A. B. da Silva, "A Survey on Performance Metrics for Object-Detection Algorithms," in *Proc. Int. Conf. Systems, Signals and Image Processing (IWSSIP)*, pp. 237-242, 2020.
+11. M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman, "The PASCAL Visual Object Classes (VOC) Challenge," *Int. J. Computer Vision*, vol. 88, no. 2, pp. 303-338, 2010.
+12. T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, "Microsoft COCO: Common Objects in Context," in *Proc. European Conf. Computer Vision (ECCV)*, pp. 740-755, 2014.
+13. COCO Consortium, "Detection Evaluation," *COCO Dataset*, accessed Nov. 4, 2026. https://cocodataset.org/#detection-eval
+14. C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable Bag-of-Freebies Sets New State-of-the-Art for Real-Time Object Detectors," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 7464-7475, 2023.

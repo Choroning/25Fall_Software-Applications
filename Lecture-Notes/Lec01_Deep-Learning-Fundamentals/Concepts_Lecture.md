@@ -79,7 +79,7 @@ An industrial revolution is a technological change that fundamentally transforms
 | First industrial revolution | 18th century | Mechanization with the steam engine |
 | Second industrial revolution | 19th century - early 20th century | Mass production with electric power |
 | Third industrial revolution | Late 20th century | Informatization with computers and the internet |
-| Fourth industrial revolution | Early 21st century | Intelligence with AI, big data, and hyper-connectivity |
+| Fourth industrial revolution | Early 21st century | Intelligence with AI, big data, and hyper-connectivity (spreading to fields such as biotechnology, energy, geoengineering, and space technology) |
 
 *Table 1. The four industrial revolutions and their key technologies*
 
@@ -131,7 +131,7 @@ graph LR
 - **Application:** the service or product that users use, such as a self-driving car or a face-recognition entry system.
 - **Task:** a concrete problem the application must solve. Self-driving splits into several tasks, such as object detection to find pedestrians and vehicles and semantic segmentation to separate lanes and roads.
 - **Model:** a concrete neural network design that solves a task. VGG, GoogLeNet, and ResNet are representative models that performed well in image classification (VGG appears in the Lecture 1 lab and Lecture 3, and ResNet in Lectures 3-4).
-- **Network:** the basic form of neural network that a model is built from. A **DNN (deep neural network)** stacks fully connected layers deeply, a **CNN (convolutional neural network)** uses the convolution operation, and an **RNN (recurrent neural network)** processes ordered data with a recurrent structure. CNNs and RNNs are covered in Lecture 2.
+- **Network:** the basic form of neural network that a model is built from. A **DNN (deep neural network)** broadly means any deep neural network, but when listed alongside CNNs and RNNs it refers to a network that stacks fully connected layers deeply; a **CNN (convolutional neural network)** uses the convolution operation, and an **RNN (recurrent neural network)** processes ordered data with a recurrent structure. CNNs and RNNs are covered in Lecture 2.
 
 > **Key Point:** An application developer breaks the application into tasks and chooses a model suited to each task. This course focuses on the middle two levels: defining the task and understanding and using a model that fits it.
 
@@ -172,7 +172,7 @@ Machine learning is divided into three kinds according to the signal used for le
 |:-----|:-----|:-----|:-----|
 | **Supervised learning** | Pairs of inputs and correct answers (labels) | A function that predicts the answer from the input | Classification (image classification, customer retention, identity fraud detection, diagnostics), regression (advertising popularity prediction, weather forecasting, market forecasting, life expectancy estimation, population growth prediction) |
 | **Unsupervised learning** | Inputs without answers | Structure or patterns hidden in the data | Dimensionality reduction (meaningful compression, structure discovery, big data visualization, feature elicitation), clustering (recommender systems, targeted marketing, customer segmentation) |
-| **Reinforcement learning** | Rewards and penalties received while interacting with an environment | Actions that maximize the cumulative reward | Real-time decisions, game AI, robot navigation, skill acquisition |
+| **Reinforcement learning** | Rewards and penalties received while interacting with an environment | Actions that maximize the cumulative reward | Real-time decisions, game AI, robot navigation, skill acquisition, learning tasks |
 
 *Table 5. Comparison of the three learning types*
 
@@ -184,7 +184,7 @@ Machine learning is divided into three kinds according to the signal used for le
 
 The upper half of Figure 4 is supervised learning. When a model is trained on apple photos (input data) together with the answer (annotation) "These are apples", it predicts that an apple photo it has never seen is an apple. The lower half is unsupervised learning. When photos of mixed apples, peaches, and bananas are given without answers, the model groups similar-looking items into an apple group, a peach group, and a banana group. The model does not know the name of each group; it only finds that the groups differ from one another.
 
-The rest of this note assumes supervised learning.
+The following sections assume supervised learning.
 
 ---
 
@@ -238,13 +238,13 @@ In the network of Figure 6, a hidden node such as $h_1$ receives the two inputs 
 
 ### 2.3 Input and Output of a Neural Network: Dog and Cat Classification
 
-Consider a neural network that classifies whether an input photo shows a dog or a cat. We decide that it should output 0 for a dog photo and 1 for a cat photo.
+Consider a neural network that classifies whether an input photo shows a dog or a cat. The network is set to output 0 for a dog photo and 1 for a cat photo.
 
 ![Figure 7. A classification model that turns an image into an array of rows, columns, and channels, feeds it to a neural network, and outputs 0 for a dog and 1 for a cat](../../images/Lec01_p11.png)
 
 *Figure 7. A classification model that turns an image into an array of rows, columns, and channels, feeds it to a neural network, and outputs 0 for a dog and 1 for a cat*
 
-Computers process all data as arrays of numbers, that is, **tensors**. A color image is a three-dimensional array of rows, columns, and channels. There are three channels, red (R), green (G), and blue (B), and each element gives the brightness of that color at that position as an integer from 0 to 255. The small example in Figure 7 is a $3 \times 3 \times 3$ array with 3 rows, 3 columns, and 3 channels. The values of this array enter the input layer, pass through the hidden layers, and produce a value close to 0 or 1 at the output layer.
+Computers process all data as arrays of numbers, that is, **tensors**. A color image is a three-dimensional array of rows, columns, and channels. There are three channels, red (R), green (G), and blue (B), and in an image stored with 8 bits per channel each element gives the brightness of that color at that position as an integer from 0 to 255. The small example in Figure 7 is a $3 \times 3 \times 3$ array with 3 rows, 3 columns, and 3 channels. The values of this array enter the input layer, pass through the hidden layers, and produce a value close to 0 or 1 at the output layer.
 
 Before training, the weights are arbitrary values, so the network can produce a value far from 0 even for a dog photo. The process of adjusting the weights over many dog and cat photos so that dogs give 0 and cats give 1 is **training**.
 
@@ -277,18 +277,18 @@ The superscripts $(1), (2)$ indicate which layer a weight belongs to.
 
 An artificial neuron adds a **bias** $b$ to the weighted sum and passes the result through an **activation function** $h$ to produce its output.
 
-$$
+```math
 y = h(w_1x_1 + w_2x_2 + b)
-$$
+```
 
 - The **bias** controls how easily the neuron is activated. It acts like the intercept of a line, allowing the neuron to output a nonzero value even when all inputs are 0 and letting the model fit the data more flexibly. In diagrams it is sometimes drawn as a weight $b$ on an input whose value is always 1.
 - The **activation function** converts the total input signal $a = w_1x_1 + w_2x_2 + b$ into the output signal. It decides whether the total input signal activates the neuron.
 
 For example, if $x_1 = 1$, $x_2 = 0.5$, $w_1 = 0.4$, $w_2 = -0.2$, and $b = 0.1$, the total is as follows.
 
-$$
+```math
 a = 0.4 \times 1 + (-0.2) \times 0.5 + 0.1 = 0.4 - 0.1 + 0.1 = 0.4
-$$
+```
 
 If the activation function is the sigmoid $\sigma(a) = 1/(1+e^{-a})$, the output is $\sigma(0.4) \approx 0.599$. With the same inputs and weights, changing only the bias to $b = -1$ gives $a = -0.7$, and the output drops to $\sigma(-0.7) \approx 0.332$. The smaller the bias (the more negative it is), the larger the input signal needed to activate the neuron.
 
@@ -312,13 +312,13 @@ The representative activation functions are as follows. The total input signal i
 
 $a$ is a constant that sets the steepness of the curve, and $a = 1$ is usual. In that case the logistic sigmoid is written $\sigma(s)$, and its derivative $\sigma'(s) = \sigma(s)(1 - \sigma(s))$ is derived as follows.
 
-$$
+```math
 \sigma(s) = (1 + e^{-s})^{-1} \quad\Rightarrow\quad \sigma'(s) = -(1 + e^{-s})^{-2} \cdot (-e^{-s}) = \frac{e^{-s}}{(1 + e^{-s})^2} = \frac{1}{1 + e^{-s}} \cdot \frac{e^{-s}}{1 + e^{-s}} = \sigma(s)\,(1 - \sigma(s))
-$$
+```
 
 The last equality holds because $\dfrac{e^{-s}}{1 + e^{-s}} = 1 - \dfrac{1}{1 + e^{-s}} = 1 - \sigma(s)$. This derivative has its maximum $0.5 \times 0.5 = 0.25$ at $s = 0$, a property related to gradients becoming smaller and smaller in deep networks (vanishing gradients in Lecture 2 Section 3.6 and Lecture 3 Section 5). The hyperbolic tangent sigmoid satisfies $\dfrac{2}{1 + e^{-as}} - 1 = \tanh(as/2)$, so with $a = 2$ it equals the ordinary $\tanh(s)$.
 
-Evaluating the functions at a few inputs gives the following ($a = 1$, and tanh is the ordinary $\tanh(s)$).
+Evaluating the functions at a few inputs gives the following ($a = 1$, and tanh is the ordinary $`\tanh(s)`$).
 
 | $s$ | Sigmoid | tanh | Softplus | ReLU |
 |:-----:|:-----:|:-----:|:-----:|:-----:|
@@ -339,9 +339,9 @@ Two functions are commonly used in the final output layer, depending on the kind
 
 Softmax transforms the output-layer values $z_1, \dots, z_K$ as follows.
 
-$$
+```math
 \text{softmax}(z)_i = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}, \qquad i = 1, \dots, K
-$$
+```
 
 An output-layer value $z_i$ before the activation function is applied is called a **logit**. For example, if the logits for the three classes dog, cat, and chicken are $z = (2.0, 1.0, 0.1)$, the computation proceeds as follows.
 
@@ -370,31 +370,31 @@ The exponential is always positive, so every output is positive, and the denomin
 
 A **linear function** is a function that can be expressed by a single straight line, $f(x) = ax + b$, and a **nonlinear function** is one that cannot. The activation functions of a neural network must be nonlinear, because with linear activation functions there is no point in making the network deeper. If there is no activation function or it is linear, the result after any number of hidden layers is the same as a single linear transformation.
 
-Suppose that in a network made of one input $x_1$, two hidden nodes ($a_1, a_2$), and a next-layer node $b_1$, the activation function is the linear function $h(x) = cx$.
+Suppose that in a network made of one input $x_1$, two hidden nodes ($`a_1, a_2`$), and a next-layer node $b_1$, the activation function is the linear function $h(x) = cx$.
 
-$$
+```math
 a_1 = h(w_1^{(1)}x_1) = cw_1^{(1)}x_1, \qquad a_2 = h(w_2^{(1)}x_1) = cw_2^{(1)}x_1
-$$
+```
 
-$$
+```math
 \begin{aligned}
 b_1 &= h(w_1^{(2)}a_1 + w_2^{(2)}a_2) = cw_1^{(2)}a_1 + cw_2^{(2)}a_2 \\
 &= c^2w_1^{(1)}w_1^{(2)}x_1 + c^2w_2^{(1)}w_2^{(2)}x_1 \\
 &= \left(c^2w_1^{(1)}w_1^{(2)} + c^2w_2^{(1)}w_2^{(2)}\right)x_1
 \end{aligned}
-$$
+```
 
-The expression in parentheses is a constant that does not depend on $x_1$. This two-layer network therefore computes the same function as the one-layer network $b_1 = h\left((cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)})x_1\right)$, whose weight is replaced by $w_1^{(1)} \to cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)}$. For example, with $c = 1$, $w_1^{(1)} = 2$, $w_2^{(1)} = 3$, $w_1^{(2)} = 4$, and $w_2^{(2)} = 5$, we get $b_1 = (2 \cdot 4 + 3 \cdot 5)x_1 = 23x_1$, which cannot be distinguished from a single connection with weight 23.
+The expression in parentheses is a constant that does not depend on $x_1$. This two-layer network therefore computes the same function as the one-layer network $b_1 = h\left((cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)})x_1\right)$, whose weight is replaced by $w_1^{(1)} \to cw_1^{(1)}w_1^{(2)} + cw_2^{(1)}w_2^{(2)}$. For example, with $c = 1$, $w_1^{(1)} = 2$, $w_2^{(1)} = 3$, $w_1^{(2)} = 4$, and $w_2^{(2)} = 5$, the result is $b_1 = (2 \cdot 4 + 3 \cdot 5)x_1 = 23x_1$, which cannot be distinguished from a single connection with weight 23.
 
-The same argument holds with more nodes and layers. Writing the weights of layer $l$ as a matrix $W_l$ and its biases as a vector $\mathbf{b}_l$, two layers without activation functions compute the following.
+The same argument holds with more nodes and layers. Writing the weights of layer $l$ as a matrix $W_l$ and its biases as a vector $`\mathbf{b}_l`$, two layers without activation functions compute the following.
 
-$$
+```math
 W_2(W_1\mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2 = (W_2W_1)\mathbf{x} + (W_2\mathbf{b}_1 + \mathbf{b}_2) = W'\mathbf{x} + \mathbf{b}'
-$$
+```
 
 However many layers are stacked, the result equals one layer with a single matrix $W'$ and vector $\mathbf{b}'$. Only by inserting nonlinear activation functions between the layers does this collapse not happen, so that stacking more layers can express more complex functions.
 
-> **[Linear Algebra]** In linear algebra, the composition of linear transformations is again a linear transformation whose matrix is the product $W_2W_1$ of the two matrices. Because matrix multiplication is associative, composing $n$ linear transformations is still represented by the single matrix $W_n \cdots W_2W_1$. The equation above shows that, because of this property, depth loses its meaning when the layers of a neural network are linear.
+> **[Linear Algebra]** In linear algebra, the composition of linear transformations is again a linear transformation whose matrix is the product $W_2W_1$ of the two matrices. Because matrix multiplication is associative, composing $n$ linear transformations is still represented by the single matrix $W_n \cdots W_2W_1$. A layer with a bias, $W\mathbf{x} + \mathbf{b}$, is an affine transformation, and a composition of affine transformations is again an affine transformation. The equation above shows that, because of this property, depth loses its meaning when the layers of a neural network are linear.
 
 ### 3.5 Why Nonlinearity Is Needed: A Conceptual Check
 
@@ -410,7 +410,7 @@ Conceptually, the need for nonlinearity can be understood from the shape of the 
 
 Real data are rarely separated cleanly by straight lines. Hidden layers with nonlinear activation functions learn from data a transformation that moves the input into a space where it is easy to separate, as above.
 
-A classic example is the XOR problem, whose output is 1 only when the two inputs differ. The points (0, 0) and (1, 1) map to 0 and (0, 1) and (1, 0) map to 1, so no single line separates them, but one hidden layer with a nonlinear function (here the step function $u$, which outputs 1 if $s \ge 0$ and 0 if $s < 0$) solves it. Setting the hidden nodes to $h_1 = u(x_1 + x_2 - 0.5)$ and $h_2 = u(x_1 + x_2 - 1.5)$ and the output to $y = u(h_1 - h_2 - 0.5)$ gives the following.
+A classic example is the XOR problem, whose output is 1 only when the two inputs differ. The points (0, 0) and (1, 1) map to 0 and (0, 1) and (1, 0) map to 1, so no single line separates them, but one hidden layer with a nonlinear function (here the step function $u$, which outputs 1 if $s \ge 0$ and 0 if $`s < 0`$) solves it. Setting the hidden nodes to $h_1 = u(x_1 + x_2 - 0.5)$ and $h_2 = u(x_1 + x_2 - 1.5)$ and the output to $y = u(h_1 - h_2 - 0.5)$ gives the following.
 
 | $x_1$ | $x_2$ | $h_1$ | $h_2$ | $y$ |
 |:-----:|:-----:|:-----:|:-----:|:-----:|
@@ -450,17 +450,17 @@ The second step of training is error computation. The closer the network's outpu
 
 A **loss function** expresses the error (loss) between a deep learning model's output and the answer as a single number. The goal of deep learning training is to find the weights and biases that minimize the loss. Representative loss functions include the mean squared error (MSE), cross-entropy, and focal loss.
 
-The **mean squared error (MSE)** is the average of the squared differences between the answers $y_i$ and the predictions $\hat{y}_i$.
+The **mean squared error (MSE)** is the average of the squared differences between the answers $y_i$ and the predictions $`\hat{y}_i`$.
 
-$$
+```math
 \text{MSE} = \frac{1}{N}\sum_{i=1}^{N}\left(y_i - \hat{y}_i\right)^2
-$$
+```
 
-For the example in Section 4.1, the MSE between the prediction $\hat{\mathbf{y}} = (0.8, 0.1, 0.1)$ and the answer $\mathbf{y} = (1, 0, 0)$ is as follows ($N = 3$).
+For the example in Section 4.1, the MSE between the prediction $\hat{\mathbf{y}} = (0.8, 0.1, 0.1)$ and the answer $\mathbf{y} = (1, 0, 0)$ is as follows ($`N = 3`$).
 
-$$
+```math
 \text{MSE} = \frac{(1 - 0.8)^2 + (0 - 0.1)^2 + (0 - 0.1)^2}{3} = \frac{0.04 + 0.01 + 0.01}{3} = 0.02
-$$
+```
 
 If the prediction worsens to $(0.3, 0.4, 0.3)$, the loss grows to $\text{MSE} = (0.49 + 0.16 + 0.09)/3 \approx 0.247$. Because the differences are squared, large errors are penalized more, and the loss is at least 0 regardless of the sign of the error. As in Section 6, the sum of squared errors multiplied by $1/2$ instead of $1/N$ is sometimes used, because the exponent 2 and the $1/2$ cancel when differentiating and the formula becomes simpler. MSE is used mainly for regression, which predicts continuous values.
 
@@ -468,31 +468,31 @@ If the prediction worsens to $(0.3, 0.4, 0.3)$, the loss grows to $\text{MSE} = 
 
 **Cross-entropy** is the most widely used loss function for classification. For a label vector $\mathbf{y}$ and a predicted probability vector $\mathbf{o}$, it is defined as follows.
 
-$$
+```math
 L_{\text{CE}} = -\sum_{k=1}^{c} y_k \log o_k
-$$
+```
 
 If the label vector is one-hot, only the term of the correct class $t$ remains and $L_{\text{CE}} = -\log o_t$. In the example above, if the predicted probability of the correct class (dog) is 0.8, the loss is $-\ln 0.8 \approx 0.223$, and if it is 0.3, the loss is $-\ln 0.3 \approx 1.204$. When the probability of the correct class is close to 1 the loss is close to 0, and when it is close to 0 the loss grows without bound. Cross-entropy therefore puts a very large penalty on confident wrong predictions.
 
 In binary classification, if the output $o$ is taken as the probability of class 1, cross-entropy becomes the following **binary cross-entropy**.
 
-$$
+```math
 L_{\text{BCE}} = -\left[y\log o + (1 - y)\log(1 - o)\right]
-$$
+```
 
 If the answer is $y = 1$, only $-\log o$ remains, and if $y = 0$, only $-\log(1 - o)$ remains. For example, if the sigmoid output separating dog (0) from cat (1) is $o = 0.07$ for a dog photo, then $L_{\text{BCE}} = -\ln(1 - 0.07) = -\ln 0.93 \approx 0.073$.
 
 **Focal loss** multiplies cross-entropy by $(1 - p_t)^{\gamma}$, reducing the loss of easy examples that are already predicted well and concentrating training on hard examples [2]. Here $p_t$ is the predicted probability of the correct class and $\gamma \ge 0$ is a focusing parameter.
 
-$$
+```math
 L_{\text{FL}} = -(1 - p_t)^{\gamma}\log p_t
-$$
+```
 
 With $\gamma = 2$, an easy example with $p_t = 0.8$ gets $(0.2)^2 \times 0.223 \approx 0.0089$, 1/25 of its cross-entropy, but a hard example with $p_t = 0.3$ gets $(0.7)^2 \times 1.204 \approx 0.590$, reduced only by about half. With $\gamma = 0$ it equals cross-entropy. Focal loss was proposed for object detection (Lecture 5), where easy examples such as background vastly outnumber the others.
 
 | Loss function | Formula | Main use |
 |:-----|:-----|:-----|
-| Mean squared error | $\frac{1}{N}\sum (y_i - \hat{y}_i)^2$ | Regression |
+| Mean squared error | $`\frac{1}{N}\sum (y_i - \hat{y}_i)^2`$ | Regression |
 | Cross-entropy | $-\sum y_k \log o_k$ | Classification (with softmax or sigmoid outputs) |
 | Focal loss | $-(1 - p_t)^{\gamma}\log p_t$ | Classification with severe class imbalance, object detection |
 
@@ -512,15 +512,15 @@ If the loss is viewed as a function $J(\theta)$ of the weights, training is the 
 
 *Figure 11. Finding the direction of the minimum from the slope of the tangent, and the path of gradient descent down to a local minimum of x² sin x*
 
-- In the left graph, the slope is negative to the left of the minimum and positive to the right, and it is 0 at the minimum (the target $\theta$). Moving so that $\theta$ increases when the slope is negative and decreases when the slope is positive brings $\theta$ closer to the minimum.
+- In the left graph, the slope is negative to the left of the minimum and positive to the right, and it is 0 at the minimum (the target $`\theta`$). Moving so that $\theta$ increases when the slope is negative and decreases when the slope is positive brings $\theta$ closer to the minimum.
 - To find the minimum of a function, one can differentiate and find where the slope is 0. However, the loss function of a neural network is a complicated function of millions of weights, so the equation for a zero slope cannot be solved at once. There are also many points with zero slope, and there is no guarantee that a local minimum among them is the global minimum.
 - So the slope at the current position is computed and a small step is taken in the opposite direction, repeatedly. This method is **gradient descent**. A larger tangent slope calls for a larger update.
 
-$$
+```math
 \theta \leftarrow \theta - \eta\,\frac{\partial J}{\partial \theta}
-$$
+```
 
-$\eta$ is a positive number that sets how far to move at once (Section 5.2). The right graph applies gradient descent to $f(x) = x^2\sin x$. Starting from $(2.5, 3.7)$, it descends along the valley (the graph marks the position after 50 iterations near $x = 4.9$), and further iterations converge to the local minimum $(5.09, -24.08)$ at $x \approx 5.09$. Because ever deeper valleys keep appearing as $x$ grows in $x^2\sin x$, this point is only a local minimum and not the minimum of the whole function. Gradient descent can converge to a local minimum near the starting point.
+$\eta$ is a positive number that sets how far to move at once (Section 5.2). The right graph applies gradient descent to $f(x) = x^2\sin x$. Starting from $(2.5, 3.7)$, it descends along the valley (the graph marks the position after 50 iterations near $`x = 4.9`$), and further iterations converge to the local minimum $(5.09, -24.08)$ at $x \approx 5.09$. Because ever deeper valleys keep appearing as $x$ grows in $x^2\sin x$, this point is only a local minimum and not the minimum of the whole function. Gradient descent can converge to a local minimum near the starting point.
 
 **Worked example.** Start from $w_0 = 0$ with $\eta = 0.1$ on $J(w) = (w - 3)^2$. The derivative is $J'(w) = 2(w - 3)$.
 
@@ -542,9 +542,9 @@ The gradient is negative, so $w$ moves in the increasing direction, and as it ap
 
 Smooth convergence to the minimum requires an appropriate step size, that is, a suitable **learning rate** $\eta$.
 
-$$
+```math
 w \leftarrow w - \eta\,\frac{\partial L}{\partial w}
-$$
+```
 
 ![Figure 12. Paths on y = x² when the learning rate is too small, appropriate, and too large](../../images/Lec01_p23.png)
 
@@ -569,9 +569,9 @@ Since $w_k = (1 - 2\eta)^k w_0$, the iteration converges only when $\lvert 1 - 2
 
 A concrete algorithm that searches for the minimum of the loss function is called an **optimizer**, and there are many of them. The updates of classical stochastic gradient descent (SGD) and of SGD with momentum are as follows ($\rho$ is the learning rate and $\alpha$ the momentum coefficient).
 
-$$
+```math
 \text{Classical SGD: } \mathbf{w} \leftarrow \mathbf{w} - \rho\frac{\partial J}{\partial \mathbf{w}} \qquad\qquad \text{SGD with momentum: } \mathbf{v} \leftarrow \alpha\mathbf{v} - \rho\frac{\partial J}{\partial \mathbf{w}}, \quad \mathbf{w} \leftarrow \mathbf{w} + \mathbf{v}
-$$
+```
 
 In momentum, $\mathbf{v}$ is a velocity vector that keeps the previous movement scaled by $\alpha$ (usually 0.9). If the gradient keeps pointing the same way, the movement accelerates, and if its direction alternates, the movements cancel and oscillation decreases. Optimizers can be compared to ways of finding a good narrow trail down a mountain, and they have developed as follows.
 
@@ -605,15 +605,15 @@ graph LR
 
 *Table 16. Ideas of the main optimizers*
 
-When the paths of several optimizers are compared on a surface with a saddle point, which goes down in one direction and up in another, SGD tends to linger near the saddle point, methods that adapt the step size per weight such as Adagrad, AdaDelta, and RMSProp escape quickly, and Momentum and NAG escape after swinging wide because of their inertia [3].
+When the paths of several optimizers are compared on a surface with a saddle point, which goes down in one direction and up in another, SGD, Momentum, and NAG have difficulty leaving the neighborhood of the saddle point and only Momentum and NAG eventually escape, whereas methods that adapt the step size per weight, such as Adagrad, AdaDelta, and RMSProp, quickly head down the descending direction [3].
 
-Adam, the most widely used optimizer today, keeps both a moving average $m_t$ of the gradient $g_t$ (direction) and a moving average $v_t$ of the squared gradient (step size) [4].
+Adam, a widely used optimizer, keeps both a moving average $m_t$ of the gradient $g_t$ (direction) and a moving average $v_t$ of the squared gradient (step size) [4].
 
-$$
+```math
 m_t = \beta_1 m_{t-1} + (1 - \beta_1)g_t, \quad v_t = \beta_2 v_{t-1} + (1 - \beta_2)g_t^2, \quad \hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}, \quad w_t = w_{t-1} - \eta\frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
-$$
+```
 
-$\hat{m}_t$ and $\hat{v}_t$ correct the bias of moving averages started at 0, which are too small at first, and the defaults are $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$. Dividing by $\sqrt{\hat{v}_t}$ shrinks the step for weights whose gradients fluctuate strongly.
+$`\hat{m}_t`$ and $`\hat{v}_t`$ correct the bias of moving averages started at 0, which are too small at first, and the defaults are $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$. Dividing by $`\sqrt{\hat{v}_t}`$ shrinks the step for weights whose gradients fluctuate strongly.
 
 ---
 
@@ -625,9 +625,9 @@ $\hat{m}_t$ and $\hat{v}_t$ correct the bias of moving averages started at 0, wh
 
 Gradient descent requires the partial derivative of the loss $\partial L/\partial w$ for every weight $w$. **Error backpropagation** computes these partial derivatives in order, starting from the weights near the output layer and going back toward the input layer [5]. Derivatives computed on the output side are reused when computing the derivatives of the layer before, so the gradients of all weights can be obtained with roughly the cost of one forward pass. Each weight then changes a little with its gradient as follows.
 
-$$
+```math
 w \leftarrow w - \eta\,\frac{\partial L}{\partial w}
-$$
+```
 
 Backpropagation proceeds in this order. It first computes how the weights directly connected to the output layer affected the error, then computes the responsibility of the hidden layer just before in a chain, and repeats this down to the first layer. When it finishes, it is known how much and in which direction (sign) every weight contributed to the final error.
 
@@ -664,41 +664,41 @@ Forward propagation gives the following node values (rounded to four decimal pla
 
 The output $y_1 = a_{20} = 0.6091$ is larger than its target 0.3, and $y_2 = a_{21} = 0.6337$ is smaller than its target 0.9. Defining the total error as the sum of squared errors multiplied by $1/2$ gives the following.
 
-$$
+```math
 E_{tot} = \frac{1}{2}\left((target_{y1} - a_{20})^2 + (target_{y2} - a_{21})^2\right) = \frac{1}{2}\left((0.3 - 0.6091)^2 + (0.9 - 0.6337)^2\right) = \frac{1}{2}(0.0956 + 0.0709) \approx 0.0832
-$$
+```
 
 ### 6.3 Decomposing the Gradient with the Chain Rule
 
 Training the weight $w_{10}^{(1)}$ (the weight from node 10 to node 20) requires $\partial E_{tot}/\partial w_{10}^{(1)}$. $w_{10}^{(1)}$ changes $z_{20}$, $z_{20}$ changes $a_{20}$, and $a_{20}$ changes $E_{tot}$. Splitting the derivative into three parts along this chain of influence is the **chain rule**.
 
-$$
+```math
 \frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = \underbrace{\frac{\partial E_{tot}}{\partial a_{20}}}_{①} \cdot \underbrace{\frac{\partial a_{20}}{\partial z_{20}}}_{②} \cdot \underbrace{\frac{\partial z_{20}}{\partial w_{10}^{(1)}}}_{③}
-$$
+```
 
 ① **Rate of change of the error with respect to the output.** The second term of $E_{tot}$ does not contain $a_{20}$, so its derivative is 0. The first term is $\frac{1}{2}u^2$ with $u = target_{y1} - a_{20}$, whose derivative is $u \cdot \frac{\partial u}{\partial a_{20}} = u \cdot (-1)$.
 
-$$
+```math
 \frac{\partial E_{tot}}{\partial a_{20}} = (target_{y1} - a_{20}) \cdot (-1) + 0 = -(target_{y1} - a_{20})
-$$
+```
 
 ② **Rate of change of the output with respect to the weighted sum.** Since $a_{20} = \text{sigmoid}(z_{20})$, the sigmoid derivative of Section 3.2 applies.
 
-$$
+```math
 \frac{\partial a_{20}}{\partial z_{20}} = \text{sigmoid}(z_{20}) \cdot (1 - \text{sigmoid}(z_{20})) = a_{20}(1 - a_{20})
-$$
+```
 
 ③ **Rate of change of the weighted sum with respect to the weight.** $z_{20} = w_{10}^{(1)}a_{10} + w_{20}^{(1)}a_{11}$, and the second term does not depend on $w_{10}^{(1)}$.
 
-$$
+```math
 \frac{\partial z_{20}}{\partial w_{10}^{(1)}} = a_{10} + 0 = a_{10}
-$$
+```
 
 Multiplying the three parts gives the following.
 
-$$
+```math
 \frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = -(target_{y1} - a_{20}) \cdot \text{sigmoid}(z_{20}) \cdot (1 - \text{sigmoid}(z_{20})) \cdot a_{10}
-$$
+```
 
 > **[Calculus]** In calculus, the chain rule is the differentiation rule for composite functions: if $y = f(u)$ and $u = g(x)$, then $\frac{dy}{dx} = \frac{dy}{du}\cdot\frac{du}{dx}$. With several variables, when $x$ affects $y$ along several paths, the products along each path are added. In Section 6.5, the output of a hidden node affects both output nodes, and adding the contributions of the two paths is this multivariable chain rule.
 
@@ -706,31 +706,31 @@ $$
 
 Substitute the values of Table 17.
 
-$$
+```math
 \frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = -(0.3 - 0.6091) \times 0.6091 \times (1 - 0.6091) \times 0.5187 = 0.3091 \times 0.2381 \times 0.5187 \approx 0.0382
-$$
+```
 
 With the learning rate $\eta = 0.5$, the gradient descent update is as follows.
 
-$$
+```math
 w_{10}^{(1)+} = w_{10}^{(1)} - \eta\,\frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = 0.4 - 0.5 \times 0.0382 = 0.3809
-$$
+```
 
 The effect of $w_{10}^{(1)}$ on the total error is 0.0382, and the updated value $w_{10}^{(1)+}$ is 0.3809. A positive gradient means that increasing $w_{10}^{(1)}$ increases the error. Indeed, the output $a_{20} = 0.6091$ is larger than the target 0.3, so decreasing this weight to lower $a_{20}$ is the right direction.
 
-> **Note:** If the intermediate values are cut to three decimal places ($a_{20} = 0.609$, $a_{10} = 0.518$), the gradient becomes $0.309 \times 0.609 \times 0.391 \times 0.518 \approx 0.0381$ and the updated value $0.4 - 0.5 \times 0.0381 \approx 0.381$. Only the last digit changes slightly with the cut-off position; the result is the same.
+> **Note:** If the intermediate values are cut to three decimal places ($a_{20} = 0.609$, $`a_{10} = 0.518`$), the gradient becomes $0.309 \times 0.609 \times 0.391 \times 0.518 \approx 0.0381$ and the updated value $0.4 - 0.5 \times 0.0381 \approx 0.381$. Only the last digit changes slightly with the cut-off position; the result is the same.
 
 ### 6.5 Updating All Weights and the Result of One Backpropagation Pass
 
 The remaining weights are computed the same way. To simplify the formulas, the **error signal** $\delta$ of an output node is defined as the product of ① and ②.
 
-$$
+```math
 \delta_{20} = (a_{20} - target_{y1})\,a_{20}(1 - a_{20}) = 0.3091 \times 0.2381 \approx 0.0736, \qquad \delta_{21} = (a_{21} - target_{y2})\,a_{21}(1 - a_{21}) = (-0.2663) \times 0.2321 \approx -0.0618
-$$
+```
 
 The gradient of an output-layer weight is then "the $\delta$ of the destination node × the output of the source node".
 
-| Weight | Connection | Gradient $\partial E_{tot}/\partial w$ | After update ($\eta = 0.5$) |
+| Weight | Connection | Gradient $\partial E_{tot}/\partial w$ | After update ($`\eta = 0.5`$) |
 |:-----|:-----|:-----|:-----|
 | $w_{10}^{(1)}$ | node 10 → node 20 | $\delta_{20}a_{10} = 0.0736 \times 0.5187 = 0.0382$ | $0.4 - 0.5 \times 0.0382 = 0.3809$ |
 | $w_{20}^{(1)}$ | node 11 → node 20 | $\delta_{20}a_{11} = 0.0736 \times 0.5250 = 0.0386$ | $0.45 - 0.5 \times 0.0386 = 0.4307$ |
@@ -743,19 +743,19 @@ $y_2$ is smaller than its target, so the gradients of the weights entering node 
 
 **Going back to the hidden layer.** The output $a_{10}$ of hidden node 10 affects both $z_{20}$ and $z_{21}$, so the contributions of the two paths are added (multivariable chain rule).
 
-$$
+```math
 \frac{\partial E_{tot}}{\partial a_{10}} = \delta_{20}w_{10}^{(1)} + \delta_{21}w_{11}^{(1)} = 0.0736 \times 0.4 + (-0.0618) \times 0.5 = 0.0294 - 0.0309 \approx -0.00147
-$$
+```
 
 Multiplying by the sigmoid derivative $a_{10}(1 - a_{10}) = 0.5187 \times 0.4813 \approx 0.2496$ gives the error signal of hidden node 10, $\delta_{10} \approx -0.000366$, and multiplying by the input $x_1 = 0.5$ gives the gradient.
 
-$$
+```math
 \frac{\partial E_{tot}}{\partial w_{10}^{(0)}} = \delta_{10}\,x_1 \approx -0.000366 \times 0.5 \approx -0.000183, \qquad w_{10}^{(0)+} = 0.15 + 0.5 \times 0.000183 \approx 0.1501
-$$
+```
 
 For hidden node 11 in the same way, $\delta_{20}w_{20}^{(1)} + \delta_{21}w_{21}^{(1)} = 0.0331 - 0.0340 \approx -0.00088$, $\delta_{11} \approx -0.00088 \times 0.2494 \approx -0.000219$, and the gradient is $\approx -0.000109$, so $w_{11}^{(0)+} \approx 0.2001$. The hidden-layer gradients use the output-layer weights before the update (0.4, 0.5, 0.45, 0.55), because backpropagation first computes all gradients and then updates all weights at once.
 
-> **Key Point:** The general rule of backpropagation fits in three lines. The error signal of an output node is $\delta = (a - target)\,\sigma'(z)$, the error signal of a hidden node is $\delta_j = \left(\sum_k \delta_k w_{jk}\right)\sigma'(z_j)$ (the error signals of the next layer gathered backward through the weights), and the gradient of a weight is "the $\delta$ of the destination node × the output of the source node". It is called backpropagation because $\delta$ is passed backward one layer at a time starting from the output layer.
+> **Key Point:** The general rule of backpropagation fits in three lines. The error signal of an output node is $`\delta = (a - target)\,\sigma'(z)`$, the error signal of a hidden node is $\delta_j = \left(\sum_k \delta_k w_{jk}\right)\sigma'(z_j)$ (the error signals of the next layer gathered backward through the weights), and the gradient of a weight is "the $\delta$ of the destination node × the output of the source node". It is called backpropagation because $\delta$ is passed backward one layer at a time starting from the output layer.
 
 Running forward propagation again with the updated weights changes the outputs as follows.
 
@@ -805,7 +805,7 @@ The test set is needed separately for the following reason. The validation set h
 
 ### 7.2 Overfitting and Underfitting
 
-**Overfitting** is the phenomenon in which a model predicts the training data almost perfectly but performs much worse on new data it did not see during training. It is like a student who memorized the questions and answers of a workbook while studying for an exam and cannot solve new questions.
+**Overfitting** is the phenomenon in which a model predicts the training data almost perfectly but performs much worse on new data it did not see during training. It is like a student who memorized the questions and answers of a workbook and cannot solve questions never seen before.
 
 ![Figure 16. Decision boundaries in the underfitting, appropriate fitting, and overfitting states](../../images/Lec01_p34.png)
 
@@ -828,7 +828,7 @@ In the training data of Figure 17, every apple photo shows a bright red apple wi
 ### 7.3 Ways to Reduce Overfitting
 
 1. **Diversifying the data:** if the model is shown more and more varied data than it can memorize, it has no choice but to learn the essential common patterns of the data. More data are collected, or the existing images are transformed by flipping, cropping, color changes, and so on to increase their number, which is data augmentation (Lecture 4).
-2. **Reducing the model's complexity:** the model is deliberately made simpler by reducing the number of layers or neurons per layer. Alternatively, a penalty term that keeps the weights from growing too large (for example, $L + \lambda\sum w^2$) is added to the loss function to regularize the weights. Large weights make the output react strongly to small changes in the input, so keeping the weights small leads the model to learn more general patterns.
+2. **Reducing the model's complexity:** the model is deliberately made simpler by reducing the number of layers or neurons per layer. Alternatively, a penalty term that keeps the weights from growing too large (for example, $`L + \lambda\sum w^2`$) is added to the loss function to regularize the weights. Large weights make the output react strongly to small changes in the input, so keeping the weights small leads the model to learn more general patterns.
 3. **Dropout (node deletion):** at every training step, a random part of the neurons in the hidden layers is deactivated [6]. Since the network cannot rely on particular neurons, each neuron learns features that are useful on their own.
 
 ![Figure 18. A standard neural network and the network after applying dropout](../../images/Lec01_p36.png)
@@ -841,9 +841,9 @@ On the right of Figure 18, the nodes marked ⊗ are the nodes deleted in that tr
 
 The weights could be updated by backpropagating the gradient computed for each single image, but this requires many updates and thus much computation, and the gradient of a single image is noisy, which can make training unstable. So the gradients of several images are collected and averaged, and the weights are updated only once. The number of data points whose gradients are collected for one update is called the **batch size**, and each bundle of data of that size is called a **mini-batch**.
 
-$$
+```math
 \mathbf{g} = \frac{1}{B}\sum_{i=1}^{B}\nabla_{\mathbf{w}} L_i, \qquad \mathbf{w} \leftarrow \mathbf{w} - \eta\,\mathbf{g}
-$$
+```
 
 $B$ is the batch size and $L_i$ is the loss of the $i$-th data point in the mini-batch.
 
@@ -941,7 +941,9 @@ print(torch.cuda.is_available())  # True on a GPU runtime
 - The program that runs the cells is the **kernel**, and it keeps remembering variables across cells. This makes it convenient to load data once and experiment with it across several cells.
 - On a local computer, it is installed with `pip install jupyterlab` and started with the `jupyter lab` command.
 
-| Python IDE or editor | Share of users |
+The following table shows the results of a 2018 poll in which KDnuggets, a website on data science and machine learning, asked more than 1,900 readers which Python editors and IDEs they had used most that year (up to three choices); Jupyter was used most [9]. Because several answers were allowed, the shares add up to more than 100%.
+
+| Python IDE or editor | Share of respondents |
 |:-----|:-----:|
 | Jupyter | 57% |
 | PyCharm | 35% |
@@ -957,7 +959,7 @@ print(torch.cuda.is_available())  # True on a GPU runtime
 | gedit | 1.3% |
 | Rodeo | 1.2% |
 
-*Table 24. The most popular Python IDEs and editors in a survey of Python developers*
+*Table 24. Shares of respondents who reported using each Python IDE or editor most in a 2018 reader poll*
 
 > **Caution:** Notebook cells can be run in any order, so the order of the code on screen and the actual state of the kernel can differ. To let others reproduce the results, it is good practice to restart the kernel at the end and run all cells again from the top.
 
@@ -967,7 +969,7 @@ A **framework** is a kind of package that bundles the libraries and modules for 
 
 | Framework | Developer | Characteristics |
 |:-----|:-----|:-----|
-| Keras | Google | Provides a concise high-level API that stacks layers like blocks, and is used together with TensorFlow. |
+| Keras | Google | Provides a concise high-level API that stacks layers like blocks. It was long used together with TensorFlow, and since Keras 3 it runs on a backend chosen from JAX, TensorFlow, and PyTorch [10]. |
 | PyTorch | Facebook (now Meta) | Builds the computation graph in the order the Python code runs, which makes debugging easy, and is widely used in research and industry. The labs of this course use PyTorch. |
 
 *Table 25. Comparison of Keras and PyTorch*
@@ -1006,7 +1008,7 @@ The first row of `w1.grad` holds the gradients of the weights entering node 20, 
 
 ### 8.4 Docker
 
-**Docker** is a tool that packages an application with the libraries and settings it needs into an isolated unit called a **container**, so that it runs the same way anywhere [9]. In deep learning it is used to reproduce environments exactly, such as combinations of Python, CUDA, and PyTorch versions that are hard to match.
+**Docker** is a tool that packages an application with the libraries and settings it needs into an isolated unit called a **container**, so that it runs the same way anywhere [11]. In deep learning it is used to reproduce environments exactly, such as combinations of Python, CUDA, and PyTorch versions that are hard to match.
 
 ![Figure 21. Comparison of the Docker container architecture and the virtual machine architecture](../../images/Lec01_p43.png)
 
@@ -1028,12 +1030,12 @@ docker run -it pytorch/pytorch python -c "import torch; print(torch.__version__)
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | Even with 10 hidden layers, a network whose activation functions are all linear is no more expressive than a network with no hidden layer. | **T.** A composition of linear transformations is one linear transformation, so it reduces to a single $W'\mathbf{x} + \mathbf{b}'$ (Section 3.4). |
 | Depending on the logits, the softmax outputs can sum to more than 1. | **F.** The denominator is the sum of all numerators, so the outputs always sum to 1. |
 | A larger learning rate always reaches the minimum faster. | **F.** In the $w^2$ example, $\eta > 1$ overshoots the minimum and diverges, and $\eta = 1$ bounces between $\pm w_0$ forever (Section 5.2). |
-| A weight whose backpropagated gradient is positive becomes smaller after a gradient descent update. | **T.** In $w \leftarrow w - \eta\,\partial L/\partial w$, with $\eta > 0$ and a positive gradient, $w$ decreases. |
+| A weight whose backpropagated gradient is positive becomes smaller after a gradient descent update. | **T.** In $`w \leftarrow w - \eta\,\partial L/\partial w`$, with $\eta > 0$ and a positive gradient, $w$ decreases. |
 | If a model was chosen with the validation set, its validation accuracy can be reported as the final performance as it is. | **F.** It may be an optimistic value fitted to the validation set during selection, so the performance is measured on a test set not used in selection. |
 | Training on 1,000 data points with batch size 100 updates the weights 10 times per epoch. | **T.** $1000/100 = 10$ iterations, with one update per iteration. |
 
@@ -1053,7 +1055,7 @@ docker run -it pytorch/pytorch python -c "import torch; print(torch.__version__)
 | Activation functions | They include the step, sigmoid, tanh, softplus, and ReLU functions. They must be nonlinear for stacking layers to make sense. The derivative of the sigmoid is $\sigma(1 - \sigma)$. |
 | Output-layer functions | Binary classification uses the sigmoid (one output), and multi-class classification uses softmax (outputs summing to 1). |
 | Loss functions | MSE is the mean of squared errors and is used mainly for regression, and cross-entropy $-\log o_t$ is used for classification. Focal loss scales the loss of easy examples by $(1 - p_t)^{\gamma}$. |
-| Gradient descent | $w \leftarrow w - \eta\,\partial L/\partial w$ moves a little in the direction opposite to the gradient. A learning rate that is too small is slow, and one that is too large diverges. |
+| Gradient descent | $`w \leftarrow w - \eta\,\partial L/\partial w`$ moves a little in the direction opposite to the gradient. A learning rate that is too small is slow, and one that is too large diverges. |
 | Optimizers | Momentum and NAG improved the step direction, Adagrad, RMSProp, and AdaDelta improved the step size, and Adam combines the two. |
 | Error backpropagation | With the chain rule, the error signal $\delta$ is passed backward from the output layer to obtain the gradients. The gradient of a weight is the product of the destination node's $\delta$ and the source node's output. |
 | Dataset split | The training set is for training, the validation set for model selection, and the test set for a single final performance measurement. |
@@ -1172,4 +1174,6 @@ docker run -it pytorch/pytorch python -c "import torch; print(torch.__version__)
 6. N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever, and R. Salakhutdinov, "Dropout: A Simple Way to Prevent Neural Networks from Overfitting," *Journal of Machine Learning Research*, vol. 15, pp. 1929-1958, 2014.
 7. NVIDIA, "CUDA C++ Programming Guide," accessed Nov. 4, 2026. https://docs.nvidia.com/cuda/cuda-c-programming-guide/
 8. Google, "Colaboratory Frequently Asked Questions," accessed Nov. 4, 2026. https://research.google.com/colaboratory/faq.html
-9. Docker, "What is a Container?," accessed Nov. 4, 2026. https://www.docker.com/resources/what-container/
+9. G. Piatetsky, "Here are the most popular Python IDEs / Editors," *KDnuggets*, Dec. 2018, accessed Nov. 4, 2026. https://www.kdnuggets.com/2018/12/most-popular-python-ide-editor.html
+10. Keras, "Getting started with Keras," accessed Nov. 4, 2026. https://keras.io/getting_started/
+11. Docker, "What is a Container?," accessed Nov. 4, 2026. https://www.docker.com/resources/what-container/

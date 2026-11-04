@@ -58,7 +58,7 @@ A **natural language** is a language people use to communicate in everyday life,
 
 Natural language processing is hard for two main reasons.
 
-- **It requires an understanding of human language.** Whether the English word "bank" means a financial institution or the side of a river can only be decided from context. To resolve such ambiguity, a computer must handle the meanings of words together with their context.
+- **It requires an understanding of human language.** Whether the Korean word "배" means a pear (fruit), a boat (vehicle), or the belly (body part) can only be decided from context. To resolve such ambiguity, a computer must handle the meanings of words together with their context.
 - **Languages vary widely in structure and form.** English separates words with spaces, so splitting words on whitespace is easy, but Chinese has no spaces, so even finding word boundaries is difficult. Korean uses spaces, but it is an agglutinative language in which a particle attaches to a noun to form one spacing unit, as in "나는" (noun "나" plus particle "는"), so a whitespace-separated unit is not necessarily a unit of meaning.
 
 ### 1.2 Corpus, Token, and Tokenization
@@ -265,7 +265,7 @@ Natural language processing is already used in many everyday services. Typical e
 
 *Table 5. Representative NLP tasks and related services*
 
-This lecture covers embedding, which turns text into numbers (Section 3), and sentiment analysis (Section 4); seq2seq, attention, and the Transformer, which underlie translation and generation, are covered in Lecture 8.
+Section 3 below covers embedding, which turns text into numbers, and Section 4 covers sentiment analysis; seq2seq, attention, and the Transformer, which underlie translation and generation, are covered in Lecture 8.
 
 ---
 
@@ -279,7 +279,7 @@ A neural network can only compute with numbers, so to use natural language as in
 
 > **Definition:** In natural language processing, an **embedding** is the result, or the process, of converting the language people use (natural language) into a numeric **vector** that a computer can understand. Turning one word into one vector is a **word embedding**, and turning a whole sentence or document into one vector is a **document embedding**.
 
-In a good word embedding, the vectors of words with similar meanings lie close together. The following figure shows the embeddings of several words on a two-dimensional plane. Means of transport such as Train, Bus, Taxi, Car, and Bicycle, drinks and ingredients such as Espresso, Cappuccino, Sugar, and Lemon, education words such as Tutor, Student, School, and University, and pet words such as Cat, Dog, Pet, and Grooming each form a cluster, and King and Queen lie close together.
+In a good word embedding, the vectors of words with similar meanings lie close together. The following figure shows the embeddings of several words on a two-dimensional plane. Means of transport such as Train, Bus, Taxi, Car, and Bicycle (with Cycling and Athlete next to them), drinks and ingredients such as Espresso, Cappuccino, Sugar, and Lemon, education words such as Tutor, Student, School, and University, exercise words such as Yoga and Pilates, and pet words such as Cat, Dog, Pet, and Grooming each form a cluster, and King and Queen lie close together.
 
 ![Figure 2. A two-dimensional visualization of word embeddings in which words with similar meanings cluster](../../images/Lec07_p09.png)
 
@@ -289,9 +289,9 @@ Real embedding vectors usually have tens to hundreds of dimensions, so such pict
 
 Closeness between vectors is commonly measured by **cosine similarity**. The cosine similarity of two vectors $\mathbf{u}$ and $\mathbf{v}$ is the cosine of the angle between them.
 
-$$
+```math
 \cos(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u} \cdot \mathbf{v}}{\lVert \mathbf{u} \rVert \, \lVert \mathbf{v} \rVert}
-$$
+```
 
 Its value lies between $-1$ and $1$; it is close to 1 when the two vectors point in the same direction and 0 when they are perpendicular.
 
@@ -386,19 +386,19 @@ The TF-IDF value is the product of the frequency of a word in a specific documen
 
 Let $D$ be the document collection, $N$ the number of documents, $t$ a word, and $d$ a document. Each value is defined as follows.
 
-$$
+```math
 \mathrm{TF}(t, d) = \text{number of times word } t \text{ appears in document } d
-$$
+```
 
-$$
+```math
 \mathrm{IDF}(t, D) = \log \frac{N}{\mathrm{DF}(t)}, \qquad \mathrm{DF}(t) = \text{number of documents containing word } t
-$$
+```
 
-$$
+```math
 \text{TF-IDF}(t, d, D) = \mathrm{TF}(t, d) \times \mathrm{IDF}(t, D)
-$$
+```
 
-IDF has the following properties. A word that appears in every document has $\mathrm{DF}(t) = N$, so its IDF is $\log 1 = 0$ and its TF-IDF is 0. A word that appears in only one document has $\mathrm{DF}(t) = 1$, so its IDF is the largest value, $\log N$. The logarithm keeps IDF from growing too large when there are many documents, and the base of the logarithm (10 or $e$) only changes the scale of the values, not the ranking among words. The idea of IDF originates in Spärck Jones's study of term specificity [6].
+IDF has the following properties. A word that appears in every document has $\mathrm{DF}(t) = N$, so its IDF is $\log 1 = 0$ and its TF-IDF is 0. A word that appears in only one document has $\mathrm{DF}(t) = 1$, so its IDF is the largest value, $\log N$. The logarithm keeps IDF from growing too large when there are many documents, and the base of the logarithm (10 or $`e`$) only changes the scale of the values, not the ranking among words. The idea of IDF originates in Spärck Jones's study of term specificity [6].
 
 Slightly modified variants of the same idea are also widely used.
 
@@ -502,7 +502,7 @@ TF-IDF has the following limitations.
 
 *Figure 3. A real-valued vector for each word (left) and a vector space in which the difference from man to woman resembles the difference from king to queen (right)*
 
-Word2Vec rests on the **distributional hypothesis**, the idea that words appearing in similar contexts have similar meanings [9]. Word2Vec trains a neural network to predict which words appear around a word and uses the weights obtained in the process as word vectors. In vectors trained this way, semantic relations appear as vector differences. As on the right of Figure 3, $\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}$ and $\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}$ point in similar directions, so computing $\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}$ yields a vector close to $\mathbf{v}_{\text{queen}}$ [10].
+Word2Vec rests on the **distributional hypothesis**, the idea that words appearing in similar contexts have similar meanings [9]. Word2Vec trains a neural network to predict which words appear around a word and uses the weights obtained in the process as word vectors. In vectors trained this way, semantic relations appear as vector differences. As on the right of Figure 3, $`\mathbf{v}_{\text{woman}} - \mathbf{v}_{\text{man}}`$ and $`\mathbf{v}_{\text{queen}} - \mathbf{v}_{\text{king}}`$ point in similar directions, so computing $`\mathbf{v}_{\text{king}} - \mathbf{v}_{\text{man}} + \mathbf{v}_{\text{woman}}`$ yields a vector close to $`\mathbf{v}_{\text{queen}}`$ [10]. A public web demo lets one try such addition and subtraction of words directly with Korean Word2Vec vectors trained on Korean Wikipedia and Namu Wiki [11].
 
 Word2Vec has two models with different training schemes, CBOW and skip-gram.
 
@@ -538,7 +538,7 @@ To predict the center word, one must decide how many words before and after to l
 
 CBOW is a **shallow neural network** with a single hidden layer. Let $V$ be the vocabulary size and $M$ the dimension of the embedding vectors. This example distinguishes case, treating The and the as different words, so $V = 7$, and $M = 5$. The word indices are The 0, black 1, cat 2, sat 3, on 4, the 5, mat 6. The network has two weight matrices, the $V \times M$ matrix $W$ on the input side and the $M \times V$ matrix $W'$ on the output side. One computation that predicts the center word sat consists of the following four steps.
 
-**Step 1: Multiply a one-hot vector by $W$.** Multiplying the one-hot vector of the context word cat, $\mathbf{x}_{\text{cat}} = [0, 0, 1, 0, 0, 0, 0]$ ($1 \times V$), by $W$ ($V \times M$) gives the $1 \times M$ vector $\mathbf{v}_{\text{cat}}$. Since $\mathbf{x}_{\text{cat}}$ is 1 only at index 2, the product equals row 2 of $W$ taken out as is.
+**Step 1: Multiply a one-hot vector by $W$.** Multiplying the one-hot vector of the context word cat, $`\mathbf{x}_{\text{cat}} = [0, 0, 1, 0, 0, 0, 0]`$ ($`1 \times V`$), by $W$ ($`V \times M`$) gives the $1 \times M$ vector $`\mathbf{v}_{\text{cat}}`$. Since $`\mathbf{x}_{\text{cat}}`$ is 1 only at index 2, the product equals row 2 of $W$ taken out as is.
 
 | Index | Word | Row of $W$ |
 |:---:|:-----|:-----|
@@ -550,41 +550,41 @@ CBOW is a **shallow neural network** with a single hidden layer. Let $V$ be the 
 | 5 | the | 0.70, 0.27, 1.22, 0.92, 1.63 |
 | 6 | mat | 3.48, 0.32, 0.48, 0.53, 2.69 |
 
-*Table 10. The input weight matrix $W$ during training ($V = 7$, $M = 5$)*
+*Table 10. The input weight matrix $`W`$ during training ($`V = 7`$, $`M = 5`$)*
 
-$$
+```math
 \mathbf{v}_{\text{cat}} = \mathbf{x}_{\text{cat}} W = [0.41, 0.73, 0.24, 0.15, 0.82]
-$$
+```
 
-The same computation for the context words black, on, and the gives $\mathbf{v}_{\text{black}}$, $\mathbf{v}_{\text{on}}$, and $\mathbf{v}_{\text{the}}$.
+The same computation for the context words black, on, and the gives $`\mathbf{v}_{\text{black}}`$, $`\mathbf{v}_{\text{on}}`$, and $`\mathbf{v}_{\text{the}}`$.
 
-**Step 2: Combine the vectors in the projection layer.** The **projection layer** combines the vectors of the $2n$ context words into one. For example, adding $\mathbf{v}_{\text{cat}}$ and $\mathbf{v}_{\text{on}} = [0.52, 0.45, 0.56, 0.17, 0.14]$ gives $[0.93, 1.18, 0.80, 0.32, 0.96]$. Adding all four vectors, including $\mathbf{v}_{\text{black}}$ and $\mathbf{v}_{\text{the}}$, gives the following.
+**Step 2: Combine the vectors in the projection layer.** The **projection layer** combines the vectors of the $2n$ context words into one. For example, adding $`\mathbf{v}_{\text{cat}}`$ and $`\mathbf{v}_{\text{on}} = [0.52, 0.45, 0.56, 0.17, 0.14]`$ gives $[0.93, 1.18, 0.80, 0.32, 0.96]$. Adding all four vectors, including $`\mathbf{v}_{\text{black}}`$ and $`\mathbf{v}_{\text{the}}`$, gives the following.
 
-$$
+```math
 \mathbf{v}_{\text{black}} + \mathbf{v}_{\text{cat}} + \mathbf{v}_{\text{on}} + \mathbf{v}_{\text{the}} = [2.25, 5.11, 2.74, 4.04, 2.83]
-$$
+```
 
 The CBOW of the original paper uses the **average**, this sum divided by the number of context words, as the value of the projection layer [8].
 
-$$
+```math
 \mathbf{h} = \frac{1}{4}[2.25, 5.11, 2.74, 4.04, 2.83] = [0.5625, 1.2775, 0.685, 1.01, 0.7075]
-$$
+```
 
-Some explanations use the sum, as Figure 4 labels the projection SUM, but the sum and the average differ only by a constant factor ($1/2n$). The projection layer differs from an ordinary hidden layer in that it has no activation function and only combines its inputs linearly.
+Some explanations use the sum, as Figure 4 labels the projection SUM, but the sum and the average differ only by a constant factor ($`1/2n`$). The projection layer differs from an ordinary hidden layer in that it has no activation function and only combines its inputs linearly.
 
-**Step 3: Obtain probabilities with $W'$ and softmax.** Multiplying the projection vector $\mathbf{h}$ ($1 \times M$) by $W'$ ($M \times V$) gives a score $\mathbf{z}$ ($1 \times V$) for each word in the vocabulary. Applying softmax to the scores gives a probability distribution $\hat{\mathbf{y}}$ that sums to 1.
+**Step 3: Obtain probabilities with $W'$ and softmax.** Multiplying the projection vector $\mathbf{h}$ ($`1 \times M`$) by $W'$ ($`M \times V`$) gives a score $\mathbf{z}$ ($`1 \times V`$) for each word in the vocabulary. Applying softmax to the scores gives a probability distribution $\hat{\mathbf{y}}$ that sums to 1.
 
-$$
+```math
 \mathbf{z} = \mathbf{h} W', \qquad \hat{y}_j = \mathrm{softmax}(\mathbf{z})_j = \frac{e^{z_j}}{\sum_{k=1}^{V} e^{z_k}}
-$$
+```
 
 For example, if $\hat{\mathbf{y}} = [0.1, 0.03, 0.02, 0.7, 0.01, 0.05, 0.09]$, the model predicts with probability 0.7 that the center word is sat, at index 3.
 
 **Step 4: Compute the loss and update the weights.** The target $\mathbf{y}$ is the one-hot vector of sat, $[0, 0, 0, 1, 0, 0, 0]$. The difference between prediction and target is measured by the **cross entropy** loss.
 
-$$
+```math
 L = -\sum_{j=1}^{V} y_j \log \hat{y}_j = -\log \hat{y}_{\text{sat}} = -\ln 0.7 \approx 0.357
-$$
+```
 
 Only the target position has $y_j = 1$, so only the term of the target word remains in the sum. The closer the predicted probability is to 1, the closer the loss is to 0. Backpropagation computes the gradient of this loss, gradient descent updates $W$ and $W'$, and the process is repeated for every (center word, context words) pair in the corpus. Softmax, cross entropy, and backpropagation are the same as in the neural network training covered in Lecture 1.
 
@@ -600,7 +600,7 @@ After training, each row of $W$ becomes the embedding vector of its word. Lookin
 
 *Figure 6. The skip-gram network that predicts the context words black, cat, on, and the from the one-hot vector of the center word sat*
 
-The computation uses the same parts as CBOW. Multiplying the one-hot vector of the center word sat by $W$ gives $\mathbf{v}_{\text{sat}}$ (the projection layer holds just this one vector, so no averaging is needed), and $W'$ and softmax give a probability distribution over the whole vocabulary. Training sums four cross entropy losses so that this distribution assigns high probability to each of the context words black, cat, on, and the.
+The computation uses the same parts as CBOW. Multiplying the one-hot vector of the center word sat by $W$ gives $`\mathbf{v}_{\text{sat}}`$ (the projection layer holds just this one vector, so no averaging is needed), and $W'$ and softmax give a probability distribution over the whole vocabulary. Training sums four cross entropy losses so that this distribution assigns high probability to each of the context words black, cat, on, and the.
 
 Skip-gram is generally known to perform better than CBOW. Because one center word receives prediction signals for several context words, the center word's vector comes to encompass the meanings of its surrounding words. In the experiments of the original paper, skip-gram was far more accurate than CBOW on analogy tasks about semantic relations, while CBOW was slightly ahead on syntactic relations and faster to train [8].
 
@@ -617,7 +617,7 @@ Skip-gram is generally known to perform better than CBOW. Because one center wor
 
 The output layer of CBOW and skip-gram uses softmax to compute probabilities for all $V$ words of the vocabulary. Computing the softmax denominator $\sum_k e^{z_k}$ requires all $V$ scores at every training step, so training becomes very slow when the vocabulary has hundreds of thousands of words.
 
-**Negative sampling** is a Word2Vec optimization technique that trains by binary classification on only a few sampled words [11]. It replaces the $V$-way classification "which word in the whole vocabulary is a context word" with the **binary classification** problem "is this pair of words a pair that actually occurred together".
+**Negative sampling** is a Word2Vec optimization technique that trains by binary classification on only a few sampled words [12]. It replaces the $V$-way classification "which word in the whole vocabulary is a context word" with the **binary classification** problem "is this pair of words a pair that actually occurred together".
 
 - A word that actually appeared nearby (**positive**) gets the target 1.
 - Another word sampled at random from the corpus (**negative**) gets the target 0.
@@ -626,17 +626,17 @@ The output layer of CBOW and skip-gram uses softmax to compute probabilities for
 
 *Figure 7. Negative sampling for "cat sat on", which takes dot products of the center word sat's vector with the vectors of cat and on (positive) and software (negative) and predicts 1 and 0 with a sigmoid*
 
-In the example of Figure 7, the vector of the center word sat, $\mathbf{v}_{\text{sat}}$ (the red row of the input matrix $W$), is dotted only with the vectors of cat, on, and software among the output-side vectors (rows of the transposed $W'^T$). Applying the **sigmoid** function $\sigma(x) = 1/(1 + e^{-x})$ to each dot product gives a probability between 0 and 1, and training pushes cat and on toward 1 and the randomly sampled software toward 0 (the Korean label 내적 in the figure means "dot product"). With the center vector $\mathbf{v}_c$, the output vector of the actual context word $\mathbf{u}_o$, and the output vectors of $k$ randomly sampled words $\mathbf{u}_1, \dots, \mathbf{u}_k$, the loss is the following.
+In the example of Figure 7, the vector of the center word sat, $`\mathbf{v}_{\text{sat}}`$ (the red row of the input matrix $`W`$), is dotted only with the vectors of cat, on, and software among the output-side vectors (rows of the transposed $`W'^T`$). Applying the **sigmoid** function $\sigma(x) = 1/(1 + e^{-x})$ to each dot product gives a probability between 0 and 1, and training pushes cat and on toward 1 and the randomly sampled software toward 0 (the Korean label 내적 in the figure means "dot product"). With the center vector $`\mathbf{v}_c`$, the output vector of the actual context word $`\mathbf{u}_o`$, and the output vectors of $k$ randomly sampled words $`\mathbf{u}_1, \dots, \mathbf{u}_k`$, the loss is the following.
 
-$$
+```math
 L = -\log \sigma(\mathbf{u}_o \cdot \mathbf{v}_c) - \sum_{i=1}^{k} \log \sigma(-\mathbf{u}_i \cdot \mathbf{v}_c)
-$$
+```
 
-The first term makes the dot product of the positive pair large, and the second term makes the dot products of the negative pairs small (since $\sigma(-x) = 1 - \sigma(x)$, it raises the probability that a negative pair is classified as 0). Each training step computes only $k + 1$ dot products instead of $V$, which greatly speeds up training. The original paper reports using $k$ of 5-20 for small datasets and 2-5 for large datasets, and that sampling negative words with probability proportional to word frequency raised to the $3/4$ power worked best [11].
+The first term makes the dot product of the positive pair large, and the second term makes the dot products of the negative pairs small (since $\sigma(-x) = 1 - \sigma(x)$, it raises the probability that a negative pair is classified as 0). Each training step computes only $k + 1$ dot products instead of $V$, which greatly speeds up training. The original paper reports using $k$ of 5-20 for small datasets and 2-5 for large datasets, and that sampling negative words with probability proportional to word frequency raised to the $3/4$ power worked best [12].
 
 ### 3.9 FastText
 
-**FastText** is a word embedding method, published in 2016 by researchers at Facebook (now Meta), that represents text in units of **subwords**, small units inside words, rather than whole words [12]. It performs strongly in diverse text situations such as rare words, emoticons, and spelling errors.
+**FastText** is a word embedding method, published in 2016 by researchers at Facebook (now Meta), that represents text in units of **subwords**, small units inside words, rather than whole words [13]. It performs strongly in diverse text situations such as rare words, emoticons, and spelling errors.
 
 FastText treats each word as a collection of character **n-grams** (pieces of $n$ consecutive characters). It adds the symbols `<` and `>` marking the start and end of the word, cuts pieces of length $n$ while sliding one character at a time, and also adds the whole word `<apple>` as one unit. Applying $n = 3$ to 'apple' gives the following.
 
@@ -655,13 +655,13 @@ print(char_ngrams("birthday"))
 ['<bi', 'bir', 'irt', 'rth', 'thd', 'hda', 'day', 'ay>', '<birthday>']
 ```
 
-`<apple>` is a 7-character string, and cutting 3 characters at each start position in `range(len(w) - n + 1)`, that is, 0 through 4, yields 5 n-grams. The boundary symbols distinguish a piece inside a word from a word itself. For example, the piece `her` inside the word "where" and `<her>`, which represents the word "her", become different units [12]. The original paper uses not only pieces with $n = 3$ but all pieces with $3 \le n \le 6$.
+`<apple>` is a 7-character string, and cutting 3 characters at each start position in `range(len(w) - n + 1)`, that is, 0 through 4, yields 5 n-grams. The boundary symbols distinguish a piece inside a word from a word itself. For example, the piece `her` inside the word "where" and `<her>`, which represents the word "her", become different units [13]. The original paper uses not only pieces with $n = 3$ but all pieces with $3 \le n \le 6$.
 
 The vector of the word apple is the sum of the vectors of the pieces obtained in this way.
 
-$$
-\mathbf{v}_{\text{apple}} = \mathbf{z}_{\text{<ap}} + \mathbf{z}_{\text{app}} + \mathbf{z}_{\text{ppl}} + \mathbf{z}_{\text{ple}} + \mathbf{z}_{\text{le>}} + \mathbf{z}_{\text{<apple>}}
-$$
+```math
+\mathbf{v}_{\text{apple}} = \mathbf{z}_{\lt\text{ap}} + \mathbf{z}_{\text{app}} + \mathbf{z}_{\text{ppl}} + \mathbf{z}_{\text{ple}} + \mathbf{z}_{\text{le}\gt} + \mathbf{z}_{\lt\text{apple}\gt}
+```
 
 The rest of the training is almost the same as Word2Vec (skip-gram with negative sampling). What is learned, however, is not a vector per word but the vector $\mathbf{z}$ of each n-gram. FastText has the following advantages.
 
@@ -771,7 +771,7 @@ Training minimizes the binary cross entropy loss (`nn.BCELoss`) between this pro
 
 ### 4.3 Research Cases
 
-Sentiment analysis with deep learning has been studied actively. The survey by Zhang et al. [13] summarizes the deep learning methods used for document-level sentiment classification as follows.
+Sentiment analysis with deep learning has been studied actively. The survey by Zhang et al. [14] summarizes the deep learning methods used for document-level sentiment classification as follows.
 
 | Research work | Document representation | Neural network model | Attention used | Information modeled jointly with sentiment |
 |:-----|:-----|:-----|:-----|:-----|
@@ -794,7 +794,7 @@ Sentiment analysis with deep learning has been studied actively. The survey by Z
 
 Table 14 shows how the research evolved. Early work fed BoW (Bag of Words, a vector of word counts) to shallow neural networks or autoencoders, after which combining word embeddings with CNNs, LSTMs, and GRUs became mainstream. Research then moved on to attention (Lecture 8), which weights the important parts of sentences and documents, and to jointly modeling additional information such as users and products, aspects, languages, and domains.
 
-A Korean case is a study that analyzed Twitter posts about foot-and-mouth disease (FMD) [14]. The study collected FMD-related tweets from July 2010 to December 2011, preprocessed them by stop word removal, word conversion, and POS tagging, classified the polarity (positive or negative) of each tweet with a deep learning model, and then extracted topics and keywords for each polarity to analyze keyword networks.
+A Korean case is a study that analyzed Twitter posts about foot-and-mouth disease (FMD) [15]. The study collected FMD-related tweets from July 2010 to December 2011, preprocessed them by stop word removal, word conversion, and POS tagging, classified the polarity (positive or negative) of each tweet with a deep learning model, and then extracted topics and keywords for each polarity to analyze keyword networks.
 
 ![Figure 9. The system architecture of data collection and preprocessing, tweet classification, and network analysis (top), and the LSTM-CNN model of embedding, LSTM, convolution, max pooling, and fully connected layers (bottom)](../../images/Lec07_p33.png)
 
@@ -816,11 +816,11 @@ Figure 10 aggregates the classification results by month. The number of tweets s
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | The result of stemming is always a dictionary word. | **F.** Stemming cuts suffixes by rules, so forms not in the dictionary can appear, such as 'flies' → 'fli'. Lemmatization is the method that returns the dictionary base form. |
 | The cosine similarity of the one-hot vectors of two different words is always 0. | **T.** The positions of their 1s differ, so the dot product is 0 and so is the similarity. This is why one-hot encoding cannot capture relations between words. |
-| A word that appears in every document has TF-IDF 0 (with $\mathrm{IDF} = \log(N/\mathrm{DF})$). | **T.** $\mathrm{DF} = N$, so $\mathrm{IDF} = \log 1 = 0$, and the product is 0 however large TF is. |
+| A word that appears in every document has TF-IDF 0 (with $`\mathrm{IDF} = \log(N/\mathrm{DF})`$). | **T.** $\mathrm{DF} = N$, so $\mathrm{IDF} = \log 1 = 0$, and the product is 0 however large TF is. |
 | The projection layer of CBOW uses a nonlinear activation function such as ReLU. | **F.** The projection layer only computes the average (or sum) of the context word vectors; it is a linear layer without an activation function. |
 | With negative sampling, a training step does not need to compute a softmax over the whole vocabulary. | **T.** The task becomes binary classification that computes dot products and sigmoids only for one positive word and $k$ negative words. |
 | FastText cannot produce a vector for a word that did not appear in the training data. | **F.** It can build a vector by adding the learned vectors of the word's character n-grams. This is how it differs from Word2Vec. |
@@ -898,7 +898,7 @@ Figure 10 aggregates the classification results by month. The number of tweets s
 
    </details>
 
-6. **CBOW computation:** With a window size of 1 and context vectors $\mathbf{v}_a = [1, 2]$ and $\mathbf{v}_b = [3, 0]$, compute the value of the projection layer (average). If the softmax output gives the target word probability 0.25, what is the cross entropy loss (natural logarithm)?
+6. **CBOW computation:** With a window size of 1 and context vectors $`\mathbf{v}_a = [1, 2]`$ and $`\mathbf{v}_b = [3, 0]`$, compute the value of the projection layer (average). If the softmax output gives the target word probability 0.25, what is the cross entropy loss (natural logarithm)?
 
    <details>
    <summary>Answer</summary>
@@ -912,7 +912,7 @@ Figure 10 aggregates the classification results by month. The number of tweets s
    <details>
    <summary>Answer</summary>
 
-   Each row of the input-side weight matrix $W$ ($V \times M$) is the embedding vector of its word. A one-hot vector is 1 at only one position, so $\mathbf{x}W$ equals taking out that row of $W$, and the row can be read directly by index. This matrix is called the lookup table.
+   Each row of the input-side weight matrix $W$ ($`V \times M`$) is the embedding vector of its word. A one-hot vector is 1 at only one position, so $\mathbf{x}W$ equals taking out that row of $W$, and the row can be read directly by index. This matrix is called the lookup table.
 
    </details>
 
@@ -959,7 +959,8 @@ Figure 10 aggregates the classification results by month. The number of tweets s
 8. T. Mikolov, K. Chen, G. Corrado, and J. Dean, "Efficient estimation of word representations in vector space," arXiv:1301.3781, 2013.
 9. Z. S. Harris, "Distributional structure," *Word*, vol. 10, no. 2-3, pp. 146-162, 1954.
 10. T. Mikolov, W. Yih, and G. Zweig, "Linguistic regularities in continuous space word representations," in *Proc. NAACL-HLT*, pp. 746-751, 2013.
-11. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, and J. Dean, "Distributed representations of words and phrases and their compositionality," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 26, pp. 3111-3119, 2013.
-12. P. Bojanowski, E. Grave, A. Joulin, and T. Mikolov, "Enriching word vectors with subword information," *Transactions of the Association for Computational Linguistics*, vol. 5, pp. 135-146, 2017.
-13. L. Zhang, S. Wang, and B. Liu, "Deep learning for sentiment analysis: A survey," *Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery*, vol. 8, no. 4, e1253, 2018.
-14. H. Chae, J. Lee, Y. Choi, D. Park, and Y. Chung, "Sentiment analysis of foot-and-mouth disease using tweet text-mining technique," *KIPS Transactions on Software and Data Engineering*, vol. 7, no. 11, pp. 419-426, 2018.
+11. "Korean Word2Vec," web demo, accessed Nov. 4, 2026. https://word2vec.kr/search/
+12. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, and J. Dean, "Distributed representations of words and phrases and their compositionality," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 26, pp. 3111-3119, 2013.
+13. P. Bojanowski, E. Grave, A. Joulin, and T. Mikolov, "Enriching word vectors with subword information," *Transactions of the Association for Computational Linguistics*, vol. 5, pp. 135-146, 2017.
+14. L. Zhang, S. Wang, and B. Liu, "Deep learning for sentiment analysis: A survey," *Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery*, vol. 8, no. 4, e1253, 2018.
+15. H. Chae, J. Lee, Y. Choi, D. Park, and Y. Chung, "Sentiment analysis of foot-and-mouth disease using tweet text-mining technique," *KIPS Transactions on Software and Data Engineering*, vol. 7, no. 11, pp. 419-426, 2018.

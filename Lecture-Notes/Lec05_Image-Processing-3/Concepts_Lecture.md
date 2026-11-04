@@ -120,9 +120,9 @@ A **bounding box** is a rectangle that encloses an object, with sides parallel t
 
 The two formats are converted into each other by the following equations.
 
-$$
+```math
 x = \frac{x_1 + x_2}{2}, \quad y = \frac{y_1 + y_2}{2}, \quad w = x_2 - x_1, \quad h = y_2 - y_1
-$$
+```
 
 For example, reading the cat box `[10, 50, 100, 200]` of Section 1.2 in corner format gives a width of $100 - 10 = 90$, a height of $200 - 50 = 150$, and a center of $(55, 125)$, so in center format it is $(55, 125, 90, 150)$. Early detection research often used the corner format, and recent models often use the center format. The same four numbers describe completely different boxes in different formats, so before using a dataset or a library one must check which format it uses and whether the coordinates are normalized to the range 0-1 by dividing by the image size.
 
@@ -144,7 +144,7 @@ The IoU of two corner-format boxes $A = (10, 10, 110, 110)$ (ground truth) and $
 4. Each box has area $100 \times 100 = 10000$, so the union area is $10000 + 10000 - 7200 = 12800$. The intersection is subtracted once because adding the two areas counts the overlapping part twice.
 5. $\text{IoU} = 7200 / 12800 = 0.5625$.
 
-IoU is used in many places in this lecture. YOLO defines the confidence of a predicted box with IoU (Section 3.4), NMS finds duplicate boxes with IoU (Section 3.7), and evaluation uses IoU to decide whether a prediction is correct (Section 4.1).
+IoU is used at several stages of object detection. YOLO defines the confidence of a predicted box with IoU (Section 3.4), NMS finds duplicate boxes with IoU (Section 3.7), and evaluation uses IoU to decide whether a prediction is correct (Section 4.1).
 
 ### 1.4 The Development of Object Detection and Its Two Families
 
@@ -247,9 +247,9 @@ Because regions from all stages are used as candidates, candidates of many sizes
 
 **Bounding-box regression.** The boxes produced by selective search enclose objects only roughly, so the same feature is used to predict by regression how far to move and stretch the box. With the proposal box in center format $P = (P_x, P_y, P_w, P_h)$ and the ground-truth box $G = (G_x, G_y, G_w, G_h)$, the targets the model learns are as follows [5].
 
-$$
+```math
 t_x = \frac{G_x - P_x}{P_w}, \quad t_y = \frac{G_y - P_y}{P_h}, \quad t_w = \log\frac{G_w}{P_w}, \quad t_h = \log\frac{G_h}{P_h}
-$$
+```
 
 Dividing the center shift by the width and height of the proposal box makes it a relative shift independent of the box size, and taking the logarithm of the size change turns a scale factor, which is always positive, into an unconstrained real number. For example, if $P = (100, 100, 50, 80)$ and $G = (110, 96, 60, 80)$, then $t_x = 10/50 = 0.2$, $t_y = -4/80 = -0.05$, $t_w = \ln(60/50) = \ln 1.2 \approx 0.182$, and $t_h = \ln(80/80) = 0$. That is, the center should move right by 20% of the width and up by 5% of the height, and the width should be stretched by a factor of 1.2.
 
@@ -338,7 +338,7 @@ Each grid cell predicts the following.
   - $x$, $y$: the coordinates of the box center measured from the top-left corner of the cell and divided by the cell size (0-1).
   - $w$, $h$: the width and height of the box divided by the width and height of the whole image (0-1).
   - $c$: the confidence of the box (Section 3.4).
-- **$C = 20$ class probabilities:** the conditional probabilities $\Pr(\text{Class}_i \mid \text{Object})$ that the object belongs to each class, given that the cell contains an object. There are 20 because the PASCAL VOC dataset on which YOLO v1 was trained has 20 classes. Only one set is predicted per cell regardless of the number of boxes (the lower part of the figure, one color per cell).
+- **$C = 20$ class probabilities:** the conditional probabilities $`\Pr(\text{Class}_i \mid \text{Object})`$ that the object belongs to each class, given that the cell contains an object. There are 20 because the PASCAL VOC dataset on which YOLO v1 was trained has 20 classes. Only one set is predicted per cell regardless of the number of boxes (the lower part of the figure, one color per cell).
 
 Therefore the output of one cell is $B \times 5 + C = 2 \times 5 + 20 = 30$ values, and the whole output is a $7 \times 7 \times 30$ tensor, that is, 1,470 numbers. The output vector of one cell is laid out as follows.
 
@@ -362,12 +362,12 @@ Because the center coordinates are normalized by the cell and the size by the im
 
 In YOLO v1, the **confidence** of a box is defined as follows [2].
 
-$$
+```math
 \text{confidence} = \Pr(\text{Object}) \times \text{IoU}_{\text{pred}}^{\text{truth}}
-$$
+```
 
 - $\Pr(\text{Object})$ is the probability that the box contains an object.
-- $\text{IoU}_{\text{pred}}^{\text{truth}}$ is the IoU between the predicted box and the ground-truth box (Section 1.3).
+- $`\text{IoU}_{\text{pred}}^{\text{truth}}`$ is the IoU between the predicted box and the ground-truth box (Section 1.3).
 
 The confidence combines whether there is an object and, if so, how accurate the box is into a single number. If the cell contains no object, the confidence should be 0; if it contains an object, the confidence should equal the IoU between the predicted box and the ground-truth box. The confidence target used during training also follows this definition.
 
@@ -377,21 +377,21 @@ The confidence combines whether there is an object and, if so, how accurate the 
 
 YOLO v1 computes the error of every output value as a sum of squared errors, and the loss function consists of three parts: the error of box locations, the error of confidences, and the error of class probabilities [2].
 
-$$
+```math
 \begin{aligned}
 \mathcal{L} = {} & \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{obj}} \left[ (x_i - \hat{x}_i)^2 + (y_i - \hat{y}_i)^2 \right] \\
 & + \lambda_{\text{coord}} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{obj}} \left[ \left( \sqrt{w_i} - \sqrt{\hat{w}_i} \right)^2 + \left( \sqrt{h_i} - \sqrt{\hat{h}_i} \right)^2 \right] \\
 & + \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{obj}} \left( C_i - \hat{C}_i \right)^2 + \lambda_{\text{noobj}} \sum_{i=0}^{S^2} \sum_{j=0}^{B} \mathbf{1}_{ij}^{\text{noobj}} \left( C_i - \hat{C}_i \right)^2 \\
 & + \sum_{i=0}^{S^2} \mathbf{1}_{i}^{\text{obj}} \sum_{c \in \text{classes}} \left( p_i(c) - \hat{p}_i(c) \right)^2
 \end{aligned}
-$$
+```
 
 The symbols mean the following.
 
 - $i$ is the index of a grid cell and $j$ is the index of a box in the cell. Of the hatted (^) and unhatted values, one is the prediction and the other is the ground truth. Because the error is squared, the value is the same whichever one is taken as the prediction.
-- $\mathbf{1}_{ij}^{\text{obj}}$ is 1 when the $i$-th cell contains an object and the $j$-th box of that cell is the box **responsible** for that object, and 0 otherwise. Of the two boxes of the cell, the one with the larger IoU with the ground-truth box is responsible.
-- $\mathbf{1}_{ij}^{\text{noobj}}$ is 1 for a box that is not responsible for any object.
-- $\mathbf{1}_{i}^{\text{obj}}$ is 1 when (the center of) an object lies in the $i$-th cell.
+- $`\mathbf{1}_{ij}^{\text{obj}}`$ is 1 when the $i$-th cell contains an object and the $j$-th box of that cell is the box **responsible** for that object, and 0 otherwise. Of the two boxes of the cell, the one with the larger IoU with the ground-truth box is responsible.
+- $`\mathbf{1}_{ij}^{\text{noobj}}`$ is 1 for a box that is not responsible for any object.
+- $`\mathbf{1}_{i}^{\text{obj}}`$ is 1 when (the center of) an object lies in the $i$-th cell.
 
 > **Note:** The paper writes the ranges of the sums as $i = 0$ to $S^2$ and $j = 0$ to $B$, but they actually mean the sum over all $S^2$ cells and over all $B$ boxes in each cell. Counting from 0, the last indices are $S^2 - 1$ and $B - 1$.
 
@@ -420,9 +420,9 @@ At inference time YOLO v1 predicts two boxes per cell whether or not there is an
 
 Drawing all 98 boxes as on the left covers the image with boxes. To keep only the boxes that should actually be detected, the confidence of each box is multiplied by the class probabilities of its cell to form **class-specific confidence scores** [2].
 
-$$
+```math
 \Pr(\text{Class}_i \mid \text{Object}) \times \Pr(\text{Object}) \times \text{IoU}_{\text{pred}}^{\text{truth}} = \Pr(\text{Class}_i) \times \text{IoU}_{\text{pred}}^{\text{truth}}
-$$
+```
 
 ![Figure 17. Multiplying the confidence of a box by the 20 class probabilities of its cell to form a 20-dimensional score vector per box](../../images/Lec05_p22.png)
 
@@ -585,9 +585,11 @@ A 2025 survey summarizes the key innovations from YOLOv1 to YOLOv13 and YOLOv26 
 
 *Table 8. Key innovations, tasks, and frameworks from YOLOv1 to YOLOv26*
 
-Several trends can be read from the table. First, after the introduction of anchor boxes in YOLOv2, the design moved to anchor-free detection in YOLOv6 and YOLOv8. Second, YOLOv10 and YOLOv26 detect end to end with a single model without the NMS post-processing of Section 3.7. Third, YOLOv12 adopted the attention techniques covered in Lecture 8, and YOLOv13 adopted lightweight techniques such as the depthwise-separable convolution covered in Lecture 9. Fourth, the tasks widened from object detection to segmentation, pose estimation, and tracking. However, the anchor-free head of YOLOv5, the self-attention of YOLOv6, the transformer modules of YOLOv7, and the GAN-based augmentation of YOLOv8 listed in the table are the descriptions of the survey and are not found in the original papers or official documentation of those models.
+Several trends can be read from the table. First, after the introduction of anchor boxes in YOLOv2, the design moved to anchor-free detection in YOLOv6 and YOLOv8. Second, YOLOv10 and YOLOv26 detect end to end with a single model without the NMS post-processing of Section 3.7. Third, YOLOv12 adopted the attention techniques covered in Lecture 8, and YOLOv13 adopted lightweight techniques such as the depthwise-separable convolution covered in Lecture 9. Fourth, the tasks widened from object detection to segmentation, pose estimation, and tracking.
 
-YOLO is also widely used in the field. One application is a system that detects incoming trucks in the CCTV footage (1920×1080, 6 frames per second) of a farm entrance. This system splits video reception, license-plate recognition, judging whether a person gets out of the vehicle, object tracking, and result visualization and server upload into separate threads that run concurrently, and it sends events, such as the device being powered on, to a server together with a timestamp. Another example is a system that detects pigs in a camera inside a pig barn and tracks them by assigning a number to each animal.
+> **Note:** Some entries of Table 8 differ from the original papers or official documentation of the models. The original YOLOv5 uses an anchor-based detection head; the anchor-free head was introduced later in YOLOv5u, which Ultralytics built by adopting the head of YOLOv8. The EfficientRep backbone of YOLOv6 consists of re-parameterizable convolution blocks (in the RepVGG style), not self-attention. The YOLOv7 paper contains no transformer-based modules, and the data augmentation of YOLOv8 (Mosaic, Mixup, and others) includes no GAN-based augmentation.
+
+YOLO is also widely used in the field. One application is a system that detects a truck in CCTV footage (1920×1080, 6 frames per second). This system splits video reception, license-plate recognition, judging whether a person gets out of the vehicle, object tracking, and result visualization and server upload into separate threads that run concurrently, and it sends events, such as the device being powered on, to a server together with a timestamp. Another example is a system that detects pigs in a camera inside a pig barn and tracks them by assigning a number to each animal.
 
 ![Figure 23. Pigs detected in barn footage and tracked with individual ID numbers](../../images/Lec05_p32.png)
 
@@ -653,9 +655,9 @@ The figure above has 6 ground-truth boxes (green) and 7 predicted boxes (red). J
 
 There are 5 TPs and 2 FPs. Of the 6 ground-truth boxes, only the car of P6 has no matching prediction, so there is 1 FN. Restating precision and recall as defined in Lecture 4 gives the following.
 
-$$
+```math
 \text{Precision} = \frac{TP}{TP + FP}, \qquad \text{Recall} = \frac{TP}{TP + FN}
-$$
+```
 
 **Precision** is the fraction of the model's predictions that are correct, and **recall** is the fraction of the actual ground truths that the model found. In this example, precision is $5 / (5 + 2) = 5/7 \approx 0.714$ and recall is $5 / (5 + 1) = 5/6 \approx 0.833$. The denominator of recall, $TP + FN$, equals the total number of ground-truth boxes.
 
@@ -733,9 +735,9 @@ The blue line is the original PR curve connecting (recall, precision) as each bo
 
 **AP (Average Precision)** is the area under the PR curve, meaning the average of precision over recall from 0 to 1. Integrating the sawtooth shape as it is would be sensitive to small wiggles, so the following **interpolated precision** is usually used.
 
-$$
+```math
 p_{\text{interp}}(r) = \max_{\tilde{r} \ge r} p(\tilde{r})
-$$
+```
 
 That is, the precision at recall $r$ is replaced by the maximum precision obtainable at recall $r$ or above. It means the best precision one can expect when requiring recall of at least $r$, and as a result the curve becomes a staircase that only goes down toward the right (orange dashed line). The interpolated precision of the example is as follows.
 
@@ -755,11 +757,11 @@ Therefore $\text{AP} = 0.400 + 0.320 + 0.125 = 0.845$. In the recall interval 0.
 
 AP is computed for one class. **mAP (mean Average Precision)** is the average of the AP computed for each class.
 
-$$
+```math
 \text{mAP} = \frac{1}{n} \sum_{k=1}^{n} \text{AP}_k
-$$
+```
 
-Here $\text{AP}_k$ is the AP of class $k$ and $n$ is the number of classes. For example, with 3 classes whose APs are 0.845, 0.70, and 0.60, $\text{mAP} = (0.845 + 0.70 + 0.60) / 3 = 0.715$.
+Here $`\text{AP}_k`$ is the AP of class $k$ and $n$ is the number of classes. For example, with 3 classes whose APs are 0.845, 0.70, and 0.60, $\text{mAP} = (0.845 + 0.70 + 0.60) / 3 = 0.715$.
 
 The COCO dataset [12] reports several APs while varying the IoU threshold and the object size [13]. In COCO, the value that also includes the class average is likewise called AP.
 
@@ -947,17 +949,17 @@ With a single IoU threshold of 0.5, a box counts as TP even if it fits only roug
 
 ## References
 
-1. S. Ren, K. He, R. Girshick, and J. Sun, "Faster R-CNN: Towards real-time object detection with region proposal networks," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 28, 2015, pp. 91-99.
-2. J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You only look once: Unified, real-time object detection," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, 2016, pp. 779-788.
-3. W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, "SSD: Single shot multibox detector," in *Proc. European Conf. Computer Vision (ECCV)*, 2016, pp. 21-37.
-4. Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, "Object detection in 20 years: A survey," *Proceedings of the IEEE*, vol. 111, no. 3, pp. 257-276, 2023.
-5. R. Girshick, J. Donahue, T. Darrell, and J. Malik, "Rich feature hierarchies for accurate object detection and semantic segmentation," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, 2014, pp. 580-587.
-6. J. R. R. Uijlings, K. E. A. van de Sande, T. Gevers, and A. W. M. Smeulders, "Selective search for object recognition," *International Journal of Computer Vision*, vol. 104, no. 2, pp. 154-171, 2013.
-7. R. Girshick, "Fast R-CNN," in *Proc. IEEE Int. Conf. Computer Vision (ICCV)*, 2015, pp. 1440-1448.
-8. Ultralytics, "Ultralytics YOLO," GitHub repository. https://github.com/ultralytics/ultralytics
-9. R. Sapkota *et al.*, "YOLO26: Key architectural enhancements and performance benchmarking for real-time object detection," arXiv:2509.25164, 2025.
-10. R. Padilla, S. L. Netto, and E. A. B. da Silva, "A survey on performance metrics for object-detection algorithms," in *Proc. Int. Conf. Systems, Signals and Image Processing (IWSSIP)*, 2020, pp. 237-242.
-11. M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman, "The PASCAL visual object classes (VOC) challenge," *International Journal of Computer Vision*, vol. 88, no. 2, pp. 303-338, 2010.
-12. T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, "Microsoft COCO: Common objects in context," in *Proc. European Conf. Computer Vision (ECCV)*, 2014, pp. 740-755.
-13. COCO Consortium, "Detection evaluation," COCO Dataset. https://cocodataset.org/#detection-eval
-14. C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, 2023, pp. 7464-7475.
+1. S. Ren, K. He, R. Girshick, and J. Sun, "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks," in *Advances in Neural Information Processing Systems (NIPS)*, vol. 28, pp. 91-99, 2015.
+2. J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 779-788, 2016.
+3. W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, "SSD: Single Shot MultiBox Detector," in *Proc. European Conf. Computer Vision (ECCV)*, pp. 21-37, 2016.
+4. Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, "Object Detection in 20 Years: A Survey," *Proceedings of the IEEE*, vol. 111, no. 3, pp. 257-276, 2023.
+5. R. Girshick, J. Donahue, T. Darrell, and J. Malik, "Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation," in *Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 580-587, 2014.
+6. J. R. R. Uijlings, K. E. A. van de Sande, T. Gevers, and A. W. M. Smeulders, "Selective Search for Object Recognition," *Int. J. Computer Vision*, vol. 104, no. 2, pp. 154-171, 2013.
+7. R. Girshick, "Fast R-CNN," in *Proc. IEEE Int. Conf. Computer Vision (ICCV)*, pp. 1440-1448, 2015.
+8. Ultralytics, "Ultralytics YOLO," *GitHub*, accessed Nov. 4, 2026. https://github.com/ultralytics/ultralytics
+9. R. Sapkota, R. H. Cheppally, A. Sharda, and M. Karkee, "YOLO26: Key Architectural Enhancements and Performance Benchmarking for Real-Time Object Detection," arXiv:2509.25164, 2025.
+10. R. Padilla, S. L. Netto, and E. A. B. da Silva, "A Survey on Performance Metrics for Object-Detection Algorithms," in *Proc. Int. Conf. Systems, Signals and Image Processing (IWSSIP)*, pp. 237-242, 2020.
+11. M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman, "The PASCAL Visual Object Classes (VOC) Challenge," *Int. J. Computer Vision*, vol. 88, no. 2, pp. 303-338, 2010.
+12. T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, "Microsoft COCO: Common Objects in Context," in *Proc. European Conf. Computer Vision (ECCV)*, pp. 740-755, 2014.
+13. COCO Consortium, "Detection Evaluation," *COCO Dataset*, accessed Nov. 4, 2026. https://cocodataset.org/#detection-eval
+14. C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable Bag-of-Freebies Sets New State-of-the-Art for Real-Time Object Detectors," in *Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)*, pp. 7464-7475, 2023.

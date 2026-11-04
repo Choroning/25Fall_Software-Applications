@@ -75,6 +75,9 @@
   - The length is about 4 pages (Word or PDF), in a free format.
 - **Assignment 2 (GPT paper summary):** Given in Week 11 and due 2025-11-21 (Fri) 23:59. Summarize the GPT paper (A. Radford et al., "Improving Language Understanding by Generative Pre-Training," 2018) in about 4 pages (Word or PDF), in a free format.
 - **Individual project proposal presentation:** Announced in Week 12 and held in Weeks 13-15 (11/25, 12/2, 12/9). Each student presented a proposal for an artificial intelligence application project that uses deep learning for about 5 minutes.
+  - The topic was free, and the presentations were assessed on feasibility, technical understanding, creativity, and similar criteria.
+  - Students were encouraged, but not required, to include the problem definition and solution, the dataset (how to obtain it for an open dataset or how to collect it otherwise), a specific deep learning model (e.g., YOLOv11 rather than just an object detection model), and how the output of the deep learning model would be used.
+  - Each student prepared presentation slides (ppt), presented them, and submitted them to the assignment board afterwards.
 
 ---
 
