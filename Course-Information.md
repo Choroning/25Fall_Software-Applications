@@ -2,7 +2,7 @@
 
 [Repository Guide](README.md) | [English](Course-Information.md) | [한국어](Course-Information.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-16
 
 ## Table of Contents
 
@@ -66,7 +66,7 @@
 
 - Assessment scores are disclosed.
 - **Assessment Plan:** The quiz component consists of assignments and a presentation, midterm and final exams are held, and attendance and participation are scored.
-- The weeks in which assignments were given are listed in [5. Weekly Plan and Progress](#5-weekly-plan-and-progress). The assignment explanations and the submitted report are in the [`Coursework` index](Coursework/README.md).
+- The weeks in which assignments were given are listed in [5. Weekly Plan and Progress](#5-weekly-plan-and-progress). The assignment explanations are in the [`Coursework` index](Coursework/README.md).
 - **Assignment 1 (survey of image processing (deep learning) research papers):** Given in Week 5 and due 2025-10-17 (Fri) 23:59.
   - Summarize the ResNet paper (K. He et al., "Deep Residual Learning for Image Recognition," CVPR 2016).
   - Choose one image processing task other than image classification, describe it including its input and output, and briefly give an example of where the task is used (e.g., road area detection in self-driving cars).

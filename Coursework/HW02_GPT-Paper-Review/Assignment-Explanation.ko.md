@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Assignment-Explanation.md) | [한국어](Assignment-Explanation.ko.md)
 
-> **최종 수정일:** 2026-11-04
+> **최종 수정일:** 2026-11-16
 
 > **학습 목표:**
 > 1. 자연어 이해에서 레이블 없는 텍스트를 활용하는 반지도학습의 동기와 기존 방법의 한계를 설명할 수 있다
@@ -67,7 +67,7 @@ A. Radford, K. Narasimhan, T. Salimans, I. Sutskever의 "Improving Language Unde
 
 *표 1. HW2의 요구사항*
 
-제출 보고서는 [`Solution/Assignment-Report.pdf`](Solution/Assignment-Report.pdf)에 있다. 논문이 바탕으로 하는 Transformer, 셀프 어텐션, BPE, 위치 인코딩, 마스크드 멀티 헤드 어텐션, BERT와 GPT의 구조는 8강에서, 단어 임베딩은 7강에서, 전이 학습과 미세 조정은 3강과 4강에서 다룬다.
+논문이 바탕으로 하는 Transformer, 셀프 어텐션, BPE, 위치 인코딩, 마스크드 멀티 헤드 어텐션, BERT와 GPT의 구조는 8강에서, 단어 임베딩은 7강에서, 전이 학습과 미세 조정은 3강과 4강에서 다룬다.
 
 ### 1.2 보고서의 구성
 

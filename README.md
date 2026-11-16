@@ -23,7 +23,7 @@ This repository archives lecture notes and coursework for the Software Applicati
 ## 📝 About This Repository
 
 - `Lecture-Notes/` holds lecture notes in the order of the lecture decks (`Lec01`, `Lec02`, and so on), and the units that had practice sessions also hold lab notes and example notebooks.
-- `Coursework/` holds the explanations of the two paper assignments and a submitted report.
+- `Coursework/` holds the explanations of the two paper assignments.
 - Every lecture note, lab note, and assignment explanation comes as an English (`.md`) and Korean (`.ko.md`) pair.
 
 > **🤖 Use of Generative AI Tools**
@@ -63,7 +63,7 @@ A course on the data processing techniques and deep learning models used across 
 ```plaintext
 25Fall_Software-Applications
 ├── Lecture-Notes               Lecture notes, lab notes, and example notebooks in lecture deck order
-├── Coursework                  Assignment explanations and a submitted report
+├── Coursework                  Assignment explanations
 ├── images                      Figures in the lecture notes
 ├── Course-Information.ko.md    Course operations
 ├── Course-Information.md

@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Assignment-Explanation.md) | [한국어](Assignment-Explanation.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-16
 
 > **Learning Objectives:**
 > 1. Explain the motivation for semi-supervised learning that uses unlabeled text in natural language understanding and the limitations of earlier methods
@@ -67,7 +67,7 @@ This assignment summarizes "Improving Language Understanding by Generative Pre-T
 
 *Table 1. Requirements of HW2*
 
-The submitted report is in [`Solution/Assignment-Report.pdf`](Solution/Assignment-Report.pdf). The Transformer, self-attention, BPE, positional encoding, masked multi-head attention, and the architectures of BERT and GPT on which the paper builds are covered in Lecture 8, word embeddings in Lecture 7, and transfer learning and fine-tuning in Lectures 3 and 4.
+The Transformer, self-attention, BPE, positional encoding, masked multi-head attention, and the architectures of BERT and GPT on which the paper builds are covered in Lecture 8, word embeddings in Lecture 7, and transfer learning and fine-tuning in Lectures 3 and 4.
 
 ### 1.2 Structure of the Report
 
