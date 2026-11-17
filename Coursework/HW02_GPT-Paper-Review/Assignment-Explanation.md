@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Assignment-Explanation.md) | [한국어](Assignment-Explanation.ko.md)
 
-> **Last Updated:** 2026-11-17
+> **Last Updated:** 2026-11-18
 
 > **Assignment Type:** Open-ended report with no single answer
 
@@ -110,8 +110,8 @@ Unsupervised pre-training was first used in image classification and regression 
 
 The most successful way of using unlabeled text had been **pre-trained word embeddings** such as Word2Vec (Lecture 7). However, word embeddings mainly carry word-level information. Learning and transferring information beyond the word level faced two difficulties [1].
 
-1. **Which optimization objective is good:** Objectives such as language modeling, machine translation, and discourse coherence had been studied, but a different method prevailed on each task, so it was unclear which one learned representations useful for transfer.
-2. **How to transfer:** Methods that changed the model architecture for each task, used intricate learning schemes, or added auxiliary objectives were mixed, and there was no consensus on the most effective way.
+1. **Choice of optimization objective:** Objectives such as language modeling, machine translation, and discourse coherence had been studied, but a different method prevailed on each task, so it was unclear which one learned representations useful for transfer.
+2. **Transfer method:** Methods that changed the model architecture for each task, used intricate learning schemes, or added auxiliary objectives were mixed, and there was no consensus on the most effective way.
 
 ### 2.3 Related Work
 

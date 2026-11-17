@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Distinguish classification, object detection, and instance segmentation, and explain that the output of object detection consists of class classification and bounding-box regression
@@ -15,7 +15,7 @@
 
 ## Table of Contents
 
-- [1. What Is Object Detection](#1-what-is-object-detection)
+- [1. Overview of Object Detection](#1-overview-of-object-detection)
   - [1.1 Classification, Object Detection, and Instance Segmentation](#11-classification-object-detection-and-instance-segmentation)
   - [1.2 Detection Output: Classification and Regression](#12-detection-output-classification-and-regression)
   - [1.3 Bounding-Box Representation and IoU](#13-bounding-box-representation-and-iou)
@@ -51,7 +51,7 @@
 
 <br>
 
-## 1. What Is Object Detection
+## 1. Overview of Object Detection
 
 ### 1.1 Classification, Object Detection, and Instance Segmentation
 

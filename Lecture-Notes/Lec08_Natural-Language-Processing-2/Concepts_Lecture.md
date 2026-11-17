@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Explain the seq2seq encoder-decoder structure and the limitation of a fixed-size context vector, and explain how attention resolves it
@@ -176,7 +176,7 @@ In Figure 6, the attention value is $`0.4\,\mathbf{v}_I + 0.1\,\mathbf{v}_{am} +
 
 > **Note:** The distribution in Figure 6 (0.4, 0.1, 0.1, 0.4) is illustrative, showing the tendency. Actually applying softmax to the scores $[16, 4, 4, 16]$ gives about $[0.5, 0.000003, 0.000003, 0.5]$, because $e^{16}$ is about 160,000 times larger than $e^{4}$. Even after division by $\sqrt{d_k}$, a score gap of 12 makes softmax put almost all the weight on the largest scores, and the unscaled gap of 96 would be far more extreme. This saturation of softmax as score gaps grow is exactly the reason for the scaling explained next.
 
-**Why divide by $\sqrt{d_k}$.** If each component of the query and the key is an independent random variable with mean 0 and variance 1, the dot product $\mathbf{q} \cdot \mathbf{k} = \sum_{i=1}^{d_k} q_i k_i$ has variance $d_k$ [4]. With $d_k = 64$, the standard deviation of the dot product is 8, so differences among scores become large and the softmax output saturates, giving almost 1 to a single position. A saturated softmax has gradients near 0, which hampers training. Dividing by $\sqrt{d_k}$ brings the variance of the scores back to 1, so softmax keeps a reasonably spread distribution.
+**Reason for dividing by $\sqrt{d_k}$.** If each component of the query and the key is an independent random variable with mean 0 and variance 1, the dot product $\mathbf{q} \cdot \mathbf{k} = \sum_{i=1}^{d_k} q_i k_i$ has variance $d_k$ [4]. With $d_k = 64$, the standard deviation of the dot product is 8, so differences among scores become large and the softmax output saturates, giving almost 1 to a single position. A saturated softmax has gradients near 0, which hampers training. Dividing by $\sqrt{d_k}$ brings the variance of the scores back to 1, so softmax keeps a reasonably spread distribution.
 
 > **[Probability and Statistics]** For independent random variables $q$ and $k$ with mean 0, the variance of their product is $\mathrm{Var}(qk) = E[q^2]E[k^2] = \mathrm{Var}(q)\mathrm{Var}(k)$. The variance of a sum of independent random variables is the sum of their variances, so the dot product, a sum of $d_k$ products of variance-1 components, has variance $d_k$. Dividing a random variable by a constant $c$ divides its variance by $c^2$, so the score divided by $\sqrt{d_k}$ has variance 1.
 
@@ -451,7 +451,7 @@ The number of merges determines the vocabulary size. With many merges, frequent 
 
 ### 2.9 Positional Encoding
 
-**Why it is needed.** The Transformer processes its input all at once in parallel, which makes it fast. Self-attention, however, computes the relatedness of every pair regardless of word order, so it does not preserve information about the input order. Word order carries important information in a sentence. "The cat chased the dog." and "The dog chased the cat." consist of the same words but have opposite meanings. **Positional encoding** is therefore used to represent word order: a fixed vector is made for each position and added to the word embedding at that position.
+**Motivation.** The Transformer processes its input all at once in parallel, which makes it fast. Self-attention, however, computes the relatedness of every pair regardless of word order, so it does not preserve information about the input order. Word order carries important information in a sentence. "The cat chased the dog." and "The dog chased the cat." consist of the same words but have opposite meanings. **Positional encoding** is therefore used to represent word order: a fixed vector is made for each position and added to the word embedding at that position.
 
 **Conditions to satisfy.** There are many ways to represent the position of a word, but the following conditions must hold.
 

@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-17
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Explain the nine-step flow of implementing a deep learning model in PyTorch, and distinguish the roles of the dataset, data loader, model, loss function, and optimizer used in each step
@@ -36,7 +36,7 @@
   - [3.2 Architecture of VGG-16](#32-architecture-of-vgg-16)
   - [3.3 Six Configurations](#33-six-configurations)
 - [4. ResNet](#4-resnet)
-  - [4.1 Is Deeper Always Better? The Degradation Problem](#41-is-deeper-always-better-the-degradation-problem)
+  - [4.1 Depth and Performance: The Degradation Problem](#41-depth-and-performance-the-degradation-problem)
   - [4.2 Deep Networks and Vanishing Gradients](#42-deep-networks-and-vanishing-gradients)
   - [4.3 The Residual Block](#43-the-residual-block)
   - [4.4 Architecture of the 34-Layer ResNet](#44-architecture-of-the-34-layer-resnet)
@@ -583,7 +583,7 @@ Every configuration takes a 224×224 RGB image as input, places max pooling afte
 
 ## 4. ResNet
 
-### 4.1 Is Deeper Always Better? The Degradation Problem
+### 4.1 Depth and Performance: The Degradation Problem
 
 VGG showed that deeper networks perform better. Then does performance keep improving just by making the network deeper? In reality, adding layers indiscriminately made performance worse.
 

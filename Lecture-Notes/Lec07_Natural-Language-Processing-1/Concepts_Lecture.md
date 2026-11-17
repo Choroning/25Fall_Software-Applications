@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-17
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Explain the definition and difficulties of natural language processing, and distinguish corpus, token, tokenization, morpheme, stop word, stemming, and lemmatization
@@ -17,7 +17,7 @@
 ## Table of Contents
 
 - [1. Natural Language Processing and Basic Terms](#1-natural-language-processing-and-basic-terms)
-  - [1.1 What Is Natural Language Processing](#11-what-is-natural-language-processing)
+  - [1.1 The Concept of Natural Language Processing](#11-the-concept-of-natural-language-processing)
   - [1.2 Corpus, Token, and Tokenization](#12-corpus-token-and-tokenization)
   - [1.3 Korean Tokenization and Morphological Analysis](#13-korean-tokenization-and-morphological-analysis)
   - [1.4 Stop Words](#14-stop-words)
@@ -36,7 +36,7 @@
   - [3.9 FastText](#39-fasttext)
   - [3.10 Comparing the Representations](#310-comparing-the-representations)
 - [4. Sentiment Analysis](#4-sentiment-analysis)
-  - [4.1 What Is Sentiment Analysis](#41-what-is-sentiment-analysis)
+  - [4.1 Definition and Uses of Sentiment Analysis](#41-definition-and-uses-of-sentiment-analysis)
   - [4.2 Classifying an Embedding Sequence with an LSTM](#42-classifying-an-embedding-sequence-with-an-lstm)
   - [4.3 Research Cases](#43-research-cases)
 - [Concept Applications](#concept-applications)
@@ -50,7 +50,7 @@
 
 ## 1. Natural Language Processing and Basic Terms
 
-### 1.1 What Is Natural Language Processing
+### 1.1 The Concept of Natural Language Processing
 
 A **natural language** is a language people use to communicate in everyday life, such as Korean, English, or Chinese. Unlike artificial languages with rigorously defined grammars, such as programming languages, a natural language allows the same sentence to be read in several ways, and meaning changes with context.
 
@@ -692,7 +692,7 @@ Word vectors obtained this way are the output of the embedding stage in Figure 1
 
 ## 4. Sentiment Analysis
 
-### 4.1 What Is Sentiment Analysis
+### 4.1 Definition and Uses of Sentiment Analysis
 
 > **Definition:** **Sentiment analysis** is an NLP technique that automatically detects and classifies the sentiment and emotional state, such as positive, negative, or neutral, expressed in a text.
 
