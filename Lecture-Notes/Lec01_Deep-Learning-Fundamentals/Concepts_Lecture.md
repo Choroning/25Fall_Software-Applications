@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-17
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Explain how artificial intelligence, machine learning, and deep learning contain one another and how supervised, unsupervised, and reinforcement learning differ, and break image, sound, and text applications down into tasks and models
@@ -673,22 +673,22 @@ E_{tot} = \frac{1}{2}\left((target_{y1} - a_{20})^2 + (target_{y2} - a_{21})^2\r
 Training the weight $w_{10}^{(1)}$ (the weight from node 10 to node 20) requires $\partial E_{tot}/\partial w_{10}^{(1)}$. $w_{10}^{(1)}$ changes $z_{20}$, $z_{20}$ changes $a_{20}$, and $a_{20}$ changes $E_{tot}$. Splitting the derivative into three parts along this chain of influence is the **chain rule**.
 
 ```math
-\frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = \underbrace{\frac{\partial E_{tot}}{\partial a_{20}}}_{①} \cdot \underbrace{\frac{\partial a_{20}}{\partial z_{20}}}_{②} \cdot \underbrace{\frac{\partial z_{20}}{\partial w_{10}^{(1)}}}_{③}
+\frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = \underbrace{\frac{\partial E_{tot}}{\partial a_{20}}}_{\text{(1)}} \cdot \underbrace{\frac{\partial a_{20}}{\partial z_{20}}}_{\text{(2)}} \cdot \underbrace{\frac{\partial z_{20}}{\partial w_{10}^{(1)}}}_{\text{(3)}}
 ```
 
-① **Rate of change of the error with respect to the output.** The second term of $E_{tot}$ does not contain $a_{20}$, so its derivative is 0. The first term is $\frac{1}{2}u^2$ with $u = target_{y1} - a_{20}$, whose derivative is $u \cdot \frac{\partial u}{\partial a_{20}} = u \cdot (-1)$.
+(1) **Rate of change of the error with respect to the output.** The second term of $E_{tot}$ does not contain $a_{20}$, so its derivative is 0. The first term is $\frac{1}{2}u^2$ with $u = target_{y1} - a_{20}$, whose derivative is $u \cdot \frac{\partial u}{\partial a_{20}} = u \cdot (-1)$.
 
 ```math
 \frac{\partial E_{tot}}{\partial a_{20}} = (target_{y1} - a_{20}) \cdot (-1) + 0 = -(target_{y1} - a_{20})
 ```
 
-② **Rate of change of the output with respect to the weighted sum.** Since $a_{20} = \text{sigmoid}(z_{20})$, the sigmoid derivative of Section 3.2 applies.
+(2) **Rate of change of the output with respect to the weighted sum.** Since $a_{20} = \text{sigmoid}(z_{20})$, the sigmoid derivative of Section 3.2 applies.
 
 ```math
 \frac{\partial a_{20}}{\partial z_{20}} = \text{sigmoid}(z_{20}) \cdot (1 - \text{sigmoid}(z_{20})) = a_{20}(1 - a_{20})
 ```
 
-③ **Rate of change of the weighted sum with respect to the weight.** $z_{20} = w_{10}^{(1)}a_{10} + w_{20}^{(1)}a_{11}$, and the second term does not depend on $w_{10}^{(1)}$.
+(3) **Rate of change of the weighted sum with respect to the weight.** $z_{20} = w_{10}^{(1)}a_{10} + w_{20}^{(1)}a_{11}$, and the second term does not depend on $w_{10}^{(1)}$.
 
 ```math
 \frac{\partial z_{20}}{\partial w_{10}^{(1)}} = a_{10} + 0 = a_{10}
@@ -722,7 +722,7 @@ The effect of $w_{10}^{(1)}$ on the total error is 0.0382, and the updated value
 
 ### 6.5 Updating All Weights and the Result of One Backpropagation Pass
 
-The remaining weights are computed the same way. To simplify the formulas, the **error signal** $\delta$ of an output node is defined as the product of ① and ②.
+The remaining weights are computed the same way. To simplify the formulas, the **error signal** $\delta$ of an output node is defined as the product of (1) and (2).
 
 ```math
 \delta_{20} = (a_{20} - target_{y1})\,a_{20}(1 - a_{20}) = 0.3091 \times 0.2381 \approx 0.0736, \qquad \delta_{21} = (a_{21} - target_{y2})\,a_{21}(1 - a_{21}) = (-0.2663) \times 0.2321 \approx -0.0618

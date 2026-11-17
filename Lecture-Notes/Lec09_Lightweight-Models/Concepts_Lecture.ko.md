@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-04
+> **최종 수정일:** 2026-11-18
 
 > **학습 목표:**
 > 1. 딥러닝 모델 경량화가 필요한 이유와 AI 엣지 컴퓨팅의 장점을 설명할 수 있다
@@ -283,7 +283,7 @@ Fire 모듈은 다음과 같이 동작한다.
 **파라미터 계산 예: fire2.** 입력이 55×55×96이고 $s_{1\times1} = 16$, $e_{1\times1} = 64$, $e_{3\times3} = 64$인 fire2의 파라미터는 다음과 같다(편향 포함).
 
 ```math
-\underbrace{96 \times 16 + 16}_{\text{squeeze}} + \underbrace{16 \times 64 + 64}_{\text{expand 1×1}} + \underbrace{9 \times 16 \times 64 + 64}_{\text{expand 3×3}} = 1{,}552 + 1{,}088 + 9{,}280 = 11{,}920
+\underbrace{96 \times 16 + 16}_{\text{squeeze}} + \underbrace{16 \times 64 + 64}_{\text{expand } 1 \times 1} + \underbrace{9 \times 16 \times 64 + 64}_{\text{expand } 3 \times 3} = 1{,}552 + 1{,}088 + 9{,}280 = 11{,}920
 ```
 
 같은 입력에서 같은 128채널을 3×3 합성곱 하나로 만들면 $9 \times 96 \times 128 + 128 = 110{,}720$개가 필요하므로, Fire 모듈은 파라미터를 약 1/9로 줄인다. 다음 코드는 Fire 모듈을 PyTorch로 구현하고 이 값을 확인한다.

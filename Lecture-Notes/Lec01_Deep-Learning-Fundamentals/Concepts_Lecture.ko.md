@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-17
+> **최종 수정일:** 2026-11-18
 
 > **학습 목표:**
 > 1. 인공지능, 기계학습, 딥러닝의 포함 관계와 지도학습, 비지도학습, 강화학습의 차이를 설명하고, 영상, 소리, 텍스트 응용을 태스크와 모델로 나누어 설명할 수 있다
@@ -673,22 +673,22 @@ E_{tot} = \frac{1}{2}\left((target_{y1} - a_{20})^2 + (target_{y2} - a_{21})^2\r
 가중치 $w_{10}^{(1)}$(노드 10에서 노드 20으로 가는 가중치)을 학습시키려면 $\partial E_{tot}/\partial w_{10}^{(1)}$이 필요하다. $w_{10}^{(1)}$은 $z_{20}$을 바꾸고, $z_{20}$은 $a_{20}$을 바꾸며, $a_{20}$은 $E_{tot}$을 바꾼다. 이 영향의 사슬을 따라 미분을 세 부분으로 나누는 것이 **연쇄 법칙(chain rule)** 이다.
 
 ```math
-\frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = \underbrace{\frac{\partial E_{tot}}{\partial a_{20}}}_{①} \cdot \underbrace{\frac{\partial a_{20}}{\partial z_{20}}}_{②} \cdot \underbrace{\frac{\partial z_{20}}{\partial w_{10}^{(1)}}}_{③}
+\frac{\partial E_{tot}}{\partial w_{10}^{(1)}} = \underbrace{\frac{\partial E_{tot}}{\partial a_{20}}}_{\text{(1)}} \cdot \underbrace{\frac{\partial a_{20}}{\partial z_{20}}}_{\text{(2)}} \cdot \underbrace{\frac{\partial z_{20}}{\partial w_{10}^{(1)}}}_{\text{(3)}}
 ```
 
-① **출력에 대한 오차의 변화율.** $E_{tot}$의 두 번째 항은 $a_{20}$을 포함하지 않으므로 미분하면 0이다. 첫 번째 항은 $\frac{1}{2}u^2$($`u = target_{y1} - a_{20}`$)의 미분 $u \cdot \frac{\partial u}{\partial a_{20}} = u \cdot (-1)$이다.
+(1) **출력에 대한 오차의 변화율.** $E_{tot}$의 두 번째 항은 $a_{20}$을 포함하지 않으므로 미분하면 0이다. 첫 번째 항은 $\frac{1}{2}u^2$($`u = target_{y1} - a_{20}`$)의 미분 $u \cdot \frac{\partial u}{\partial a_{20}} = u \cdot (-1)$이다.
 
 ```math
 \frac{\partial E_{tot}}{\partial a_{20}} = (target_{y1} - a_{20}) \cdot (-1) + 0 = -(target_{y1} - a_{20})
 ```
 
-② **가중합에 대한 출력의 변화율.** $a_{20} = \text{sigmoid}(z_{20})$이므로 3.2절의 시그모이드 도함수를 쓴다.
+(2) **가중합에 대한 출력의 변화율.** $a_{20} = \text{sigmoid}(z_{20})$이므로 3.2절의 시그모이드 도함수를 쓴다.
 
 ```math
 \frac{\partial a_{20}}{\partial z_{20}} = \text{sigmoid}(z_{20}) \cdot (1 - \text{sigmoid}(z_{20})) = a_{20}(1 - a_{20})
 ```
 
-③ **가중치에 대한 가중합의 변화율.** $z_{20} = w_{10}^{(1)}a_{10} + w_{20}^{(1)}a_{11}$이고 두 번째 항은 $w_{10}^{(1)}$과 무관하다.
+(3) **가중치에 대한 가중합의 변화율.** $z_{20} = w_{10}^{(1)}a_{10} + w_{20}^{(1)}a_{11}$이고 두 번째 항은 $w_{10}^{(1)}$과 무관하다.
 
 ```math
 \frac{\partial z_{20}}{\partial w_{10}^{(1)}} = a_{10} + 0 = a_{10}
@@ -722,7 +722,7 @@ $w_{10}^{(1)}$이 전체 오차에 미치는 영향은 0.0382이고, 갱신한 $
 
 ### 6.5 모든 가중치의 갱신과 역전파 1회의 결과
 
-나머지 가중치도 같은 방법으로 계산한다. 식을 간단히 하기 위해 출력 노드의 **오차 신호(error signal)** $\delta$를 ①과 ②의 곱으로 정의한다.
+나머지 가중치도 같은 방법으로 계산한다. 식을 간단히 하기 위해 출력 노드의 **오차 신호(error signal)** $\delta$를 (1)과 (2)의 곱으로 정의한다.
 
 ```math
 \delta_{20} = (a_{20} - target_{y1})\,a_{20}(1 - a_{20}) = 0.3091 \times 0.2381 \approx 0.0736, \qquad \delta_{21} = (a_{21} - target_{y2})\,a_{21}(1 - a_{21}) = (-0.2663) \times 0.2321 \approx -0.0618

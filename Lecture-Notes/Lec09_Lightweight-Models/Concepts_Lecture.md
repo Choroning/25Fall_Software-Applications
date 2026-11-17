@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Explain why deep learning models need to be made lightweight and the advantages of AI edge computing
@@ -283,7 +283,7 @@ The Fire module works as follows.
 **Parameter count example: fire2.** With a 55×55×96 input and $s_{1\times1} = 16$, $e_{1\times1} = 64$, $e_{3\times3} = 64$, the parameters of fire2 are as follows (including biases).
 
 ```math
-\underbrace{96 \times 16 + 16}_{\text{squeeze}} + \underbrace{16 \times 64 + 64}_{\text{expand 1×1}} + \underbrace{9 \times 16 \times 64 + 64}_{\text{expand 3×3}} = 1{,}552 + 1{,}088 + 9{,}280 = 11{,}920
+\underbrace{96 \times 16 + 16}_{\text{squeeze}} + \underbrace{16 \times 64 + 64}_{\text{expand } 1 \times 1} + \underbrace{9 \times 16 \times 64 + 64}_{\text{expand } 3 \times 3} = 1{,}552 + 1{,}088 + 9{,}280 = 11{,}920
 ```
 
 Producing the same 128 channels from the same input with one 3×3 convolution would need $9 \times 96 \times 128 + 128 = 110{,}720$ parameters, so the Fire module cuts the parameters to about 1/9. The following code implements the Fire module in PyTorch and confirms these values.
