@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain the nine-step flow of implementing a deep learning model in PyTorch, and distinguish the roles of the dataset, data loader, model, loss function, and optimizer used in each step
@@ -78,8 +78,8 @@ The nine steps correspond to the three actions of neural network training. The n
 
 ```mermaid
 graph LR
-    F["1. Forward computation<br>compute prediction out from inputs x₁, x₂"] --> E["2. Error computation<br>compare prediction out with answer y"]
-    E --> B["3. Backward weight update<br>correct w⁽²⁾, then w⁽¹⁾"]
+    F["1. Forward computation<br>compute prediction out from inputs x1, x2"] --> E["2. Error computation<br>compare prediction out with answer y"]
+    E --> B["3. Backward weight update<br>correct w^(2), then w^(1)"]
     B --> F
 ```
 

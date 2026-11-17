@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain how artificial intelligence, machine learning, and deep learning contain one another and how supervised, unsupervised, and reinforcement learning differ, and break image, sound, and text applications down into tasks and models
@@ -217,10 +217,10 @@ One artificial neuron is also called a **node**. A neural network arranges nodes
 
 ```mermaid
 graph LR
-    x1(("x₁")) --> h1(("h₁"))
-    x1 --> h2(("h₂"))
-    x1 --> h3(("h₃"))
-    x2(("x₂")) --> h1
+    x1(("x1")) --> h1(("h1"))
+    x1 --> h2(("h2"))
+    x1 --> h3(("h3"))
+    x2(("x2")) --> h1
     x2 --> h2
     x2 --> h3
     h1 --> o(("o"))
@@ -637,14 +637,14 @@ Backpropagation is computed from start to finish on the following network. There
 
 ```mermaid
 graph LR
-    X(("x₁ = 0.5")) -->|"w₁₀⁽⁰⁾ = 0.15"| N10(("node 10"))
-    X -->|"w₁₁⁽⁰⁾ = 0.2"| N11(("node 11"))
-    N10 -->|"w₁₀⁽¹⁾ = 0.4"| N20(("node 20"))
-    N10 -->|"w₁₁⁽¹⁾ = 0.5"| N21(("node 21"))
-    N11 -->|"w₂₀⁽¹⁾ = 0.45"| N20
-    N11 -->|"w₂₁⁽¹⁾ = 0.55"| N21
-    N20 --> Y1["y₁ target 0.3"]
-    N21 --> Y2["y₂ target 0.9"]
+    X(("x1 = 0.5")) -->|"w10^(0) = 0.15"| N10(("node 10"))
+    X -->|"w11^(0) = 0.2"| N11(("node 11"))
+    N10 -->|"w10^(1) = 0.4"| N20(("node 20"))
+    N10 -->|"w11^(1) = 0.5"| N21(("node 21"))
+    N11 -->|"w20^(1) = 0.45"| N20
+    N11 -->|"w21^(1) = 0.55"| N21
+    N20 --> Y1["y1 target 0.3"]
+    N21 --> Y2["y2 target 0.9"]
 ```
 
 *Figure 14. The backpropagation example network with one input, two hidden nodes, and two output nodes, and its initial weights*

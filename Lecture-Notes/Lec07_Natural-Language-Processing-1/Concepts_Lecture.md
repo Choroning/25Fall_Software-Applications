@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain the definition and difficulties of natural language processing, and distinguish corpus, token, tokenization, morpheme, stop word, stemming, and lemmatization
@@ -277,7 +277,11 @@ Section 3 below covers embedding, which turns text into numbers, and Section 4 c
 
 A neural network can only compute with numbers, so to use natural language as input to a deep learning model, text must first be converted into numbers.
 
-> **Definition:** In natural language processing, an **embedding** is the result, or the process, of converting the language people use (natural language) into a numeric **vector** that a computer can understand. Turning one word into one vector is a **word embedding**, and turning a whole sentence or document into one vector is a **document embedding**.
+> **Definition:** In natural language processing, an **embedding** is the result, or the process, of converting the language people use (natural language) into a numeric vector that a computer can understand.
+
+> **Definition:** A **word embedding** is an embedding that turns one word into one vector.
+
+> **Definition:** A **document embedding** is an embedding that turns a whole sentence or document into one vector.
 
 In a good word embedding, the vectors of words with similar meanings lie close together. The following figure shows the embeddings of several words on a two-dimensional plane. Means of transport such as Train, Bus, Taxi, Car, and Bicycle (with Cycling and Athlete next to them), drinks and ingredients such as Espresso, Cappuccino, Sugar, and Lemon, education words such as Tutor, Student, School, and University, exercise words such as Yoga and Pilates, and pet words such as Cat, Dog, Pet, and Grooming each form a cluster, and King and Queen lie close together.
 

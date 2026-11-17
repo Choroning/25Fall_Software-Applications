@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Assignment-Explanation.md) | [한국어](Assignment-Explanation.ko.md)
 
-> **Last Updated:** 2026-11-16
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain the motivation for semi-supervised learning that uses unlabeled text in natural language understanding and the limitations of earlier methods
@@ -98,7 +98,9 @@ Match the equations to the paper's equation numbers (1)-(5), and define each sym
 
 **Natural language understanding (NLU)** covers a variety of tasks that require grasping the meaning of sentences, such as textual entailment, question answering, semantic similarity assessment, and document classification. Unlabeled text is abundant, but labeled data for specific tasks is scarce, so a **discriminative model** trained only on labeled data struggles to perform adequately. Collecting more labels is time-consuming and expensive, so models that learn linguistic information from unlabeled data are a valuable alternative [1].
 
-> **Definition:** **Semi-supervised learning** trains with a small amount of labeled data together with a large amount of unlabeled data. **Unsupervised pre-training** is a special case whose goal is to find good initial parameters from unlabeled data instead of modifying the supervised learning objective.
+> **Definition:** **Semi-supervised learning** trains with a small amount of labeled data together with a large amount of unlabeled data.
+
+> **Definition:** **Unsupervised pre-training** is a special case of semi-supervised learning whose goal is to find good initial parameters from unlabeled data instead of modifying the supervised learning objective.
 
 Unsupervised pre-training was first used in image classification and regression tasks, and research also showed that pre-training acts as a regularization scheme that helps deep neural networks generalize. It was later used to help train models for tasks such as speech recognition, entity disambiguation, and machine translation [1].
 
