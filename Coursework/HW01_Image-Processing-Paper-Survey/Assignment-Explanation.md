@@ -2,7 +2,9 @@
 
 [Repository Guide](../../README.md) | [English](Assignment-Explanation.md) | [한국어](Assignment-Explanation.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
+
+> **Assignment Type:** Open-ended report with no single answer
 
 > **Learning Objectives:**
 > 1. Explain the degradation problem of deep neural networks and distinguish it from overfitting and vanishing gradients

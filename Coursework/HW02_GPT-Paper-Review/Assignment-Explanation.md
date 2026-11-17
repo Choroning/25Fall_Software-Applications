@@ -4,6 +4,8 @@
 
 > **Last Updated:** 2026-11-17
 
+> **Assignment Type:** Open-ended report with no single answer
+
 > **Learning Objectives:**
 > 1. Explain the motivation for semi-supervised learning that uses unlabeled text in natural language understanding and the limitations of earlier methods
 > 2. Explain with equations the unsupervised pre-training stage made of a language modeling objective and a Transformer decoder
