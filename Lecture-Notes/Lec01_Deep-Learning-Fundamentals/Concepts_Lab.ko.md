@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lab.md) | [한국어](Concepts_Lab.ko.md)
 
-> **최종 수정일:** 2026-11-04
+> **최종 수정일:** 2026-11-19
 
 > **학습 목표:**
 > 1. Colab과 로컬 컴퓨터에서 실습 노트북과 데이터를 준비하고, Google Drive 경로와 상대 경로의 차이를 설명할 수 있다
@@ -77,28 +77,11 @@ Lec01_Deep-Learning-Fundamentals/
 
 ### 1.3 실행 환경 준비
 
-**Colab에서 실행하기.** 1강 8.1절의 방법으로 Colab에 접속하여 노트북을 연다. 학습된 가중치로 추론만 하므로 CPU 런타임으로도 실행할 수 있으며, GPU 런타임을 쓰면 더 빠르다. 데이터는 다음 두 가지 중 하나로 준비한다.
-
-1. 왼쪽 파일 창에서 `data` 폴더를 만들고 세 파일을 세션 저장소 `/content/data/`에 업로드한다. Colab의 기본 작업 디렉토리는 `/content`이므로 `data/...` 경로가 그대로 동작한다.
-2. 단원 폴더를 Google Drive에 올려 두었다면, 노트북의 Drive 연결 셀을 실행한 뒤 단원 폴더로 작업 디렉토리를 옮긴다.
-
-```python
-%cd /content/drive/MyDrive/Lec01_Deep-Learning-Fundamentals
-```
-
-`%cd`는 Jupyter의 매직 명령으로, 커널의 작업 디렉토리를 바꾼다. 경로는 Drive에 올린 위치에 맞게 고친다.
-
-**로컬 컴퓨터에서 실행하기.** 필요한 패키지를 설치하고 단원 폴더에서 JupyterLab을 실행한다.
-
-```bash
-pip install torch torchvision matplotlib pillow jupyterlab
-cd Lecture-Notes/Lec01_Deep-Learning-Fundamentals
-jupyter lab
-```
+학습된 가중치로 추론만 하므로 CPU 런타임으로도 실행할 수 있으며, GPU 런타임을 쓰면 더 빠르다. 노트북은 1.2절의 상대 경로로 파일을 열므로, Colab에서는 세 파일을 세션 저장소의 `/content/data/`에 올리거나(기본 작업 디렉토리가 `/content`이다) Drive에 올린 단원 폴더로 `%cd`(커널의 작업 디렉토리를 바꾸는 Jupyter의 매직 명령)를 실행하고, 로컬 컴퓨터에서는 단원 폴더에서 JupyterLab을 실행한다.
 
 > **주의:** 노트북의 `from google.colab import drive` 셀은 Colab 전용이다. 로컬 컴퓨터에서 실행하면 `ModuleNotFoundError`가 나므로 이 셀은 건너뛴다. 처음 실행할 때는 VGG-16의 학습된 가중치(약 528 MB)를 내려받으므로 인터넷 연결과 시간이 필요하다.
 
-> **참고:** 노트북 첫머리의 사전 준비 셀은 원서 예제 저장소의 `make_folders_and_data_downloads.ipynb`로 데이터를 내려받고 conda로 PyTorch 1.0과 Matplotlib을 설치하라고 안내한다. 이 안내는 PyTorch 1.0 시기의 설치 방법이므로, 지금은 위의 pip 명령이나 PyTorch 홈페이지(https://pytorch.org/get-started/locally/)의 설치 안내를 따르고, 데이터는 1.2절의 `data/` 폴더에 있는 세 파일을 쓴다.
+> **참고:** 노트북 첫머리의 사전 준비 셀은 원서 예제 저장소의 `make_folders_and_data_downloads.ipynb`로 데이터를 내려받고 conda로 PyTorch 1.0을 설치하라고 안내하지만, 이는 PyTorch 1.0 시기의 방법이다. 지금은 PyTorch 홈페이지(https://pytorch.org/get-started/locally/)의 설치 안내를 따르고, 데이터는 1.2절의 `data/` 폴더에 있는 세 파일을 쓴다.
 
 ---
 

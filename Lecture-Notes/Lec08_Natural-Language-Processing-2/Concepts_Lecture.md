@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-18
+> **Last Updated:** 2026-11-19
 
 > **Learning Objectives:**
 > 1. Explain the seq2seq encoder-decoder structure and the limitation of a fixed-size context vector, and explain how attention resolves it
@@ -376,70 +376,6 @@ low : 5,  low e r : 2,  newest : 6,  widest : 3
 # vocabulary update!
 l, o, w, e, r, n, s, t, i, d, es, est, lo, low, ne, new, newest, wi, wid, widest
 ```
-
-The following code implements this process.
-
-```python
-from collections import Counter
-
-def count_pairs(dictionary):
-    pairs = Counter()
-    for symbols, freq in dictionary.items():
-        for pair in zip(symbols, symbols[1:]):     # pairs of adjacent symbols
-            pairs[pair] += freq                     # count by the word's frequency
-    return pairs
-
-def merge(symbols, pair):
-    out, i = [], 0
-    while i < len(symbols):
-        if i < len(symbols) - 1 and (symbols[i], symbols[i + 1]) == pair:
-            out.append(symbols[i] + symbols[i + 1])  # merge the pair into one symbol
-            i += 2
-        else:
-            out.append(symbols[i])
-            i += 1
-    return tuple(out)
-
-dictionary = {tuple("low"): 5, tuple("lower"): 2, tuple("newest"): 6, tuple("widest"): 3}
-vocabulary = ["l", "o", "w", "e", "r", "n", "s", "t", "i", "d"]
-merges = []
-
-for step in range(1, 11):
-    pairs = count_pairs(dictionary)
-    best = max(pairs, key=pairs.get)                # most frequent pair (on a tie, the one counted first)
-    print(step, best, pairs[best])
-    dictionary = {merge(s, best): f for s, f in dictionary.items()}
-    vocabulary.append(best[0] + best[1])
-    merges.append(best)
-
-print({" ".join(s): f for s, f in dictionary.items()})
-print(vocabulary)
-
-word = tuple("lowest")                              # a word not in the training data
-for pair in merges:                                 # apply the merges in the learned order
-    word = merge(word, pair)
-print(word)
-```
-
-```text
-1 ('e', 's') 9
-2 ('es', 't') 9
-3 ('l', 'o') 7
-4 ('lo', 'w') 7
-5 ('n', 'e') 6
-6 ('ne', 'w') 6
-7 ('new', 'est') 6
-8 ('w', 'i') 3
-9 ('wi', 'd') 3
-10 ('wid', 'est') 3
-{'low': 5, 'low e r': 2, 'newest': 6, 'widest': 3}
-['l', 'o', 'w', 'e', 'r', 'n', 's', 't', 'i', 'd', 'es', 'est', 'lo', 'low', 'ne', 'new', 'newest', 'wi', 'wid', 'widest']
-('low', 'est')
-```
-
-- `count_pairs()` forms adjacent pairs in each word (a tuple of symbols) with `zip(symbols, symbols[1:])` and counts them by the word's frequency. `Counter` is a dictionary whose missing keys start at 0.
-- `merge()` scans a symbol sequence from the left and merges the given pair whenever it is met.
-- `max(pairs, key=pairs.get)` picks the pair with the largest count. On a tie, the pair counted first is chosen, so step 1 selects (e, s) rather than (s, t).
 
 **BPE can handle new words.** When lowest, absent from the training data, arrives, it is first split into the characters l, o, w, e, s, t, and the learned merge rules are applied in the learned order. Applying (e, s) → es, (es, t) → est, (l, o) → lo, and (lo, w) → low turns lowest into the two subwords low and est, both of which are in the vocabulary, so it can be represented.
 

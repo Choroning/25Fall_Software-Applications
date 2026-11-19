@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-19
 
 > **Learning Objectives:**
 > 1. Distinguish the perceptron from the multi-layer perceptron, and compute one- and two-dimensional convolutions by hand
@@ -411,11 +411,8 @@ torch.nn.MaxPool2d(kernel_size, stride=None, padding=0, dilation=1, return_indic
 | `kernel_size` | Size of the region over which the maximum is taken |
 | `stride` | Step with which the region moves. The default `None` equals `kernel_size` |
 | `padding` | Number of cells added on both sides. Added cells are treated as negative infinity, so they are never chosen as the maximum |
-| `dilation` | Spacing between elements within the region |
-| `return_indices` | If `True`, also returns the positions of the maxima (used with `MaxUnpool2d`) |
-| `ceil_mode` | If `True`, uses the ceiling instead of the floor when computing the output size |
 
-*Table 9. Arguments of torch.nn.MaxPool2d*
+*Table 9. Main arguments of torch.nn.MaxPool2d*
 
 The output-size formula is the same as for `Conv2d`. So `MaxPool2d(2)` also has stride 2 and halves the height and width, and `MaxPool2d(3, 2)` is AlexNet's overlapping max pooling. Code that builds a CNN with these two classes and traces the tensor size at each layer is covered in the Lecture 2 lab.
 

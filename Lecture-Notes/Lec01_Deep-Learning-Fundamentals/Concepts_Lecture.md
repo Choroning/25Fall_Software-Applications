@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-18
+> **Last Updated:** 2026-11-19
 
 > **Learning Objectives:**
 > 1. Explain how artificial intelligence, machine learning, and deep learning contain one another and how supervised, unsupervised, and reinforcement learning differ, and break image, sound, and text applications down into tasks and models
@@ -915,13 +915,7 @@ There are many values that the user must set when building a model, and all of t
 - It can connect to Google Drive to read and write data.
 - Work does not depend on the specifications of one's own computer, which makes it a good environment for simple exercises. Free use has limits on running time and GPU types.
 
-A deep learning practice environment is prepared on Colab in the following order.
-
-1. Go to https://colab.research.google.com/ and sign in with a Google account.
-2. Create a new notebook, or from the File menu upload a notebook (`.ipynb`) or open one stored on Google Drive or GitHub.
-3. If a GPU is needed, open Change runtime type in the Runtime menu and set the hardware accelerator to GPU (for example, T4).
-4. Select a code cell and press Shift+Enter to run it. Prefixing a line with `!` runs a shell command (for example, `!nvidia-smi` to check the GPU and `!pip install package` to install a package).
-5. Upload data files to the session storage (`/content`) from the Files pane on the left, or connect Google Drive with the following code and use the files under `/content/drive/MyDrive/`.
+If a GPU is needed, set the hardware accelerator to GPU (for example, T4) in the runtime type settings. Prefixing a line with `!` runs a shell command (for example, `!nvidia-smi` to check the GPU and `!pip install package` to install a package), and data files are either uploaded to the session storage (`/content`) or read from `/content/drive/MyDrive/` after connecting Google Drive with the following code.
 
 ```python
 from google.colab import drive

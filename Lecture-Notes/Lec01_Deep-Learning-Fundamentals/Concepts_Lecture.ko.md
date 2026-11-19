@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-18
+> **최종 수정일:** 2026-11-19
 
 > **학습 목표:**
 > 1. 인공지능, 기계학습, 딥러닝의 포함 관계와 지도학습, 비지도학습, 강화학습의 차이를 설명하고, 영상, 소리, 텍스트 응용을 태스크와 모델로 나누어 설명할 수 있다
@@ -915,13 +915,7 @@ $B$는 배치 크기, $L_i$는 미니 배치의 $i$번째 데이터에 대한 �
 - Google Drive를 연결하여 데이터를 읽고 쓸 수 있다.
 - 본인 컴퓨터의 사양에 구애받지 않고 작업할 수 있어 간단한 실습을 하기 좋은 환경이다. 무료 사용에는 실행 시간과 GPU 종류의 제한이 있다.
 
-Colab에서 딥러닝 실습 환경을 준비하는 순서는 다음과 같다.
-
-1. https://colab.research.google.com/ 에 접속하여 Google 계정으로 로그인한다.
-2. 새 노트를 만들거나, 파일 메뉴에서 노트북(`.ipynb`)을 업로드하거나 Google Drive 또는 GitHub에 있는 노트북을 연다.
-3. GPU가 필요하면 런타임 메뉴의 런타임 유형 변경에서 하드웨어 가속기를 GPU(예: T4)로 바꾼다.
-4. 코드 셀을 선택하고 Shift+Enter를 눌러 실행한다. 셀 앞에 `!`를 붙이면 셸 명령을 실행한다(예: `!nvidia-smi`로 GPU 확인, `!pip install 패키지`로 설치).
-5. 데이터 파일은 왼쪽의 파일 창에서 세션 저장소(`/content`)에 업로드하거나, 다음 코드로 Google Drive를 연결하여 `/content/drive/MyDrive/` 아래의 파일을 쓴다.
+GPU가 필요하면 런타임 유형에서 하드웨어 가속기를 GPU(예: T4)로 바꾼다. 셀 앞에 `!`를 붙이면 셸 명령을 실행하며(예: `!nvidia-smi`로 GPU 확인, `!pip install 패키지`로 설치), 데이터 파일은 세션 저장소(`/content`)에 올리거나 다음 코드로 Google Drive를 연결하여 `/content/drive/MyDrive/` 아래의 파일을 쓴다.
 
 ```python
 from google.colab import drive

@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-18
+> **최종 수정일:** 2026-11-19
 
 > **학습 목표:**
 > 1. seq2seq 인코더-디코더 구조와 고정 크기 컨텍스트 벡터의 한계를 설명하고, 어텐션이 이를 해결하는 원리를 설명할 수 있다
@@ -376,70 +376,6 @@ low : 5,  low e r : 2,  newest : 6,  widest : 3
 # vocabulary update!
 l, o, w, e, r, n, s, t, i, d, es, est, lo, low, ne, new, newest, wi, wid, widest
 ```
-
-다음 코드는 이 과정을 구현한다.
-
-```python
-from collections import Counter
-
-def count_pairs(dictionary):
-    pairs = Counter()
-    for symbols, freq in dictionary.items():
-        for pair in zip(symbols, symbols[1:]):     # 이웃한 두 기호의 쌍
-            pairs[pair] += freq                     # 단어의 빈도만큼 센다
-    return pairs
-
-def merge(symbols, pair):
-    out, i = [], 0
-    while i < len(symbols):
-        if i < len(symbols) - 1 and (symbols[i], symbols[i + 1]) == pair:
-            out.append(symbols[i] + symbols[i + 1])  # 쌍을 하나의 기호로 합친다
-            i += 2
-        else:
-            out.append(symbols[i])
-            i += 1
-    return tuple(out)
-
-dictionary = {tuple("low"): 5, tuple("lower"): 2, tuple("newest"): 6, tuple("widest"): 3}
-vocabulary = ["l", "o", "w", "e", "r", "n", "s", "t", "i", "d"]
-merges = []
-
-for step in range(1, 11):
-    pairs = count_pairs(dictionary)
-    best = max(pairs, key=pairs.get)                # 가장 빈도가 높은 쌍(동률이면 먼저 센 쌍)
-    print(step, best, pairs[best])
-    dictionary = {merge(s, best): f for s, f in dictionary.items()}
-    vocabulary.append(best[0] + best[1])
-    merges.append(best)
-
-print({" ".join(s): f for s, f in dictionary.items()})
-print(vocabulary)
-
-word = tuple("lowest")                              # 학습 데이터에 없던 단어
-for pair in merges:                                 # 학습한 순서대로 병합을 적용한다
-    word = merge(word, pair)
-print(word)
-```
-
-```text
-1 ('e', 's') 9
-2 ('es', 't') 9
-3 ('l', 'o') 7
-4 ('lo', 'w') 7
-5 ('n', 'e') 6
-6 ('ne', 'w') 6
-7 ('new', 'est') 6
-8 ('w', 'i') 3
-9 ('wi', 'd') 3
-10 ('wid', 'est') 3
-{'low': 5, 'low e r': 2, 'newest': 6, 'widest': 3}
-['l', 'o', 'w', 'e', 'r', 'n', 's', 't', 'i', 'd', 'es', 'est', 'lo', 'low', 'ne', 'new', 'newest', 'wi', 'wid', 'widest']
-('low', 'est')
-```
-
-- `count_pairs()`는 각 단어(기호의 튜플)에서 `zip(symbols, symbols[1:])`으로 이웃한 쌍을 만들고, 그 단어의 빈도만큼 센다. `Counter`는 없는 키를 0으로 시작하는 딕셔너리이다.
-- `merge()`는 기호 열을 왼쪽부터 보며 지정한 쌍을 만나면 하나로 합친다.
-- `max(pairs, key=pairs.get)`은 등장 횟수가 가장 큰 쌍을 고른다. 동률이면 먼저 센 쌍이 선택되므로 1단계에서 (s, t)가 아니라 (e, s)가 선택된다.
 
 **BPE는 새로운 단어가 등장해도 대응할 수 있다.** 학습 데이터에 없던 lowest가 들어오면 먼저 글자 l, o, w, e, s, t로 나눈 뒤, 학습한 병합 규칙을 학습한 순서대로 적용한다. (e, s) → es, (es, t) → est, (l, o) → lo, (lo, w) → low를 적용하면 lowest는 low와 est 두 서브워드가 되고, 둘 다 어휘에 있으므로 표현할 수 있다.
 

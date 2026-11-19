@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-04
+> **최종 수정일:** 2026-11-19
 
 > **학습 목표:**
 > 1. 퍼셉트론과 다층 퍼셉트론을 구분하고, 1차원과 2차원 합성곱을 직접 계산할 수 있다
@@ -411,11 +411,8 @@ torch.nn.MaxPool2d(kernel_size, stride=None, padding=0, dilation=1, return_indic
 | `kernel_size` | 최댓값을 취할 영역의 크기 |
 | `stride` | 영역의 이동 간격. 기본값 `None`은 `kernel_size`와 같다 |
 | `padding` | 양쪽에 덧대는 칸 수. 덧댄 칸은 음의 무한대로 취급되어 최댓값으로 뽑히지 않는다 |
-| `dilation` | 영역 안 원소 사이의 간격 |
-| `return_indices` | `True`이면 최댓값의 위치도 함께 돌려준다(`MaxUnpool2d`에 쓰임) |
-| `ceil_mode` | `True`이면 출력 크기를 계산할 때 내림 대신 올림을 쓴다 |
 
-*표 9. torch.nn.MaxPool2d의 인자*
+*표 9. torch.nn.MaxPool2d의 주요 인자*
 
 출력 크기 공식은 `Conv2d`와 같다. 따라서 `MaxPool2d(2)`는 스트라이드도 2가 되어 가로세로를 절반으로 줄이고, `MaxPool2d(3, 2)`는 AlexNet의 중첩 최대 풀링이다. 이 두 클래스로 CNN을 만들고 층마다 텐서 크기를 추적하는 코드는 2강 실습에서 다룬다.
 

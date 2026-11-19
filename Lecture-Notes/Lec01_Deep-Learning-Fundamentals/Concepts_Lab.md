@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lab.md) | [한국어](Concepts_Lab.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-19
 
 > **Learning Objectives:**
 > 1. Prepare the lab notebook and data on Colab and on a local computer, and explain the difference between a Google Drive path and a relative path
@@ -77,28 +77,11 @@ The notebook opens files with **relative paths** such as `data/goldenretriever-3
 
 ### 1.3 Preparing the Runtime Environment
 
-**Running on Colab.** Open Colab as in Section 8.1 of Lecture 1 and open the notebook. Since only inference with pretrained weights is done, a CPU runtime is enough, and a GPU runtime is faster. Prepare the data in one of the following two ways.
-
-1. In the Files pane on the left, create a `data` folder and upload the three files to the session storage `/content/data/`. Colab's default working directory is `/content`, so the `data/...` paths work as they are.
-2. If the unit folder has been uploaded to Google Drive, run the notebook's Drive connection cell and then move the working directory to the unit folder.
-
-```python
-%cd /content/drive/MyDrive/Lec01_Deep-Learning-Fundamentals
-```
-
-`%cd` is a Jupyter magic command that changes the kernel's working directory. Adjust the path to where the folder was uploaded on Drive.
-
-**Running on a local computer.** Install the required packages and start JupyterLab in the unit folder.
-
-```bash
-pip install torch torchvision matplotlib pillow jupyterlab
-cd Lecture-Notes/Lec01_Deep-Learning-Fundamentals
-jupyter lab
-```
+Since only inference with pretrained weights is done, a CPU runtime is enough, and a GPU runtime is faster. The notebook opens files with the relative paths of Section 1.2, so on Colab either upload the three files to `/content/data/` in the session storage (the default working directory is `/content`) or run `%cd` (a Jupyter magic command that changes the kernel's working directory) to the unit folder uploaded to Drive, and on a local computer start JupyterLab in the unit folder.
 
 > **Caution:** The notebook's `from google.colab import drive` cell works only on Colab. On a local computer it raises `ModuleNotFoundError`, so skip that cell. The first run downloads the pretrained weights of VGG-16 (about 528 MB), which requires an internet connection and some time.
 
-> **Note:** The preparation cell at the top of the notebook says to download the data with `make_folders_and_data_downloads.ipynb` from the original book's example repository and to install PyTorch 1.0 and Matplotlib with conda. These instructions date from the PyTorch 1.0 era, so today follow the pip commands above or the installation guide on the PyTorch website (https://pytorch.org/get-started/locally/), and use the three files in the `data/` folder of Section 1.2.
+> **Note:** The preparation cell at the top of the notebook says to download the data with `make_folders_and_data_downloads.ipynb` from the original book's example repository and to install PyTorch 1.0 with conda, which is the method of the PyTorch 1.0 era. Today follow the installation guide on the PyTorch website (https://pytorch.org/get-started/locally/), and use the three files in the `data/` folder of Section 1.2.
 
 ---
 
